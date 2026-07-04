@@ -260,6 +260,27 @@
   .bar-track { flex: 1; height: 26px; background: var(--card); border-radius: 8px; overflow: hidden; }
   .bar-fill { height: 100%; border-radius: 8px; display: flex; align-items: center; padding-left: 9px; font-size: 12px; font-weight: 800; color: #06231e; min-width: 30px; }
   .bar-zero { font-size: 12px; font-weight: 700; color: var(--sub); padding-left: 9px; line-height: 26px; display: block; }
+  /* 과목별 종합 */
+  .subj-card { display: flex; align-items: center; gap: 12px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 13px 15px; margin-bottom: 9px; }
+  .subj-card .sd { width: 8px; align-self: stretch; min-height: 34px; border-radius: 4px; flex: none; }
+  .subj-card .si { flex: 1; min-width: 0; }
+  .subj-card .sn { font-size: 15.5px; font-weight: 800; }
+  .subj-card .sm { font-size: 13px; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .subj-card .sm .lesson { color: var(--indigo); font-weight: 700; }
+  .subj-card .sm .prac { color: var(--teal); font-weight: 700; }
+  .subj-card .sm .sep { color: var(--faint); margin: 0 5px; }
+  :root { --faint: #6b7688; }
+  /* 도넛 */
+  .donut-wrap { display: flex; align-items: center; gap: 20px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 18px; margin-bottom: 10px; }
+  .donut { width: 112px; height: 112px; border-radius: 50%; flex: none; display: grid; place-items: center; }
+  .donut .dh { width: 66px; height: 66px; border-radius: 50%; background: var(--card); display: grid; place-items: center; text-align: center; }
+  .donut .dh b { font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .donut .dh span { font-size: 10px; color: var(--sub); display: block; }
+  .donut-leg { flex: 1; display: flex; flex-direction: column; gap: 7px; }
+  .donut-leg .lg { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+  .donut-leg .lg .dot { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+  .donut-leg .lg .nm { flex: 1; font-weight: 600; }
+  .donut-leg .lg .vl { color: var(--sub); font-variant-numeric: tabular-nums; }
   .fam-row { display: flex; justify-content: space-between; gap: 10px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 11px 14px; font-size: 13.5px; margin-bottom: 8px; }
   .fam-row .fn { font-weight: 700; }
   .fam-row .fv { color: var(--sub); }
@@ -750,27 +771,38 @@
     } else {
       h += '<div class="stat-hero"><div class="sh-l">🗓 ' + tname + ' · 일정</div><div class="sh-big">' + d.monthCount + '건</div><div class="sh-sub">이 달에 기록된 일정</div></div>';
     }
-    if (d.bars && d.bars.length) {
-      var noQuota = d.bars.filter(function (b) { return !b.quota; });
-      var max = Math.max.apply(null, noQuota.map(function (b) { return b.count; }).concat([1]));
-      h += '<div class="sec-label">' + tname + ' · 종류별 횟수 (정원 대비)</div>';
-      d.bars.forEach(function (b, i) {
-        var col = ['#8b96f2', '#4fc0af', '#e3a94f', '#9aa4b2'][i % 4];
-        var label, w;
-        if (b.quota > 0) {
-          var full = b.count >= b.quota;
-          label = (b.total ? '누적 ' : '') + b.count + '/' + b.quota + '회' + (full ? ' ✓' : '');
-          w = Math.min(100, Math.round(b.count / b.quota * 100));
-          if (full) col = '#4cc27e';
-        } else {
-          label = b.count + '회';
-          w = Math.max(16, Math.round(b.count / max * 100));
-        }
-        var inner = (b.count > 0)
-          ? '<div class="bar-fill" style="width:' + Math.max(w, 18) + '%;background:' + col + '">' + label + '</div>'
-          : '<span class="bar-zero">' + label + '</span>';
-        h += '<div class="bar-row"><div class="bl">' + esc(b.name) + '</div><div class="bar-track">' + inner + '</div></div>';
+    // Ⓑ 과목별 종합 — 레슨(캘린더) + 연습(타이머)
+    if (d.subjects && d.subjects.length) {
+      h += '<div class="sec-label">과목별 — 레슨 · 연습</div>';
+      d.subjects.forEach(function (s) {
+        var col = KIND_COLS[KINDS.indexOf(s.name)] || '#9aa4b2';
+        var lFull = s.quota > 0 && s.lessonCount >= s.quota;
+        var lTxt = '레슨 ' + s.lessonCount + (s.quota ? '/' + s.quota : '') + '회' + (lFull ? ' ✓' : '');
+        var pTxt = s.practiceMin > 0 ? '연습 ' + durLabel(s.practiceMin) : '연습 없음';
+        h += '<div class="subj-card"><span class="sd" style="background:' + col + '"></span>' +
+          '<div class="si"><div class="sn">' + esc(s.name) + '</div>' +
+          '<div class="sm"><span class="lesson">' + lTxt + '</span><span class="sep">·</span><span class="prac">' + pTxt + '</span></div></div></div>';
       });
+      // Ⓒ 연습 비중 도넛
+      var tot = d.subjects.reduce(function (a, s) { return a + s.practiceMin; }, 0);
+      if (tot > 0) {
+        var acc = 0, stops = [];
+        d.subjects.forEach(function (s) {
+          if (s.practiceMin <= 0) return;
+          var col = KIND_COLS[KINDS.indexOf(s.name)] || '#9aa4b2';
+          var from = acc / tot * 100, to = (acc + s.practiceMin) / tot * 100;
+          stops.push(col + ' ' + from.toFixed(1) + '% ' + to.toFixed(1) + '%');
+          acc += s.practiceMin;
+        });
+        var leg = d.subjects.filter(function (s) { return s.practiceMin > 0; }).map(function (s) {
+          var col = KIND_COLS[KINDS.indexOf(s.name)] || '#9aa4b2';
+          return '<div class="lg"><span class="dot" style="background:' + col + '"></span><span class="nm">' + esc(s.name) + '</span><span class="vl">' + durLabel(s.practiceMin) + ' · ' + Math.round(s.practiceMin / tot * 100) + '%</span></div>';
+        }).join('');
+        var totTxt = tot >= 60 ? Math.floor(tot / 60) + '시간' + (tot % 60 ? ' ' + (tot % 60) : '') : tot + '분';
+        h += '<div class="sec-label">연습 비중</div><div class="donut-wrap">' +
+          '<div class="donut" style="background:conic-gradient(' + stops.join(',') + ')"><div class="dh"><b>' + totTxt + '</b><span>총 연습</span></div></div>' +
+          '<div class="donut-leg">' + leg + '</div></div>';
+      }
     }
     if (d.grass) {
       var ym = d.label.match(/(\d{4})년 (\d{1,2})월/);
@@ -817,6 +849,29 @@
               : '<span class="bar-zero">0</span>') + '</div></div>';
         });
       }
+    }
+    // Ⓓ 굵직한 이벤트 통계 (운동·PT·학원·병원 등)
+    if (d.events && d.events.length) {
+      var evNoQ = d.events.filter(function (b) { return !b.quota; });
+      var evMax = Math.max.apply(null, evNoQ.map(function (b) { return b.count; }).concat([1]));
+      h += '<div class="sec-label">' + (d.target.practice ? '그 외 일정' : tname + ' · 일정') + ' (정원 대비)</div>';
+      d.events.forEach(function (b, i) {
+        var col = ['#e3a94f', '#8b96f2', '#4fc0af', '#9aa4b2'][i % 4];
+        var label, w;
+        if (b.quota > 0) {
+          var full = b.count >= b.quota;
+          label = (b.total ? '누적 ' : '') + b.count + '/' + b.quota + '회' + (full ? ' ✓' : '');
+          w = Math.min(100, Math.round(b.count / b.quota * 100));
+          if (full) col = '#4cc27e';
+        } else {
+          label = b.count + '회';
+          w = Math.max(16, Math.round(b.count / evMax * 100));
+        }
+        var inner = (b.count > 0)
+          ? '<div class="bar-fill" style="width:' + Math.max(w, 18) + '%;background:' + col + '">' + label + '</div>'
+          : '<span class="bar-zero">' + label + '</span>';
+        h += '<div class="bar-row"><div class="bl">' + esc(b.name) + '</div><div class="bar-track">' + inner + '</div></div>';
+      });
     }
     $('app').innerHTML = h;
     bindCalS();
