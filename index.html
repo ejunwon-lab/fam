@@ -286,7 +286,7 @@
   // 타이머
   var sess = null, selKind = '베이스', tick = null;
   // 통계
-  var statsOff = 0, statsData = null, statsLoading = false;
+  var statsOff = 0, statsData = null, statsLoading = false, statsTarget = '';
 
   function $(id) { return document.getElementById(id); }
   function esc(s) {
@@ -361,7 +361,7 @@
         var k = b.getAttribute('data-k');
         if (k === view) return;
         view = k;
-        if (k === 'stats') { statsOff = 0; statsData = null; loadStats(); }
+        if (k === 'stats') { statsOff = 0; statsTarget = ''; statsData = null; loadStats(); }
         else render();
       });
     })(btns[i]);
@@ -542,7 +542,7 @@
   // ── 통계 ──
   function loadStats() {
     statsLoading = true; renderStats();
-    fetch(API + '?api=stats&u=' + encodeURIComponent(BOOT.member.code) + '&off=' + statsOff)
+    fetch(API + '?api=stats&u=' + encodeURIComponent(BOOT.member.code) + '&off=' + statsOff + '&t=' + encodeURIComponent(statsTarget))
       .then(function (r) { return r.json(); })
       .then(function (d) { statsData = d; statsLoading = false; renderStats(); })
       .catch(function () { statsLoading = false; statsData = { error: '통계를 불러오지 못했어요.' }; renderStats(); });
@@ -554,11 +554,23 @@
     if (statsData.error) { $('app').innerHTML = head + '<div class="guide"><p>' + esc(statsData.error) + '</p></div>'; bindCalS(); return; }
     var d = statsData;
     var h = head + '<div class="month-nav"><button id="mPrev">‹</button><span class="m">' + esc(d.label) + '</span><button id="mNext"' + (d.offset >= 0 ? ' disabled' : '') + '>›</button></div>';
-    h += '<div class="stat-hero"><div class="sh-l">🎸 채영 · 연습</div><div class="sh-big">' + (d.practiceMin >= 60 ? Math.floor(d.practiceMin / 60) + '시간 ' + (d.practiceMin % 60) + '분' : d.practiceMin + '분') + '</div><div class="sh-sub">' + d.sessions + '세션' + (d.sessions ? ' · 평균 ' + d.avgMin + '분' : '') + '</div></div>';
+    if (d.targets && d.targets.length) {
+      h += '<div class="chips" style="justify-content:center;margin-bottom:14px">';
+      d.targets.forEach(function (m) {
+        h += '<button class="chip st-t' + (m.code === d.target.code ? ' on' : '') + '" data-c="' + esc(m.code) + '">' + esc(m.name) + '</button>';
+      });
+      h += '</div>';
+    }
+    var tname = esc(d.target.name);
+    if (d.target.practice) {
+      h += '<div class="stat-hero"><div class="sh-l">🎸 ' + tname + ' · 연습</div><div class="sh-big">' + (d.practiceMin >= 60 ? Math.floor(d.practiceMin / 60) + '시간 ' + (d.practiceMin % 60) + '분' : d.practiceMin + '분') + '</div><div class="sh-sub">' + d.sessions + '세션' + (d.sessions ? ' · 평균 ' + d.avgMin + '분' : '') + '</div></div>';
+    } else {
+      h += '<div class="stat-hero"><div class="sh-l">🗓 ' + tname + ' · 일정</div><div class="sh-big">' + d.monthCount + '건</div><div class="sh-sub">이 달에 기록된 일정</div></div>';
+    }
     if (d.bars && d.bars.length) {
       var noQuota = d.bars.filter(function (b) { return !b.quota; });
       var max = Math.max.apply(null, noQuota.map(function (b) { return b.count; }).concat([1]));
-      h += '<div class="sec-label">채영 · 종류별 횟수 (수강권 대비)</div>';
+      h += '<div class="sec-label">' + tname + ' · 종류별 횟수 (정원 대비)</div>';
       d.bars.forEach(function (b, i) {
         var col = ['#8b96f2', '#4fc0af', '#e3a94f', '#9aa4b2'][i % 4];
         var label, w;
@@ -577,12 +589,15 @@
         h += '<div class="bar-row"><div class="bl">' + esc(b.name) + '</div><div class="bar-track">' + inner + '</div></div>';
       });
     }
-    if (d.fam && d.fam.length) {
-      h += '<div class="sec-label">가족 일정</div>';
-      d.fam.forEach(function (f) { h += '<div class="fam-row"><span class="fn">' + esc(f.name) + '</span><span class="fv">' + esc(f.summary) + '</span></div>'; });
-    }
     $('app').innerHTML = h;
     bindCalS();
+    var tchips = $('app').querySelectorAll('.st-t');
+    for (var i = 0; i < tchips.length; i++) (function (c) {
+      c.addEventListener('click', function () {
+        statsTarget = c.getAttribute('data-c');
+        statsData = null; loadStats();
+      });
+    })(tchips[i]);
     $('mPrev').addEventListener('click', function () { statsOff -= 1; statsData = null; loadStats(); });
     var mn = $('mNext'); if (mn && d.offset < 0) mn.addEventListener('click', function () { statsOff += 1; statsData = null; loadStats(); });
   }
