@@ -709,8 +709,8 @@
     var pMin = sm.practiceMin || 0, sets = sm.sets || 0, kind = sm.kind || '베이스';
     $('summary').innerHTML =
       '<div class="done-ic">🎉</div><h2>오늘 연습 끝!</h2><p class="ssub">실연습 ' + human(pMin * 60000) + ' · 잘했어요</p>' +
-      '<div class="evt-card"><div class="cal-row">📅 가족 캘린더에 등록됐어요</div><div class="etitle">' + esc(kind) + ' 연습 (' + esc(BOOT.member.name) + ')</div>' +
-      '<div class="edesc">실연습 <b>' + human(pMin * 60000) + '</b> · ' + sets + '세트 · 연습/휴식 구간이 각각 기록됐어요</div></div>' +
+      '<div class="evt-card"><div class="cal-row">🎸 연습 기록 저장됐어요</div><div class="etitle">' + esc(kind) + ' 연습 · ' + human(pMin * 60000) + '</div>' +
+      '<div class="edesc">' + sets + '세트 · 통계 탭에서 오늘 잔디와 시간을 볼 수 있어요</div></div>' +
       '<button class="close" id="sClose">확인</button>';
     document.body.classList.add('summary-on');
     $('sClose').addEventListener('click', function () { document.body.classList.remove('summary-on'); view = BOOT.member.practice ? 'timer' : 'home'; render(); });
