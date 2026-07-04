@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>가족 일정</title>
+<meta name="theme-color" content="#171a20">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #171a20; --ink: #e8ebf0; --sub: #98a2b1;
+    --card: #21252d; --line: #2e343e;
+    --etc-bg: #262b33; --etc-ink: #b6bec9;
+    --indigo: #8b96f2; --indigo-soft: #262b45;
+    --teal: #4fc0af; --teal-soft: #1c3330;
+    --amber: #e3a94f; --amber-soft: #38301e;
+    --success: #4cc27e; --danger: #e07070;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: "Apple SD Gothic Neo", system-ui, -apple-system, "Segoe UI", sans-serif;
+    line-height: 1.5;
+  }
+  .screen { max-width: 480px; margin: 0 auto; padding: 14px 18px 40px; }
+
+  .appbar { display: flex; justify-content: space-between; align-items: baseline; padding: 8px 2px 14px; }
+  .appbar .t { font-size: 21px; font-weight: 800; }
+  .appbar .who {
+    font-size: 13px; font-weight: 700; color: var(--indigo);
+    background: var(--indigo-soft); border: none; font-family: inherit;
+    border-radius: 99px; padding: 4px 12px; cursor: pointer;
+  }
+  .sec-label { font-size: 12px; font-weight: 700; letter-spacing: .08em; color: var(--sub); margin: 14px 2px 8px; }
+
+  .presets { display: flex; flex-direction: column; gap: 10px; }
+  .preset {
+    display: flex; align-items: center; gap: 14px; width: 100%; text-align: left;
+    background: var(--card); border: 1px solid var(--line); border-radius: 18px;
+    padding: 16px; font: inherit; color: inherit; cursor: pointer;
+    transition: transform .08s ease;
+  }
+  .preset:active { transform: scale(.98); }
+  .preset:focus-visible, .chip:focus-visible, .cta:focus-visible, .etc:focus-visible, .pick:focus-visible {
+    outline: 2px solid var(--indigo); outline-offset: 2px;
+  }
+  .preset .dot {
+    width: 44px; height: 44px; border-radius: 14px; flex: none;
+    display: grid; place-items: center; font-size: 19px; font-weight: 800;
+  }
+  .preset[data-hue="indigo"] .dot { background: var(--indigo-soft); color: var(--indigo); }
+  .preset[data-hue="teal"]   .dot { background: var(--teal-soft);   color: var(--teal); }
+  .preset[data-hue="amber"]  .dot { background: var(--amber-soft);  color: var(--amber); }
+  .preset .name { font-size: 17.5px; font-weight: 700; flex: 1; }
+  .preset .cnt { font-size: 12.5px; color: var(--sub); font-variant-numeric: tabular-nums; }
+
+  .etc {
+    width: 100%; margin-top: 10px; background: var(--etc-bg);
+    border: 1.5px dashed var(--line); border-radius: 18px; padding: 14px;
+    font: inherit; font-size: 15.5px; font-weight: 600; color: var(--etc-ink); cursor: pointer;
+  }
+
+  .recent { display: flex; flex-direction: column; gap: 8px; }
+  .recent .row {
+    display: flex; justify-content: space-between; gap: 10px;
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 13px; padding: 10px 14px; font-size: 13.5px;
+  }
+  .recent .r-t { font-weight: 600; }
+  .recent .r-d { color: var(--sub); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .empty { color: var(--sub); font-size: 13.5px; padding: 6px 2px; }
+
+  .backdrop {
+    position: fixed; inset: 0; background: rgba(10, 14, 20, .45);
+    opacity: 0; pointer-events: none; transition: opacity .2s ease; z-index: 5;
+  }
+  body.open .backdrop { opacity: 1; pointer-events: auto; }
+  .sheet {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 6;
+    max-width: 480px; margin: 0 auto;
+    background: var(--card); border-radius: 26px 26px 0 0;
+    padding: 10px 20px calc(26px + env(safe-area-inset-bottom));
+    transform: translateY(105%); transition: transform .24s ease;
+    box-shadow: 0 -8px 30px rgba(10, 14, 20, .18);
+  }
+  body.open .sheet { transform: translateY(0); }
+  .grip { width: 40px; height: 4px; border-radius: 2px; background: var(--line); margin: 2px auto 12px; }
+  .sheet h2 { margin: 0 0 2px; font-size: 20px; }
+  .sheet .sub { font-size: 13px; color: var(--sub); margin: 0 0 14px; }
+  .sheet input[type="text"] {
+    width: 100%; font: inherit; font-size: 17px; font-weight: 700;
+    border: none; border-bottom: 2px solid var(--indigo);
+    background: none; color: inherit; padding: 4px 2px 6px; margin-bottom: 12px;
+  }
+  .sheet input[type="text"]:focus { outline: none; }
+  .f-label { font-size: 12px; font-weight: 700; color: var(--sub); margin: 12px 0 6px; }
+  .dt-row { display: flex; gap: 8px; }
+  .dt-row input {
+    flex: 1; font: inherit; font-size: 15.5px; font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    background: var(--bg); color: inherit;
+    border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; min-width: 0;
+  }
+  .chips { display: flex; gap: 7px; flex-wrap: wrap; }
+  .chip {
+    font: inherit; font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums;
+    border: 1px solid var(--line); border-radius: 99px;
+    background: var(--bg); color: var(--sub); padding: 8px 15px; cursor: pointer;
+  }
+  .chip.on { background: var(--indigo); border-color: var(--indigo); color: #14171c; }
+  .endline { margin-top: 12px; font-size: 14px; color: var(--sub); font-variant-numeric: tabular-nums; }
+  .endline b { color: var(--ink); }
+  .cta {
+    width: 100%; margin-top: 16px; background: var(--indigo); color: #14171c;
+    border: none; border-radius: 16px; font: inherit; font-size: 17px; font-weight: 800;
+    padding: 16px; cursor: pointer;
+  }
+  .cta:disabled { opacity: .6; }
+  .cta:active { filter: brightness(.92); }
+
+  .toast {
+    position: fixed; left: 18px; right: 18px; top: 16px; z-index: 9;
+    max-width: 444px; margin: 0 auto;
+    background: var(--success); color: #14171c; border-radius: 14px; padding: 13px 16px;
+    font-size: 14.5px; font-weight: 700;
+    opacity: 0; transform: translateY(-12px);
+    transition: opacity .2s ease, transform .2s ease; pointer-events: none;
+    box-shadow: 0 8px 24px rgba(10, 14, 20, .25);
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast.err { background: var(--danger); }
+
+  .guide { margin-top: 24px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px; }
+  .guide h2 { margin: 0 0 8px; font-size: 18px; }
+  .guide p { margin: 0 0 6px; font-size: 14.5px; color: var(--sub); }
+  .guide .retry {
+    margin-top: 10px; background: var(--indigo); color: #14171c;
+    border: none; border-radius: 12px; font: inherit; font-size: 15px; font-weight: 700;
+    padding: 11px 20px; cursor: pointer;
+  }
+
+  .picker { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+  .pick {
+    background: var(--card); border: 1px solid var(--line); border-radius: 18px;
+    padding: 18px; font: inherit; font-size: 18px; font-weight: 700; color: var(--ink);
+    cursor: pointer; text-align: center;
+  }
+  .pick:active { transform: scale(.98); }
+
+  .loading { text-align: center; color: var(--sub); padding: 80px 0; font-size: 15px; }
+  .spin {
+    width: 28px; height: 28px; margin: 0 auto 14px;
+    border: 3px solid var(--line); border-top-color: var(--indigo);
+    border-radius: 50%; animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .kakao {
+    margin: 4px 0 14px; background: var(--amber-soft); border: 1px solid var(--amber);
+    border-radius: 16px; padding: 16px;
+  }
+  .kakao h2 { margin: 0 0 6px; font-size: 16.5px; color: var(--amber); }
+  .kakao p { margin: 0 0 10px; font-size: 13.5px; color: var(--ink); }
+  .kakao .go {
+    width: 100%; background: var(--amber); color: #1c1508;
+    border: none; border-radius: 12px; font: inherit; font-size: 15.5px; font-weight: 800;
+    padding: 13px; cursor: pointer;
+  }
+
+  .install {
+    margin-top: 18px; position: relative;
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 14px; padding: 14px 38px 14px 16px;
+  }
+  .install .i-t { font-size: 13.5px; font-weight: 700; margin-bottom: 4px; }
+  .install p { margin: 0; font-size: 12.5px; color: var(--sub); }
+  .install .x {
+    position: absolute; top: 8px; right: 8px;
+    background: none; border: none; color: var(--sub);
+    font-size: 16px; padding: 4px 8px; cursor: pointer;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sheet, .backdrop, .toast, .preset, .spin { transition: none; animation: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="screen" id="app">
+    <div class="loading"><div class="spin"></div>불러오는 중…</div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <div class="backdrop" id="backdrop"></div>
+
+  <div class="sheet" id="sheet">
+    <div class="grip"></div>
+    <h2 id="shTitle"></h2>
+    <p class="sub" id="shSub"></p>
+    <input type="text" id="shCustom" placeholder="일정 이름 입력" style="display:none">
+    <div class="f-label">날짜 · 시작</div>
+    <div class="dt-row">
+      <input type="date" id="shDate">
+      <input type="time" id="shTime">
+    </div>
+    <div class="f-label">얼마나 하나요?</div>
+    <div class="chips" id="durChips"></div>
+    <div class="dt-row" id="endRow" style="display:none; margin-top:8px">
+      <input type="time" id="shEnd" aria-label="끝나는 시간">
+    </div>
+    <div class="endline" id="endline"></div>
+    <button class="cta" id="ctaBtn">가족 캘린더에 등록</button>
+  </div>
+
+<script>
+  var API = 'https://script.google.com/macros/s/AKfycbxCMHMAE-br_i_MuSG7kQx-Jk6RZW-bqSQVBEorqXo0_EIa0BmujdHZJCNb_n0sSvU4lA/exec';
+  var HUES = ['indigo', 'teal', 'amber'];
+  var DURS = [30, 60, 90, 120];
+
+  var BOOT = null;
+  var cur = null, curDur = 60, customEnd = false, sending = false;
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function store(k, v) { try { if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} }
+  function read(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+
+  function myCode() {
+    var q = new URLSearchParams(location.search).get('u');
+    if (q) { store('famcode', q); return q; }
+    return read('famcode') || '';
+  }
+
+  function init() {
+    $('app').innerHTML = '<div class="loading"><div class="spin"></div>불러오는 중…</div>';
+    fetch(API + '?api=init&u=' + encodeURIComponent(myCode()))
+      .then(function (r) { return r.json(); })
+      .then(function (data) { BOOT = data; render(); })
+      .catch(function () {
+        $('app').innerHTML =
+          '<div class="guide"><h2>연결이 안 돼요</h2>' +
+          '<p>인터넷 연결을 확인하고 다시 시도해주세요.</p>' +
+          '<button class="retry" id="retryBtn">다시 시도</button></div>';
+        $('retryBtn').addEventListener('click', init);
+      });
+  }
+
+  function render() {
+    var app = $('app');
+    if (BOOT.error) {
+      app.innerHTML = '<div class="guide"><h2>준비가 안 됐어요</h2><p>' + esc(BOOT.error) + '</p>' +
+        '<button class="retry" id="retryBtn">다시 시도</button></div>';
+      $('retryBtn').addEventListener('click', init);
+      return;
+    }
+    if (!BOOT.member) {
+      var ph = '<div class="appbar"><span class="t">누구세요?</span></div>' +
+        '<div class="sec-label">이름을 누르면 이 폰에 기억돼요</div><div class="picker">';
+      (BOOT.members || []).forEach(function (m) {
+        ph += '<button class="pick" data-code="' + esc(m.code) + '">' + esc(m.name) + '</button>';
+      });
+      ph += '</div>';
+      app.innerHTML = ph;
+      var picks = app.querySelectorAll('.pick');
+      for (var i = 0; i < picks.length; i++) {
+        (function (b) {
+          b.addEventListener('click', function () {
+            store('famcode', b.getAttribute('data-code'));
+            init();
+          });
+        })(picks[i]);
+      }
+      return;
+    }
+
+    var isKakao = /KAKAOTALK/i.test(navigator.userAgent);
+    var h = '';
+    if (isKakao) {
+      h += '<div class="kakao"><h2>카카오톡 안에서는 설치가 안 돼요</h2>' +
+        '<p>아래 버튼으로 브라우저에서 연 다음, 홈 화면에 추가해주세요.<br>' +
+        'iPhone: 사파리 공유버튼 → <b>홈 화면에 추가</b> · Android: 크롬 메뉴 ⋮ → <b>홈 화면에 추가</b></p>' +
+        '<button class="go" id="kakaoGo">브라우저로 열기</button></div>';
+    }
+    h +=
+      '<div class="appbar"><span class="t">일정 올리기</span>' +
+      '<button class="who" id="whoBtn" title="이름 바꾸기">' + esc(BOOT.member.name) + '</button></div>' +
+      '<div class="sec-label">탭 한 번으로 등록</div><div class="presets">';
+    BOOT.presets.forEach(function (p, i) {
+      h += '<button class="preset" data-hue="' + HUES[i % HUES.length] + '" data-i="' + i + '">' +
+        '<span class="dot">' + esc(p.name.charAt(0)) + '</span>' +
+        '<span class="name">' + esc(p.name) + '</span>' +
+        '<span class="cnt">이달 ' + p.cnt + '회</span></button>';
+    });
+    h += '</div><button class="etc" id="etcBtn">기타 일정 (직접 입력)</button>' +
+      '<div class="sec-label">최근 기록</div><div class="recent">';
+    if (BOOT.recent.length) {
+      BOOT.recent.forEach(function (r) {
+        h += '<div class="row"><span class="r-t">' + esc(r.t) + '</span><span class="r-d">' + esc(r.d) + '</span></div>';
+      });
+    } else {
+      h += '<div class="empty">아직 기록이 없어요. 첫 일정을 올려보세요!</div>';
+    }
+    h += '</div>';
+    var standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    if (!isKakao && !standalone && read('installHintOff') !== '1') {
+      h += '<div class="install" id="installHint">' +
+        '<button class="x" id="installX" aria-label="닫기">✕</button>' +
+        '<div class="i-t">홈 화면에 추가하면 앱처럼 열려요</div>' +
+        '<p>iPhone: 사파리 공유버튼(네모+화살표) → 홈 화면에 추가<br>Android: 크롬 메뉴 ⋮ → 홈 화면에 추가</p></div>';
+    }
+    app.innerHTML = h;
+
+    if (isKakao) {
+      $('kakaoGo').addEventListener('click', function () {
+        location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(location.origin + location.pathname);
+      });
+    }
+    if ($('installX')) {
+      $('installX').addEventListener('click', function () {
+        store('installHintOff', '1');
+        $('installHint').style.display = 'none';
+      });
+    }
+    $('whoBtn').addEventListener('click', function () {
+      if (confirm('이름을 다시 고를까요?')) { store('famcode', null); init(); }
+    });
+    var btns = app.querySelectorAll('.preset');
+    for (var i = 0; i < btns.length; i++) {
+      (function (b) {
+        b.addEventListener('click', function () { openSheet(BOOT.presets[+b.getAttribute('data-i')]); });
+      })(btns[i]);
+    }
+    $('etcBtn').addEventListener('click', function () { openSheet(null); });
+  }
+
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function todayStr() {
+    var d = new Date();
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  }
+  function nowRounded() {
+    var d = new Date();
+    d.setMinutes(Math.ceil(d.getMinutes() / 10) * 10, 0, 0);
+    return pad(d.getHours()) + ':' + pad(d.getMinutes());
+  }
+  function durLabel(m) {
+    if (m < 60) return m + '분';
+    var h = Math.floor(m / 60), r = m % 60;
+    return h + '시간' + (r ? ' ' + r + '분' : '');
+  }
+  function addMin(t, m) {
+    var hm = t.split(':');
+    var d = new Date(2026, 0, 1, +hm[0], +hm[1] + m);
+    return pad(d.getHours()) + ':' + pad(d.getMinutes());
+  }
+  function diffMin(a, b) {
+    var x = a.split(':'), y = b.split(':');
+    return (+y[0] * 60 + +y[1]) - (+x[0] * 60 + +x[1]);
+  }
+
+  function openSheet(preset) {
+    cur = preset;
+    var custom = !preset;
+    $('shTitle').textContent = custom ? '기타 일정' : preset.name;
+    $('shSub').textContent = custom ? '이름을 적고 시간을 확인하세요' : '시간만 확인하고 등록을 누르세요';
+    $('shCustom').style.display = custom ? 'block' : 'none';
+    $('shCustom').value = '';
+    $('shDate').value = todayStr();
+    $('shTime').value = (preset && preset.defStart) || nowRounded();
+    curDur = (preset && preset.defDur) || 60;
+    customEnd = false;
+    $('endRow').style.display = 'none';
+    renderChips(); updateEnd();
+    document.body.classList.add('open');
+    if (custom) setTimeout(function () { $('shCustom').focus(); }, 250);
+  }
+  function closeSheet() { document.body.classList.remove('open'); }
+
+  function renderChips() {
+    var list = DURS.indexOf(curDur) >= 0 || customEnd ? DURS : DURS.concat([curDur]).sort(function (a, b) { return a - b; });
+    var h = '';
+    list.forEach(function (m) {
+      h += '<button class="chip' + (!customEnd && m === curDur ? ' on' : '') + '" data-m="' + m + '">' + durLabel(m) + '</button>';
+    });
+    h += '<button class="chip' + (customEnd ? ' on' : '') + '" data-m="custom">직접…</button>';
+    $('durChips').innerHTML = h;
+    var chips = document.querySelectorAll('.chip');
+    for (var i = 0; i < chips.length; i++) {
+      (function (c) {
+        c.addEventListener('click', function () {
+          var m = c.getAttribute('data-m');
+          if (m === 'custom') {
+            customEnd = true;
+            $('endRow').style.display = 'flex';
+            $('shEnd').value = addMin($('shTime').value || '12:00', curDur);
+            renderChips(); updateEnd();
+            $('shEnd').focus();
+          } else {
+            customEnd = false;
+            $('endRow').style.display = 'none';
+            curDur = +m;
+            renderChips(); updateEnd();
+          }
+        });
+      })(chips[i]);
+    }
+  }
+  function updateEnd() {
+    var t = $('shTime').value || '12:00';
+    if (customEnd) {
+      var e = $('shEnd').value;
+      var m = e ? diffMin(t, e) : 0;
+      if (m > 0) {
+        curDur = m;
+        $('endline').innerHTML = '끝나는 시간 <b>' + e + '</b> · ' + durLabel(m);
+      } else {
+        $('endline').innerHTML = '<b style="color:var(--danger)">끝나는 시간을 시작보다 뒤로 정해주세요</b>';
+      }
+      return;
+    }
+    $('endline').innerHTML = '끝나는 시간 <b>' + addMin(t, curDur) + '</b> · ' + durLabel(curDur);
+  }
+
+  function showToast(msg, isErr) {
+    var toast = $('toast');
+    toast.textContent = msg;
+    toast.className = 'toast show' + (isErr ? ' err' : '');
+    setTimeout(function () { toast.className = 'toast' + (isErr ? ' err' : ''); }, 2800);
+  }
+
+  $('shTime').addEventListener('input', updateEnd);
+  $('shEnd').addEventListener('input', updateEnd);
+  $('backdrop').addEventListener('click', closeSheet);
+
+  $('ctaBtn').addEventListener('click', function () {
+    if (sending) return;
+    var title = cur ? cur.name : $('shCustom').value.trim();
+    if (!title) { $('shCustom').focus(); return; }
+    var d = $('shDate').value.split('-');
+    var t = $('shTime').value.split(':');
+    if (d.length !== 3 || t.length !== 2) { showToast('날짜와 시간을 확인해주세요', true); return; }
+    if (customEnd && (!$('shEnd').value || diffMin($('shTime').value, $('shEnd').value) <= 0)) {
+      showToast('끝나는 시간을 시작보다 뒤로 정해주세요', true); return;
+    }
+    sending = true;
+    var btn = $('ctaBtn');
+    btn.disabled = true; btn.textContent = '등록 중…';
+    var payload = {
+      action: 'register', u: BOOT.member.code, title: title, durationMin: curDur,
+      y: +d[0], mo: +d[1], d: +d[2], h: +t[0], mi: +t[1], memo: ''
+    };
+    var startLabel = $('shTime').value;
+    fetch(API, { method: 'POST', body: JSON.stringify(payload) })
+      .then(function (r) { return r.json(); })
+      .then(function (res) {
+        sending = false; btn.disabled = false; btn.textContent = '가족 캘린더에 등록';
+        if (res && res.error) { showToast(res.error, true); return; }
+        BOOT = res;
+        render(); closeSheet();
+        showToast('등록 완료 — ' + title + ' ' + startLabel + ', 가족 캘린더에 올라갔어요');
+      })
+      .catch(function () {
+        sending = false; btn.disabled = false; btn.textContent = '가족 캘린더에 등록';
+        showToast('등록에 실패했어요. 인터넷 연결을 확인하고 다시 시도해주세요.', true);
+      });
+  });
+
+  init(); updateEnd();
+</script>
+</body>
+</html>

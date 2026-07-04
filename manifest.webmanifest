@@ -1,0 +1,14 @@
+{
+  "name": "가족 일정",
+  "short_name": "가족일정",
+  "description": "가족 일정을 3탭으로 등록하고 공유 캘린더로 확인",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#171a20",
+  "theme_color": "#171a20",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
