@@ -320,7 +320,7 @@
     if (code) { try { cached = JSON.parse(read(bootKey(code)) || 'null'); } catch (e) {} }
     if (cached && cached.member) {
       BOOT = cached;
-      view = sess ? 'timer' : (view === 'stats' ? 'stats' : 'home');
+      view = sess ? 'timer' : (cached.member.practice ? 'timer' : 'home');
       render();
     } else {
       $('app').innerHTML = '<div class="loading"><div class="spin"></div>불러오는 중…</div>';
@@ -330,7 +330,7 @@
       .then(function (data) {
         BOOT = data;
         saveBoot(data);
-        if (!cached) view = sess ? 'timer' : 'home';
+        if (!cached) view = (sess || (data.member && data.member.practice)) ? 'timer' : 'home';
         // 사용자가 시트·요약을 보는 중이면 화면은 두고 데이터만 갱신
         if (!document.body.classList.contains('open') && !document.body.classList.contains('summary-on') && view !== 'stats') {
           render();
@@ -348,8 +348,9 @@
   function renderTabs() {
     var bar = $('tabbar');
     if (!BOOT || BOOT.error || !BOOT.member) { bar.style.display = 'none'; return; }
-    var tabs = [{ k: 'home', i: '📝', l: '기록' }];
+    var tabs = [];
     if (BOOT.member.practice) tabs.push({ k: 'timer', i: '🎸', l: '연습' });
+    tabs.push({ k: 'home', i: '📝', l: '기록' });
     tabs.push({ k: 'stats', i: '📊', l: '통계' });
     bar.style.display = 'flex';
     bar.innerHTML = tabs.map(function (t) {
@@ -481,7 +482,7 @@
     var clabel = stt === 'break' ? '휴식 시간' : '연습 시간';
     var chips = '';
     if (stt === 'idle') {
-      chips = '<div class="kind-chips">' + ['베이스', '화성학', '기타'].map(function (k) { return '<button class="kchip' + (k === selKind ? ' on' : '') + '" data-k="' + k + '">' + k + '</button>'; }).join('') + '</div>';
+      chips = '<div class="kind-chips">' + ['베이스', '화성학', '멘토링'].map(function (k) { return '<button class="kchip' + (k === selKind ? ' on' : '') + '" data-k="' + k + '">' + k + '</button>'; }).join('') + '</div>';
     }
     var btns;
     if (stt === 'idle') btns = '<button class="tbtn start" id="bStart">▶ 연습 시작</button>';
