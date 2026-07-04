@@ -28,13 +28,37 @@
   }
   .screen { max-width: 480px; margin: 0 auto; padding: 14px 18px 40px; }
 
-  .appbar { display: flex; justify-content: space-between; align-items: baseline; padding: 8px 2px 14px; }
+  .appbar { display: flex; justify-content: space-between; align-items: center; padding: 8px 2px 14px; }
   .appbar .t { font-size: 21px; font-weight: 800; }
+  .appbar .right { display: flex; align-items: center; gap: 8px; }
   .appbar .who {
     font-size: 13px; font-weight: 700; color: var(--indigo);
     background: var(--indigo-soft); border: none; font-family: inherit;
-    border-radius: 99px; padding: 4px 12px; cursor: pointer;
+    border-radius: 99px; padding: 6px 12px; cursor: pointer;
   }
+  .cal {
+    width: 32px; height: 32px; border-radius: 11px; padding: 0;
+    background: var(--card); border: 1px solid var(--line);
+    font-size: 15px; cursor: pointer; display: grid; place-items: center;
+  }
+  .others { margin-top: 18px; }
+  .others-toggle {
+    width: 100%; display: flex; align-items: center; justify-content: space-between;
+    background: none; border: none; font: inherit; color: var(--sub);
+    font-size: 13.5px; font-weight: 700; padding: 8px 2px; cursor: pointer;
+  }
+  .others-toggle .arr { transition: transform .15s ease; }
+  .others.on .others-toggle .arr { transform: rotate(90deg); }
+  .others-body { display: none; }
+  .others.on .others-body { display: block; }
+  .o-group { margin: 8px 0 4px; font-size: 12px; font-weight: 700; color: var(--sub); }
+  .o-preset {
+    display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    padding: 11px 14px; font: inherit; color: inherit; cursor: pointer; margin-bottom: 7px;
+  }
+  .o-preset .o-name { font-size: 15px; font-weight: 600; flex: 1; }
+  .o-preset .o-tag { font-size: 11.5px; color: var(--sub); }
   .sec-label { font-size: 12px; font-weight: 700; letter-spacing: .08em; color: var(--sub); margin: 14px 2px 8px; }
 
   .presets { display: flex; flex-direction: column; gap: 10px; }
@@ -222,7 +246,7 @@
   var DURS = [30, 60, 90, 120];
 
   var BOOT = null;
-  var cur = null, curDur = 60, customEnd = false, sending = false;
+  var cur = null, curDur = 60, customEnd = false, sending = false, othersOpen = false;
 
   function $(id) { return document.getElementById(id); }
   function esc(s) {
@@ -290,8 +314,9 @@
         '<button class="go" id="kakaoGo">브라우저로 열기</button></div>';
     }
     h +=
-      '<div class="appbar"><span class="t">일정 올리기</span>' +
-      '<button class="who" id="whoBtn" title="이름 바꾸기">' + esc(BOOT.member.name) + '</button></div>' +
+      '<div class="appbar"><span class="t">일정 올리기</span><div class="right">' +
+      '<button class="cal" id="calBtn" title="가족 캘린더 열기" aria-label="가족 캘린더 열기">📅</button>' +
+      '<button class="who" id="whoBtn" title="이름 바꾸기">' + esc(BOOT.member.name) + '</button></div></div>' +
       '<div class="sec-label">탭 한 번으로 등록</div><div class="presets">';
     BOOT.presets.forEach(function (p, i) {
       h += '<button class="preset" data-hue="' + HUES[i % HUES.length] + '" data-i="' + i + '">' +
@@ -299,8 +324,27 @@
         '<span class="name">' + esc(p.name) + '</span>' +
         '<span class="cnt">이달 ' + p.cnt + '회</span></button>';
     });
-    h += '</div><button class="etc" id="etcBtn">기타 일정 (직접 입력)</button>' +
-      '<div class="sec-label">최근 기록</div><div class="recent">';
+    h += '</div><button class="etc" id="etcBtn">기타 일정 (직접 입력)</button>';
+    var others = BOOT.others || [];
+    if (others.length) {
+      var groups = {};
+      others.forEach(function (o, i) { (groups[o.whoName] = groups[o.whoName] || []).push(i); });
+      h += '<div class="others' + (othersOpen ? ' on' : '') + '" id="others">' +
+        '<button class="others-toggle" id="othersToggle">' +
+        '<span>가족 일정 대신 올리기 (' + others.length + ')</span><span class="arr">▸</span></button>' +
+        '<div class="others-body">';
+      Object.keys(groups).forEach(function (wn) {
+        h += '<div class="o-group">' + esc(wn) + '</div>';
+        groups[wn].forEach(function (i) {
+          var o = others[i];
+          h += '<button class="o-preset" data-oi="' + i + '">' +
+            '<span class="o-name">' + esc(o.name) + '</span>' +
+            '<span class="o-tag">' + esc(o.whoName) + ' 일정으로 등록</span></button>';
+        });
+      });
+      h += '</div></div>';
+    }
+    h += '<div class="sec-label">최근 기록</div><div class="recent">';
     if (BOOT.recent.length) {
       BOOT.recent.forEach(function (r) {
         h += '<div class="row"><span class="r-t">' + esc(r.t) + '</span><span class="r-d">' + esc(r.d) + '</span></div>';
@@ -332,13 +376,36 @@
     $('whoBtn').addEventListener('click', function () {
       if (confirm('이름을 다시 고를까요?')) { store('famcode', null); init(); }
     });
+    $('calBtn').addEventListener('click', openCalendar);
     var btns = app.querySelectorAll('.preset');
     for (var i = 0; i < btns.length; i++) {
       (function (b) {
         b.addEventListener('click', function () { openSheet(BOOT.presets[+b.getAttribute('data-i')]); });
       })(btns[i]);
     }
+    var obtns = app.querySelectorAll('.o-preset');
+    for (var j = 0; j < obtns.length; j++) {
+      (function (b) {
+        b.addEventListener('click', function () { openSheet(BOOT.others[+b.getAttribute('data-oi')]); });
+      })(obtns[j]);
+    }
+    var ot = $('othersToggle');
+    if (ot) ot.addEventListener('click', function () {
+      othersOpen = !othersOpen;
+      $('others').classList.toggle('on', othersOpen);
+    });
     $('etcBtn').addEventListener('click', function () { openSheet(null); });
+  }
+
+  /** 구글 캘린더 앱 열기 시도 → 1.2초 내 전환 안 되면 웹 캘린더로 */
+  function openCalendar() {
+    var t = setTimeout(function () { location.href = 'https://calendar.google.com/'; }, 1200);
+    var clear = function () { clearTimeout(t); };
+    window.addEventListener('pagehide', clear, { once: true });
+    document.addEventListener('visibilitychange', function v() {
+      if (document.hidden) { clear(); document.removeEventListener('visibilitychange', v); }
+    });
+    location.href = 'googlecalendar://';
   }
 
   function pad(n) { return (n < 10 ? '0' : '') + n; }
@@ -370,7 +437,8 @@
     cur = preset;
     var custom = !preset;
     $('shTitle').textContent = custom ? '기타 일정' : preset.name;
-    $('shSub').textContent = custom ? '이름을 적고 시간을 확인하세요' : '시간만 확인하고 등록을 누르세요';
+    $('shSub').textContent = custom ? '이름을 적고 시간을 확인하세요'
+      : (preset.whoName ? preset.whoName + ' 일정으로 등록돼요' : '시간만 확인하고 등록을 누르세요');
     $('shCustom').style.display = custom ? 'block' : 'none';
     $('shCustom').value = '';
     $('shDate').value = todayStr();
@@ -454,9 +522,11 @@
     var btn = $('ctaBtn');
     btn.disabled = true; btn.textContent = '등록 중…';
     var payload = {
-      action: 'register', u: BOOT.member.code, title: title, durationMin: curDur,
+      action: 'register', u: BOOT.member.code, who: (cur && cur.who) || BOOT.member.code,
+      title: title, durationMin: curDur,
       y: +d[0], mo: +d[1], d: +d[2], h: +t[0], mi: +t[1], memo: ''
     };
+    var subjectName = (cur && cur.whoName) || BOOT.member.name;
     var startLabel = $('shTime').value;
     fetch(API, { method: 'POST', body: JSON.stringify(payload) })
       .then(function (r) { return r.json(); })
@@ -465,7 +535,7 @@
         if (res && res.error) { showToast(res.error, true); return; }
         BOOT = res;
         render(); closeSheet();
-        showToast('등록 완료 — ' + title + ' ' + startLabel + ', 가족 캘린더에 올라갔어요');
+        showToast('등록 완료 — ' + title + ' (' + subjectName + ') ' + startLabel + ', 가족 캘린더에 올라갔어요');
       })
       .catch(function () {
         sending = false; btn.disabled = false; btn.textContent = '가족 캘린더에 등록';
