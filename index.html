@@ -808,11 +808,16 @@
     var t = (BOOT.todos || []).find(function (x) { return x.id === id; });
     if (!t) return;
     t.done = !t.done;
-    if (document.body.classList.contains('measuring')) renderMeasure(); else renderTimer();
+    var redraw = function () { if (document.body.classList.contains('measuring')) renderMeasure(); else renderTimer(); };
+    redraw();
+    var revert = function (msg) { t.done = !t.done; redraw(); showToast(msg || '체크 저장 안 됐어요 — 인터넷 확인 후 다시', true); };
     fetch(API, { method: 'POST', body: JSON.stringify({ action: 'todo', op: 'toggle', u: BOOT.member.code, id: id, done: t.done }) })
       .then(function (r) { return r.json(); })
-      .then(function (res) { if (res && !res.error) { BOOT = res; saveBoot(res); } })
-      .catch(function () {});
+      .then(function (res) {
+        if (res && res.error) { revert(res.error); return; }
+        if (res) { BOOT = res; saveBoot(res); }
+      })
+      .catch(function () { revert(); });
   }
 
   var todoKind = '', todoRep = false, todoNewColor = COLOR_PALETTE[0], todoEditId = '';
@@ -1159,8 +1164,12 @@
     $('shDate').value = todayStr();
     if (isGroup) {
       $('varLabel').style.display = ''; $('varChips').style.display = '';
+      // 오늘 요일에 맞는 변주를 기본 선택 (토→'토…', 일→'일…', 평일→'평일')
+      var day = new Date().getDay(), want = day === 6 ? '토' : day === 0 ? '일' : '평일';
+      var di = 0;
+      preset.variants.forEach(function (v, k) { if (v.variant.indexOf(want) === 0) di = k; });
       var vh = '';
-      preset.variants.forEach(function (v, k) { vh += '<button class="chip' + (k === 0 ? ' on' : '') + '" data-v="' + k + '">' + esc(v.variant) + '</button>'; });
+      preset.variants.forEach(function (v, k) { vh += '<button class="chip' + (k === di ? ' on' : '') + '" data-v="' + k + '">' + esc(v.variant) + '</button>'; });
       $('varChips').innerHTML = vh;
       var vcs = document.querySelectorAll('#varChips .chip');
       for (var k = 0; k < vcs.length; k++) (function (c) {
@@ -1170,7 +1179,7 @@
           applyVariant(preset.variants[vi]);
         });
       })(vcs[k]);
-      applyVariant(preset.variants[0]);
+      applyVariant(preset.variants[di]);
     } else {
       $('varLabel').style.display = 'none'; $('varChips').style.display = 'none';
       $('shTime').value = (preset && preset.defStart) || nowRounded();
