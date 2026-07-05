@@ -87,17 +87,19 @@
     width: 44px; height: 44px; border-radius: 14px; flex: none;
     display: grid; place-items: center; font-size: 19px; font-weight: 800;
   }
-  .preset[data-hue="indigo"] .dot { background: var(--indigo-soft); color: var(--indigo); }
-  .preset[data-hue="teal"]   .dot { background: var(--teal-soft);   color: var(--teal); }
-  .preset[data-hue="amber"]  .dot { background: var(--amber-soft);  color: var(--amber); }
+  /* 의미 그룹별 배경 채우기: ex=운동, ac=학원~멘토링 */
+  .preset[data-cat="ex"] { background: var(--teal-soft);   border-color: #2b5248; }
+  .preset[data-cat="ex"] .dot { background: var(--teal);   color: #12241f; }
+  .preset[data-cat="ac"] { background: var(--indigo-soft); border-color: #3a4270; }
+  .preset[data-cat="ac"] .dot { background: var(--indigo); color: #1a1d33; }
   .preset .name { font-size: 17.5px; font-weight: 700; flex: 1; }
   .preset .cnt { font-size: 12.5px; color: var(--sub); font-variant-numeric: tabular-nums; }
   .preset .cnt.full { color: var(--success); font-weight: 700; }
 
   .etc {
-    width: 100%; margin-top: 10px; background: var(--etc-bg);
-    border: 1.5px dashed var(--line); border-radius: 18px; padding: 14px;
-    font: inherit; font-size: 15.5px; font-weight: 600; color: var(--etc-ink); cursor: pointer;
+    width: 100%; margin-top: 10px; background: var(--amber-soft);
+    border: 1.5px dashed var(--amber); border-radius: 18px; padding: 14px;
+    font: inherit; font-size: 15.5px; font-weight: 600; color: var(--amber); cursor: pointer;
   }
 
   .others { margin-top: 18px; }
@@ -621,10 +623,11 @@
     items = items.map(function (it) {
       return (it.type === 'group' && it.variants.length === 1) ? { type: 'single', p: it.variants[0].p } : it;
     });
+    // 배경색 그룹: 운동류(운동-PT·운동만)=ex, 나머지(학원~멘토링)=ac
+    function presetCat(nm) { return /^운동/.test(nm) ? 'ex' : 'ac'; }
     items.forEach(function (it, gi) {
-      var hue = HUES[gi % HUES.length];
       if (it.type === 'group') {
-        h += '<button class="preset" data-hue="' + hue + '" data-g="' + gi + '"><span class="dot">' + esc(it.name.charAt(0)) + '</span><span class="name">' + esc(it.name) + '</span><span class="cnt"></span></button>';
+        h += '<button class="preset" data-cat="' + presetCat(it.name) + '" data-g="' + gi + '"><span class="dot">' + esc(it.name.charAt(0)) + '</span><span class="name">' + esc(it.name) + '</span><span class="cnt"></span></button>';
         return;
       }
       var p = it.p, full, cntLabel;
@@ -635,7 +638,7 @@
         full = p.quota > 0 && p.cnt >= p.quota;
         cntLabel = '이달 ' + p.cnt + (p.quota > 0 ? '/' + p.quota : '') + '회' + (full ? ' ✓' : '');
       }
-      h += '<button class="preset" data-hue="' + hue + '" data-g="' + gi + '"><span class="dot">' + esc(p.name.charAt(0)) + '</span><span class="name">' + esc(p.name) + '</span><span class="cnt' + (full ? ' full' : '') + '">' + cntLabel + '</span></button>';
+      h += '<button class="preset" data-cat="' + presetCat(p.name) + '" data-g="' + gi + '"><span class="dot">' + esc(p.name.charAt(0)) + '</span><span class="name">' + esc(p.name) + '</span><span class="cnt' + (full ? ' full' : '') + '">' + cntLabel + '</span></button>';
     });
     h += '</div><button class="etc" id="etcBtn">기타 일정 (직접 입력)</button>';
     var others = BOOT.others || [];
