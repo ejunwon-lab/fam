@@ -554,8 +554,8 @@
     var bar = $('tabbar');
     if (!BOOT || BOOT.error || !BOOT.member) { bar.style.display = 'none'; return; }
     var tabs = [];
-    if (BOOT.member.practice) tabs.push({ k: 'timer', i: '🎸', l: '연습' });
     tabs.push({ k: 'home', i: '📝', l: '일정 등록' });
+    if (BOOT.member.practice) tabs.push({ k: 'timer', i: '🎸', l: '연습' });
     tabs.push({ k: 'stats', i: '📊', l: '통계' });
     bar.style.display = 'flex';
     bar.innerHTML = tabs.map(function (t) {
