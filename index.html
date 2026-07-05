@@ -183,6 +183,8 @@
   .yp-tx { font-size: 14px; flex: 1; }
   .yp-todo.done .yp-tx { color: var(--faint); text-decoration: line-through; }
   .yp-rep { font-size: 10px; font-weight: 800; color: var(--amber); background: var(--amber-soft); border-radius: 99px; padding: 2px 7px; }
+  .yp-edit { flex: none; background: none; border: none; padding: 4px 6px; font-size: 14px; line-height: 1; cursor: pointer; opacity: .5; }
+  .yp-edit:active { opacity: 1; }
   .yp-add { display: flex; align-items: center; gap: 9px; padding: 12px 2px 6px; color: var(--sub); font-size: 14.5px; font-weight: 600; cursor: pointer; background: none; border: none; font-family: inherit; }
   .yp-add .p { width: 25px; height: 25px; border-radius: 50%; border: 1.5px solid var(--line); display: grid; place-items: center; font-size: 15px; }
   .yp-div { height: 1px; background: var(--line); margin: 5px 0 6px; }
@@ -759,7 +761,8 @@
         '<span class="yp-nm">' + esc(k) + '</span><span class="yp-tm" data-kt="' + esc(k) + '" style="color:' + c + '">' + fmtHMS(todaySec(k)) + '</span></button>';
       todos.filter(function (t) { return t.kind === k; }).forEach(function (t) {
         left += '<div class="yp-todo' + (t.done ? ' done' : '') + '" data-td="' + esc(t.id) + '"><span class="yp-ring" style="border-color:' + c + ';background:' + (t.done ? c : 'transparent') + '">✓</span>' +
-          '<span class="yp-tx">' + esc(t.text) + '</span>' + (t.repeat ? '<span class="yp-rep">매일</span>' : '') + '</div>';
+          '<span class="yp-tx">' + esc(t.text) + '</span>' + (t.repeat ? '<span class="yp-rep">매일</span>' : '') +
+          '<button class="yp-edit" data-ed="' + esc(t.id) + '" aria-label="수정">✏️</button></div>';
       });
       left += '<div class="yp-div"></div></div>';
     });
@@ -793,7 +796,11 @@
     for (var j = 0; j < tds.length; j++) (function (b) {
       b.addEventListener('click', function () { toggleTodo(b.getAttribute('data-td')); });
     })(tds[j]);
-    $('addTodo').addEventListener('click', openTodoSheet);
+    var eds = $('app').querySelectorAll('.yp-edit');
+    for (var e = 0; e < eds.length; e++) (function (b) {
+      b.addEventListener('click', function (ev) { ev.stopPropagation(); openTodoSheet(b.getAttribute('data-ed')); });
+    })(eds[e]);
+    $('addTodo').addEventListener('click', function () { openTodoSheet(); });
     startTick();
   }
 
@@ -808,10 +815,13 @@
       .catch(function () {});
   }
 
-  var todoKind = '', todoRep = false, todoNewColor = COLOR_PALETTE[0];
-  function openTodoSheet() {
+  var todoKind = '', todoRep = false, todoNewColor = COLOR_PALETTE[0], todoEditId = '';
+  function openTodoSheet(editId) {
     var names = subjNames();
-    todoKind = names[0] || ''; todoRep = false;
+    todoEditId = editId || '';
+    var t = todoEditId ? (BOOT.todos || []).find(function (x) { return x.id === todoEditId; }) : null;
+    if (t) { todoKind = t.kind; todoRep = !!t.repeat; }
+    else { todoEditId = ''; todoKind = names[0] || ''; todoRep = false; }
     renderTodoSheet(false);
     document.body.classList.add('todo-open');
     setTimeout(function () { if ($('ttext')) $('ttext').focus(); }, 250);
@@ -820,7 +830,7 @@
     var chips = (BOOT.subjects || []).map(function (s) {
       return '<button class="chip subj-chip' + (s.name === todoKind ? ' on' : '') + '" data-k="' + esc(s.name) + '">' + esc(s.name) + '</button>';
     }).join('') + '<button class="chip subj-chip add' + (newMode ? ' on' : '') + '" id="newSubjChip">+ 새 과목</button>';
-    var body = '<div class="grip"></div><h2>할 일 추가</h2>' +
+    var body = '<div class="grip"></div><h2>' + (todoEditId ? '할 일 수정' : '할 일 추가') + '</h2>' +
       '<div class="f-label">과목</div><div class="chips" id="tkchips">' + chips + '</div>';
     if (newMode) {
       body += '<div style="background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:12px 12px;margin-top:8px">' +
@@ -829,9 +839,11 @@
         COLOR_PALETTE.map(function (c) { return '<button class="colordot' + (c === todoNewColor ? ' on' : '') + '" data-c="' + c + '" style="background:' + c + '"></button>'; }).join('') +
         '</div><button class="cta" id="nsAdd" style="margin-top:12px;background:var(--teal);color:#06231e">과목 추가</button></div>';
     } else {
-      body += '<div class="f-label">내용</div><input type="text" id="ttext" placeholder="예: 크로매틱 스케일 10분">' +
+      var et = todoEditId ? (BOOT.todos || []).find(function (x) { return x.id === todoEditId; }) : null;
+      body += '<div class="f-label">내용</div><input type="text" id="ttext" placeholder="예: 크로매틱 스케일 10분" value="' + esc(et ? et.text : '') + '">' +
         '<div class="rep-toggle"><span>매일 반복 <span style="color:var(--faint);font-weight:600">— 다음 날 자동으로 다시</span></span><span class="tg' + (todoRep ? ' on' : '') + '" id="ttg"></span></div>' +
-        '<button class="cta" id="taddCta" style="margin-top:16px">추가</button>';
+        '<button class="cta" id="taddCta" style="margin-top:16px">' + (todoEditId ? '저장' : '추가') + '</button>' +
+        (todoEditId ? '<button class="cta" id="tdelCta" style="margin-top:10px;background:transparent;color:var(--danger);border:1px solid var(--danger)">🗑 삭제</button>' : '');
     }
     $('todoSheet').innerHTML = body;
 
@@ -859,18 +871,35 @@
       $('taddCta').addEventListener('click', function () {
         var v = $('ttext').value.trim(); if (!v) { $('ttext').focus(); return; }
         if (!todoKind) { showToast('과목을 먼저 추가하세요', true); return; }
-        var btn = $('taddCta'); btn.disabled = true; btn.textContent = '추가 중…';
-        fetch(API, { method: 'POST', body: JSON.stringify({ action: 'todo', op: 'add', u: BOOT.member.code, kind: todoKind, text: v, repeat: todoRep }) })
+        var editing = !!todoEditId, lbl = editing ? '저장' : '추가';
+        var btn = $('taddCta'); btn.disabled = true; btn.textContent = lbl + ' 중…';
+        var payload = editing
+          ? { action: 'todo', op: 'edit', u: BOOT.member.code, id: todoEditId, kind: todoKind, text: v, repeat: todoRep }
+          : { action: 'todo', op: 'add', u: BOOT.member.code, kind: todoKind, text: v, repeat: todoRep };
+        fetch(API, { method: 'POST', body: JSON.stringify(payload) })
           .then(function (r) { return r.json(); })
           .then(function (res) {
-            if (res && res.error) { showToast(res.error, true); btn.disabled = false; btn.textContent = '추가'; return; }
-            BOOT = res; saveBoot(res); document.body.classList.remove('todo-open'); renderTimer();
+            if (res && res.error) { showToast(res.error, true); btn.disabled = false; btn.textContent = lbl; return; }
+            BOOT = res; saveBoot(res); todoEditId = ''; document.body.classList.remove('todo-open'); renderTimer();
           })
-          .catch(function () { showToast('추가 실패 — 인터넷 확인', true); btn.disabled = false; btn.textContent = '추가'; });
+          .catch(function () { showToast(lbl + ' 실패 — 인터넷 확인', true); btn.disabled = false; btn.textContent = lbl; });
       });
+      if (todoEditId && $('tdelCta')) {
+        $('tdelCta').addEventListener('click', function () {
+          if (!confirm('이 할 일을 삭제할까요?')) return;
+          var delId = todoEditId, btn = $('tdelCta'); btn.disabled = true; btn.textContent = '삭제 중…';
+          fetch(API, { method: 'POST', body: JSON.stringify({ action: 'todo', op: 'delete', u: BOOT.member.code, id: delId }) })
+            .then(function (r) { return r.json(); })
+            .then(function (res) {
+              if (res && res.error) { showToast(res.error, true); btn.disabled = false; btn.textContent = '🗑 삭제'; return; }
+              BOOT = res; saveBoot(res); todoEditId = ''; document.body.classList.remove('todo-open'); renderTimer();
+            })
+            .catch(function () { showToast('삭제 실패 — 인터넷 확인', true); btn.disabled = false; btn.textContent = '🗑 삭제'; });
+        });
+      }
     }
   }
-  function closeTodoSheet() { document.body.classList.remove('todo-open'); }
+  function closeTodoSheet() { todoEditId = ''; document.body.classList.remove('todo-open'); }
 
   /** 측정 화면 — 검정 몰입 + 과목 과제 체크 + 화면 꺼짐 방지 */
   function renderMeasure() {
