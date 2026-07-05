@@ -553,7 +553,7 @@
     if (!BOOT || BOOT.error || !BOOT.member) { bar.style.display = 'none'; return; }
     var tabs = [];
     if (BOOT.member.practice) tabs.push({ k: 'timer', i: '🎸', l: '연습' });
-    tabs.push({ k: 'home', i: '📝', l: '일정등록' });
+    tabs.push({ k: 'home', i: '📝', l: '일정 등록' });
     tabs.push({ k: 'stats', i: '📊', l: '통계' });
     bar.style.display = 'flex';
     bar.innerHTML = tabs.map(function (t) {
@@ -714,11 +714,10 @@
     var goal = m.goalMin || 0;
     var pct = goal ? Math.min(100, Math.round(todaySec(null) / (goal * 60) * 100)) : 0;
     var d = new Date();
-    var dateStr = (d.getMonth() + 1) + '. ' + d.getDate() + ' (' + ['일', '월', '화', '수', '목', '금', '토'][d.getDay()] + ')';
+    var dateStr = d.getFullYear() + '. ' + (d.getMonth() + 1) + '. ' + d.getDate() + ' (' + ['일', '월', '화', '수', '목', '금', '토'][d.getDay()] + ')';
     var todos = BOOT.todos || [];
 
-    var h = '<div style="display:flex;justify-content:space-between;align-items:center;padding:2px 2px 6px">' +
-      '<span>' + ddayLabel(m) + '</span><div class="right">' +
+    var h = '<div class="appbar" style="padding:2px 2px 6px"><span>' + ddayLabel(m) + '</span><div class="right">' +
       '<button class="iconbtn" id="calBtnT" title="가족 캘린더 열기">📅</button>' +
       '<button class="who" id="whoBtnT">' + esc(m.name) + '</button></div></div>';
     h += '<div class="yp-top"><span class="yp-date">' + dateStr + '</span><span class="yp-total" id="heroClock">' + hmShort(todaySec(null)) + '</span></div>';
