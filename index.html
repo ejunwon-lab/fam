@@ -184,12 +184,13 @@
   .yp-add { display: flex; align-items: center; gap: 9px; padding: 12px 2px 6px; color: var(--sub); font-size: 14.5px; font-weight: 600; cursor: pointer; background: none; border: none; font-family: inherit; }
   .yp-add .p { width: 25px; height: 25px; border-radius: 50%; border: 1.5px solid var(--line); display: grid; place-items: center; font-size: 15px; }
   .yp-div { height: 1px; background: var(--line); margin: 5px 0 6px; }
-  .tt { position: relative; }
-  .tt-row { display: flex; align-items: flex-start; height: 26px; }
-  .tt-hr { width: 20px; flex: none; font-size: 10.5px; color: var(--faint); font-variant-numeric: tabular-nums; padding-top: 1px; }
-  .tt-cell { flex: 1; height: 100%; border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
-  .tt-blocks { position: absolute; left: 20px; right: 0; top: 0; bottom: 0; }
-  .tt-blk { position: absolute; left: 1px; right: 1px; border-radius: 3px; }
+  .mtt { position: relative; }
+  .mtt-row { display: flex; align-items: flex-start; height: 26px; }
+  .mtt-hr { width: 20px; flex: none; font-size: 10.5px; color: var(--faint); font-variant-numeric: tabular-nums; line-height: 1; transform: translateY(-5px); }
+  .mtt-cell { flex: 1; height: 100%; border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+  .mtt-row:last-child .mtt-cell { border-bottom: 1px solid var(--line); }
+  .mtt-blocks { position: absolute; left: 20px; right: 0; top: 0; bottom: 0; }
+  .mtt-blk { position: absolute; left: 2px; right: 2px; border-radius: 3px; }
 
   /* ── 열품타 통계 ── */
   .yp-pills { display: flex; gap: 7px; margin: 4px 0 14px; overflow-x: auto; }
@@ -242,6 +243,8 @@
   body.todo-open .backdrop { opacity: 1; pointer-events: auto; }
   .tsheet h2 { margin: 0 0 4px; font-size: 19px; }
   .tsheet input { width: 100%; font: inherit; font-size: 16px; font-weight: 600; background: var(--bg); color: inherit; border: 1px solid var(--line); border-radius: 12px; padding: 11px 12px; }
+  .colordot { width: 30px; height: 30px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; padding: 0; }
+  .colordot.on { border-color: var(--ink); box-shadow: 0 0 0 2px var(--card), 0 0 0 4px var(--ink); }
 
   /* 연습 홈 (열품타식) */
   .dday-pill {
@@ -480,8 +483,9 @@
   var cur = null, curDur = 60, customEnd = false, sending = false, othersOpen = false;
   // 타이머
   var sess = null, tick = null, overlayOpen = false, wakeLock = null;
-  var KINDS = ['베이스', '화성학', '멘토링'];
-  var KIND_COLS = ['#4fc0af', '#8b96f2', '#e3a94f'];
+  function subjNames() { return ((BOOT && BOOT.subjects) || []).map(function (s) { return s.name; }); }
+  function subjColor(name) { var l = (BOOT && BOOT.subjects) || []; for (var i = 0; i < l.length; i++) if (l[i].name === name) return l[i].color || '#9aa4b2'; return '#9aa4b2'; }
+  var COLOR_PALETTE = ['#4fc0af', '#8b96f2', '#e3a94f', '#e07070', '#5fb0e0', '#c78bf2', '#7cc36a', '#e8a13c'];
   // 통계
   var statsOff = 0, statsData = null, statsLoading = false, statsTarget = '', statsSelDay = 0, statsMode = '일간';
   var CAL_COLS = ['#191c22', '#26264a', '#3a3f8f', '#5a63c8', '#8b96f2'];
@@ -549,7 +553,7 @@
     if (!BOOT || BOOT.error || !BOOT.member) { bar.style.display = 'none'; return; }
     var tabs = [];
     if (BOOT.member.practice) tabs.push({ k: 'timer', i: '🎸', l: '연습' });
-    tabs.push({ k: 'home', i: '📝', l: '기록' });
+    tabs.push({ k: 'home', i: '📝', l: '일정등록' });
     tabs.push({ k: 'stats', i: '📊', l: '통계' });
     bar.style.display = 'flex';
     bar.innerHTML = tabs.map(function (t) {
@@ -721,10 +725,10 @@
     if (goal) h += '<div class="yp-goal" id="heroGoal">목표 ' + durLabel(goal) + ' · ' + pct + '%</div>';
 
     var left = '';
-    KINDS.forEach(function (k, i) {
-      var c = KIND_COLS[i];
-      left += '<div class="yp-subj"><button class="yp-sh" data-start="' + k + '"><span class="yp-cbar" style="background:' + c + '"></span>' +
-        '<span class="yp-nm">' + k + '</span><span class="yp-tm" data-kt="' + k + '" style="color:' + c + '">' + fmtHMS(todaySec(k)) + '</span></button>';
+    (BOOT.subjects || []).forEach(function (s) {
+      var k = s.name, c = s.color || '#9aa4b2';
+      left += '<div class="yp-subj"><button class="yp-sh" data-start="' + esc(k) + '"><span class="yp-cbar" style="background:' + c + '"></span>' +
+        '<span class="yp-nm">' + esc(k) + '</span><span class="yp-tm" data-kt="' + esc(k) + '" style="color:' + c + '">' + fmtHMS(todaySec(k)) + '</span></button>';
       todos.filter(function (t) { return t.kind === k; }).forEach(function (t) {
         left += '<div class="yp-todo' + (t.done ? ' done' : '') + '" data-td="' + esc(t.id) + '"><span class="yp-ring" style="border-color:' + c + ';background:' + (t.done ? c : 'transparent') + '">✓</span>' +
           '<span class="yp-tx">' + esc(t.text) + '</span>' + (t.repeat ? '<span class="yp-rep">매일</span>' : '') + '</div>';
@@ -734,18 +738,18 @@
     left += '<button class="yp-add" id="addTodo"><span class="p">+</span> 할 일 추가</button>';
 
     var rows = '';
-    for (var hh = TT_H0; hh <= TT_H1; hh++) rows += '<div class="tt-row"><span class="tt-hr">' + hrLabel(hh) + '</span><span class="tt-cell"></span></div>';
+    for (var hh = TT_H0; hh <= TT_H1; hh++) rows += '<div class="mtt-row"><span class="mtt-hr">' + hrLabel(hh) + '</span><span class="mtt-cell"></span></div>';
     var blocks = '';
     ((BOOT.today && BOOT.today.segs) || []).forEach(function (sg) {
       var s = toHr(sg.s), e = toHr(sg.e);
       if (e <= s) e = s + 1 / 60;
       if (e <= TT_H0 || s >= TT_H1) return;
       s = Math.max(s, TT_H0); e = Math.min(e, TT_H1);
-      var c = sg.k === '휴식' ? '#3a3f4a' : (KIND_COLS[KINDS.indexOf(sg.k)] || '#9aa4b2');
-      blocks += '<div class="tt-blk" style="top:' + ((s - TT_H0) * TT_RH) + 'px;height:' + Math.max(2, (e - s) * TT_RH - 1) + 'px;background:' + c + '"></div>';
+      var c = sg.k === '휴식' ? '#3a3f4a' : subjColor(sg.k);
+      blocks += '<div class="mtt-blk" style="top:' + ((s - TT_H0) * TT_RH) + 'px;height:' + Math.max(2, (e - s) * TT_RH - 1) + 'px;background:' + c + '"></div>';
     });
     h += '<div class="yp-body"><div class="yp-left">' + left + '</div>' +
-      '<div class="yp-right"><div class="tt">' + rows + '<div class="tt-blocks">' + blocks + '</div></div></div></div>';
+      '<div class="yp-right"><div class="mtt">' + rows + '<div class="mtt-blocks">' + blocks + '</div></div></div></div>';
 
     $('app').innerHTML = h;
     $('calBtnT').addEventListener('click', openCalendar);
@@ -776,40 +780,74 @@
       .catch(function () {});
   }
 
-  var todoKind = '베이스', todoRep = false;
+  var todoKind = '', todoRep = false, todoNewColor = COLOR_PALETTE[0];
   function openTodoSheet() {
-    todoKind = KINDS[0]; todoRep = false;
-    $('todoSheet').innerHTML = '<div class="grip"></div><h2>할 일 추가</h2>' +
-      '<div class="f-label">과목</div><div class="chips" id="tkchips">' +
-      KINDS.map(function (k) { return '<button class="chip' + (k === todoKind ? ' on' : '') + '" data-k="' + k + '">' + k + '</button>'; }).join('') + '</div>' +
-      '<div class="f-label">내용</div><input type="text" id="ttext" placeholder="예: 크로매틱 스케일 10분">' +
-      '<div class="rep-toggle"><span>매일 반복 <span style="color:var(--faint);font-weight:600">— 다음 날 자동으로 다시</span></span><span class="tg" id="ttg"></span></div>' +
-      '<button class="cta" id="taddCta" style="margin-top:16px">추가</button>';
+    var names = subjNames();
+    todoKind = names[0] || ''; todoRep = false;
+    renderTodoSheet(false);
     document.body.classList.add('todo-open');
-    var kc = $('todoSheet').querySelectorAll('.chip');
-    for (var i = 0; i < kc.length; i++) (function (b) {
-      b.addEventListener('click', function () { todoKind = b.getAttribute('data-k'); for (var j = 0; j < kc.length; j++) kc[j].classList.toggle('on', kc[j] === b); });
-    })(kc[i]);
-    $('ttg').addEventListener('click', function () { todoRep = !todoRep; $('ttg').classList.toggle('on', todoRep); });
-    $('taddCta').addEventListener('click', function () {
-      var v = $('ttext').value.trim(); if (!v) { $('ttext').focus(); return; }
-      var btn = $('taddCta'); btn.disabled = true; btn.textContent = '추가 중…';
-      fetch(API, { method: 'POST', body: JSON.stringify({ action: 'todo', op: 'add', u: BOOT.member.code, kind: todoKind, text: v, repeat: todoRep }) })
-        .then(function (r) { return r.json(); })
-        .then(function (res) {
-          if (res && res.error) { showToast(res.error, true); btn.disabled = false; btn.textContent = '추가'; return; }
-          BOOT = res; saveBoot(res); document.body.classList.remove('todo-open'); renderTimer();
-        })
-        .catch(function () { showToast('추가 실패 — 인터넷 확인', true); btn.disabled = false; btn.textContent = '추가'; });
+    setTimeout(function () { if ($('ttext')) $('ttext').focus(); }, 250);
+  }
+  function renderTodoSheet(newMode) {
+    var chips = (BOOT.subjects || []).map(function (s) {
+      return '<button class="chip subj-chip' + (s.name === todoKind ? ' on' : '') + '" data-k="' + esc(s.name) + '">' + esc(s.name) + '</button>';
+    }).join('') + '<button class="chip subj-chip add' + (newMode ? ' on' : '') + '" id="newSubjChip">+ 새 과목</button>';
+    var body = '<div class="grip"></div><h2>할 일 추가</h2>' +
+      '<div class="f-label">과목</div><div class="chips" id="tkchips">' + chips + '</div>';
+    if (newMode) {
+      body += '<div style="background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:12px 12px;margin-top:8px">' +
+        '<input type="text" id="nsname" placeholder="새 과목 이름 (예: 재즈)" style="margin-bottom:10px">' +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
+        COLOR_PALETTE.map(function (c) { return '<button class="colordot' + (c === todoNewColor ? ' on' : '') + '" data-c="' + c + '" style="background:' + c + '"></button>'; }).join('') +
+        '</div><button class="cta" id="nsAdd" style="margin-top:12px;background:var(--teal);color:#06231e">과목 추가</button></div>';
+    } else {
+      body += '<div class="f-label">내용</div><input type="text" id="ttext" placeholder="예: 크로매틱 스케일 10분">' +
+        '<div class="rep-toggle"><span>매일 반복 <span style="color:var(--faint);font-weight:600">— 다음 날 자동으로 다시</span></span><span class="tg' + (todoRep ? ' on' : '') + '" id="ttg"></span></div>' +
+        '<button class="cta" id="taddCta" style="margin-top:16px">추가</button>';
+    }
+    $('todoSheet').innerHTML = body;
+
+    $('todoSheet').querySelectorAll('.subj-chip').forEach(function (b) {
+      b.addEventListener('click', function () {
+        if (b.id === 'newSubjChip') { renderTodoSheet(true); return; }
+        todoKind = b.getAttribute('data-k'); renderTodoSheet(false);
+      });
     });
-    setTimeout(function () { $('ttext').focus(); }, 250);
+    if (newMode) {
+      $('todoSheet').querySelectorAll('.colordot').forEach(function (b) {
+        b.addEventListener('click', function () { todoNewColor = b.getAttribute('data-c'); $('todoSheet').querySelectorAll('.colordot').forEach(function (x) { x.classList.toggle('on', x === b); }); });
+      });
+      $('nsAdd').addEventListener('click', function () {
+        var nm = $('nsname').value.trim(); if (!nm) { $('nsname').focus(); return; }
+        var btn = $('nsAdd'); btn.disabled = true; btn.textContent = '추가 중…';
+        fetch(API, { method: 'POST', body: JSON.stringify({ action: 'subject', op: 'add', u: BOOT.member.code, name: nm, color: todoNewColor }) })
+          .then(function (r) { return r.json(); })
+          .then(function (res) { if (res && res.error) { showToast(res.error, true); btn.disabled = false; btn.textContent = '과목 추가'; return; } BOOT = res; saveBoot(res); todoKind = nm; renderTodoSheet(false); })
+          .catch(function () { showToast('추가 실패 — 인터넷 확인', true); btn.disabled = false; btn.textContent = '과목 추가'; });
+      });
+      setTimeout(function () { if ($('nsname')) $('nsname').focus(); }, 100);
+    } else {
+      $('ttg').addEventListener('click', function () { todoRep = !todoRep; $('ttg').classList.toggle('on', todoRep); });
+      $('taddCta').addEventListener('click', function () {
+        var v = $('ttext').value.trim(); if (!v) { $('ttext').focus(); return; }
+        if (!todoKind) { showToast('과목을 먼저 추가하세요', true); return; }
+        var btn = $('taddCta'); btn.disabled = true; btn.textContent = '추가 중…';
+        fetch(API, { method: 'POST', body: JSON.stringify({ action: 'todo', op: 'add', u: BOOT.member.code, kind: todoKind, text: v, repeat: todoRep }) })
+          .then(function (r) { return r.json(); })
+          .then(function (res) {
+            if (res && res.error) { showToast(res.error, true); btn.disabled = false; btn.textContent = '추가'; return; }
+            BOOT = res; saveBoot(res); document.body.classList.remove('todo-open'); renderTimer();
+          })
+          .catch(function () { showToast('추가 실패 — 인터넷 확인', true); btn.disabled = false; btn.textContent = '추가'; });
+      });
+    }
   }
   function closeTodoSheet() { document.body.classList.remove('todo-open'); }
 
   /** 측정 화면 — 검정 몰입 + 과목 과제 체크 + 화면 꺼짐 방지 */
   function renderMeasure() {
     var st = sess.state;
-    var c = KIND_COLS[KINDS.indexOf(sess.kind)] || '#9aa4b2';
+    var c = subjColor(sess.kind);
     var td = (BOOT.todos || []).filter(function (t) { return t.kind === sess.kind; });
     var tdHtml = td.length ? td.map(function (t) {
       return '<div class="yp-todo' + (t.done ? ' done' : '') + '" data-mtd="' + esc(t.id) + '"><span class="yp-ring" style="border-color:' + c + ';background:' + (t.done ? c : 'transparent') + '">✓</span><span class="yp-tx" style="color:' + (t.done ? 'var(--faint)' : '#cfd4dc') + '">' + esc(t.text) + '</span></div>';
@@ -989,8 +1027,8 @@
     var tot = d.subjects.reduce(function (a, s) { return a + s.practiceMin; }, 0);
     if (tot <= 0) return '';
     var acc = 0, stops = [];
-    d.subjects.forEach(function (s) { if (s.practiceMin <= 0) return; var c = KIND_COLS[KINDS.indexOf(s.name)] || '#9aa4b2'; stops.push(c + ' ' + (acc / tot * 100).toFixed(1) + '% ' + ((acc + s.practiceMin) / tot * 100).toFixed(1) + '%'); acc += s.practiceMin; });
-    var leg = d.subjects.filter(function (s) { return s.practiceMin > 0; }).map(function (s) { var c = KIND_COLS[KINDS.indexOf(s.name)] || '#9aa4b2'; return '<div class="lgi"><span class="dt" style="background:' + c + '"></span><span class="dn">' + esc(s.name) + '</span><span class="dv">' + clockHM(s.practiceMin) + ' · ' + Math.round(s.practiceMin / tot * 100) + '%</span></div>'; }).join('');
+    d.subjects.forEach(function (s) { if (s.practiceMin <= 0) return; var c = s.color || subjColor(s.name); stops.push(c + ' ' + (acc / tot * 100).toFixed(1) + '% ' + ((acc + s.practiceMin) / tot * 100).toFixed(1) + '%'); acc += s.practiceMin; });
+    var leg = d.subjects.filter(function (s) { return s.practiceMin > 0; }).map(function (s) { var c = s.color || subjColor(s.name); return '<div class="lgi"><span class="dt" style="background:' + c + '"></span><span class="dn">' + esc(s.name) + '</span><span class="dv">' + clockHM(s.practiceMin) + ' · ' + Math.round(s.practiceMin / tot * 100) + '%</span></div>'; }).join('');
     return '<div class="yp-scard"><div class="scard-t">과목별 비율</div><div class="donut2"><div class="d" style="background:conic-gradient(' + stops.join(',') + ')"><div class="dh">' + clockHM(tot) + '</div></div><div class="lg">' + leg + '</div></div></div>';
   }
 
@@ -998,7 +1036,7 @@
     if (!d.week || !d.week.length) return '';
     var max = Math.max.apply(null, d.week.map(function (w) { return w.min; }).concat([1]));
     var cols = d.week.map(function (w) {
-      var segs = KINDS.map(function (k, i) { var v = (w.byKind && w.byKind[k]) || 0; return v > 0 ? '<div class="stack-seg" style="height:' + (v / max * 110) + 'px;background:' + KIND_COLS[i] + '"></div>' : ''; }).join('');
+      var segs = subjNames().map(function (k) { var v = (w.byKind && w.byKind[k]) || 0; return v > 0 ? '<div class="stack-seg" style="height:' + (v / max * 110) + 'px;background:' + subjColor(k) + '"></div>' : ''; }).join('');
       return '<div class="stack-col"><div class="stack-bars">' + segs + '</div><span class="stack-lb">' + w.label.replace(/\(.*\)/, '') + '</span></div>';
     }).join('');
     return '<div class="yp-scard"><div class="scard-t">과목별 연습시간 (최근 7일)</div><div class="stack">' + cols + '</div></div>';
