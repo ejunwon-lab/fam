@@ -458,6 +458,8 @@
     <h2 id="shTitle"></h2>
     <p class="sub" id="shSub"></p>
     <input type="text" id="shCustom" placeholder="일정 이름 입력" style="display:none">
+    <div class="f-label" id="varLabel" style="display:none">어느 날?</div>
+    <div class="chips" id="varChips" style="display:none"></div>
     <div class="f-label">날짜 · 시작</div>
     <div class="dt-row"><input type="date" id="shDate"><input type="time" id="shTime"></div>
     <div class="f-label">얼마나 하나요?</div>
@@ -606,8 +608,26 @@
       '<button class="iconbtn" id="calBtn" title="가족 캘린더 열기" aria-label="가족 캘린더 열기">📅</button>' +
       '<button class="who" id="whoBtn" title="이름 바꾸기">' + esc(BOOT.member.name) + '</button></div></div>';
     h += '<div class="sec-label">탭 한 번으로 등록</div><div class="presets">';
-    BOOT.presets.forEach(function (p, i) {
-      var full, cntLabel;
+    // 이름이 'X (변주)' 꼴인 프리셋은 X로 묶어 버튼 1개 → 시트 안에서 변주(칩) 선택
+    var items = [], gmap = {};
+    BOOT.presets.forEach(function (p) {
+      var mm = /^(.+?)\s*\((.+)\)$/.exec(p.name);
+      if (mm) {
+        var base = mm[1].replace(/\s+$/, ''), variant = mm[2].trim();
+        if (!gmap[base]) { gmap[base] = { type: 'group', name: base, variants: [] }; items.push(gmap[base]); }
+        gmap[base].variants.push({ p: p, variant: variant });
+      } else items.push({ type: 'single', p: p });
+    });
+    items = items.map(function (it) {
+      return (it.type === 'group' && it.variants.length === 1) ? { type: 'single', p: it.variants[0].p } : it;
+    });
+    items.forEach(function (it, gi) {
+      var hue = HUES[gi % HUES.length];
+      if (it.type === 'group') {
+        h += '<button class="preset" data-hue="' + hue + '" data-g="' + gi + '"><span class="dot">' + esc(it.name.charAt(0)) + '</span><span class="name">' + esc(it.name) + '</span><span class="cnt"></span></button>';
+        return;
+      }
+      var p = it.p, full, cntLabel;
       if (p.tQuota > 0) {
         full = p.tCnt >= p.tQuota;
         cntLabel = '누적 ' + p.tCnt + '/' + p.tQuota + '회' + (full ? ' ✓' : '');
@@ -615,7 +635,7 @@
         full = p.quota > 0 && p.cnt >= p.quota;
         cntLabel = '이달 ' + p.cnt + (p.quota > 0 ? '/' + p.quota : '') + '회' + (full ? ' ✓' : '');
       }
-      h += '<button class="preset" data-hue="' + HUES[i % HUES.length] + '" data-i="' + i + '"><span class="dot">' + esc(p.name.charAt(0)) + '</span><span class="name">' + esc(p.name) + '</span><span class="cnt' + (full ? ' full' : '') + '">' + cntLabel + '</span></button>';
+      h += '<button class="preset" data-hue="' + hue + '" data-g="' + gi + '"><span class="dot">' + esc(p.name.charAt(0)) + '</span><span class="name">' + esc(p.name) + '</span><span class="cnt' + (full ? ' full' : '') + '">' + cntLabel + '</span></button>';
     });
     h += '</div><button class="etc" id="etcBtn">기타 일정 (직접 입력)</button>';
     var others = BOOT.others || [];
@@ -647,7 +667,13 @@
     $('whoBtn').addEventListener('click', function () { if (confirm('이름을 다시 고를까요?')) { store('famcode', null); init(); } });
     $('calBtn').addEventListener('click', openCalendar);
     var btns = $('app').querySelectorAll('.preset');
-    for (var i = 0; i < btns.length; i++) (function (b) { b.addEventListener('click', function () { openSheet(BOOT.presets[+b.getAttribute('data-i')]); }); })(btns[i]);
+    for (var i = 0; i < btns.length; i++) (function (b) {
+      b.addEventListener('click', function () {
+        var it = items[+b.getAttribute('data-g')];
+        if (it.type === 'group') openSheet({ name: it.name, variants: it.variants });
+        else openSheet(it.p);
+      });
+    })(btns[i]);
     var obtns = $('app').querySelectorAll('.o-preset');
     for (var j = 0; j < obtns.length; j++) (function (b) { b.addEventListener('click', function () { openSheet(BOOT.others[+b.getAttribute('data-oi')]); }); })(obtns[j]);
     var ot = $('othersToggle');
@@ -1085,16 +1111,40 @@
   function addMin(t, m) { var hm = t.split(':'); var d = new Date(2026, 0, 1, +hm[0], +hm[1] + m); return pad(d.getHours()) + ':' + pad(d.getMinutes()); }
   function diffMin(a, b) { var x = a.split(':'), y = b.split(':'); return (+y[0] * 60 + +y[1]) - (+x[0] * 60 + +x[1]); }
 
+  function applyVariant(v) {
+    $('shTime').value = (v && v.p.defStart) || nowRounded();
+    curDur = (v && v.p.defDur) || 60; customEnd = false; $('endRow').style.display = 'none';
+    renderChips(); updateEnd();
+  }
   function openSheet(preset) {
-    cur = preset; var custom = !preset;
+    cur = preset; var custom = !preset; var isGroup = !!(preset && preset.variants);
     $('shTitle').textContent = custom ? '기타 일정' : preset.name;
-    $('shSub').textContent = custom ? '이름을 적고 시간을 확인하세요' : (preset.whoName ? preset.whoName + ' 일정으로 등록돼요' : '시간만 확인하고 등록을 누르세요');
+    $('shSub').textContent = custom ? '이름을 적고 시간을 확인하세요'
+      : (preset.whoName ? preset.whoName + ' 일정으로 등록돼요'
+        : (isGroup ? '어느 날인지 고르면 시간이 채워져요' : '시간만 확인하고 등록을 누르세요'));
     $('shCustom').style.display = custom ? 'block' : 'none';
     $('shCustom').value = '';
     $('shDate').value = todayStr();
-    $('shTime').value = (preset && preset.defStart) || nowRounded();
-    curDur = (preset && preset.defDur) || 60; customEnd = false; $('endRow').style.display = 'none';
-    renderChips(); updateEnd();
+    if (isGroup) {
+      $('varLabel').style.display = ''; $('varChips').style.display = '';
+      var vh = '';
+      preset.variants.forEach(function (v, k) { vh += '<button class="chip' + (k === 0 ? ' on' : '') + '" data-v="' + k + '">' + esc(v.variant) + '</button>'; });
+      $('varChips').innerHTML = vh;
+      var vcs = document.querySelectorAll('#varChips .chip');
+      for (var k = 0; k < vcs.length; k++) (function (c) {
+        c.addEventListener('click', function () {
+          var vi = +c.getAttribute('data-v');
+          for (var j = 0; j < vcs.length; j++) vcs[j].classList.toggle('on', j === vi);
+          applyVariant(preset.variants[vi]);
+        });
+      })(vcs[k]);
+      applyVariant(preset.variants[0]);
+    } else {
+      $('varLabel').style.display = 'none'; $('varChips').style.display = 'none';
+      $('shTime').value = (preset && preset.defStart) || nowRounded();
+      curDur = (preset && preset.defDur) || 60; customEnd = false; $('endRow').style.display = 'none';
+      renderChips(); updateEnd();
+    }
     document.body.classList.add('open');
     if (custom) setTimeout(function () { $('shCustom').focus(); }, 250);
   }
