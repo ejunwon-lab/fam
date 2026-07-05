@@ -1,5 +1,5 @@
 /* 가족 일정 — 앱 셸 캐시 (stale-while-revalidate): 아이콘 탭 → 즉시 표시 */
-var CACHE = 'fam-shell-v2';
+var CACHE = 'fam-shell-v3';
 var SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 
 self.addEventListener('install', function (e) {
