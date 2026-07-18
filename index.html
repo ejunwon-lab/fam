@@ -461,6 +461,12 @@
   .fd-hd .tot { font-size: 13px; color: #98917f; }
   .fd-hd .tot b { color: #f4652f; font-size: 16px; font-variant-numeric: tabular-nums; }
   .fd-dday { display: inline-block; background: #fff; border: 1px solid #f0e4d0; color: #a06b33; font-size: 11.5px; font-weight: 700; border-radius: 99px; padding: 3px 10px; }
+  .fd-nav { display: flex; align-items: center; gap: 5px; padding: 0 2px 6px; }
+  .fd-nav .arr { width: 32px; height: 32px; border-radius: 11px; border: 1px solid #f0e4d0; background: #fff; color: #8a8272; font-size: 16px; cursor: pointer; padding: 0; }
+  .fd-nav .arr:disabled { opacity: .4; cursor: default; }
+  .fd-nav .dt { position: relative; font-size: 13.5px; font-weight: 800; color: #33302a; padding: 7px 12px; background: #fff; border: 1px solid #f0e4d0; border-radius: 11px; }
+  .fd-nav .dt input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; border: 0; padding: 0; }
+  .fd-nav .today-btn { margin-left: auto; font-size: 12px; font-weight: 800; color: #c2481a; background: #ffe9d8; border: none; border-radius: 99px; padding: 7px 13px; cursor: pointer; font-family: inherit; }
   .fd-feed { position: relative; padding: 4px 0 8px; }
   .fd-feed::before { content: ""; position: absolute; left: 9px; top: 14px; bottom: 12px; width: 2px; background: #f0e4d0; }
   .fd-ev { display: flex; gap: 13px; padding: 8px 0; position: relative; }
@@ -564,6 +570,8 @@
   var cur = null, curDur = 60, customEnd = false, sending = false, othersOpen = false;
   // 타이머
   var sess = null, tick = null, overlayOpen = false, wakeLock = null;
+  // 피드 날짜 (null=오늘)
+  var feedDate = null, feedDayCache = {};
   function subjNames() { return ((BOOT && BOOT.subjects) || []).map(function (s) { return s.name; }); }
   function subjColor(name) { var l = (BOOT && BOOT.subjects) || []; for (var i = 0; i < l.length; i++) if (l[i].name === name) return l[i].color || '#9aa4b2'; return '#9aa4b2'; }
   var COLOR_PALETTE = ['#4fc0af', '#8b96f2', '#e3a94f', '#e07070', '#5fb0e0', '#c78bf2', '#7cc36a', '#e8a13c'];
@@ -693,6 +701,7 @@
         var k = b.getAttribute('data-k');
         if (k === view) return;
         overlayOpen = false;
+        feedDate = null; // 화면 전환 시 피드는 오늘로 복귀
         view = k;
         if (k === 'stats') { statsOff = 0; statsTarget = isViewer() ? BOOT.viewTarget.code : ''; statsData = null; loadStats(); }
         else render();
@@ -834,31 +843,79 @@
     return base;
   }
 
+  // ── 피드 날짜 네비 — feedDate=null이면 오늘(라이브), 과거는 api=day ──
+  function fmtD_(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+  function setFeedDate(ds) {
+    feedDate = (ds === todayStr()) ? null : ds;
+    if (feedDate && !feedDayCache[feedDate]) loadFeedDay(feedDate);
+    renderFeed();
+  }
+  function shiftFeedDay(delta) {
+    var p = (feedDate || todayStr()).split('-');
+    var d = new Date(+p[0], +p[1] - 1, +p[2] + delta);
+    if (fmtD_(d) > todayStr()) return;
+    setFeedDate(fmtD_(d));
+  }
+  function loadFeedDay(ds) {
+    fetch(API + '?api=day&u=' + encodeURIComponent(BOOT.member.code) + '&d=' + ds)
+      .then(function (r) { return r.json(); })
+      .then(function (res) {
+        feedDayCache[ds] = (res && !res.error) ? res : { totalMin: 0, segs: [] };
+        if (res && res.error) showToast(res.error, true);
+        if (view === 'feed' && feedDate === ds) renderFeed();
+      })
+      .catch(function () {
+        showToast('그날 기록을 불러오지 못했어요 — 인터넷 확인', true);
+        if (feedDate === ds) { feedDate = null; renderFeed(); }
+      });
+  }
+
   function renderFeed() {
     var m = BOOT.member;
     var vt = isViewer() ? BOOT.viewTarget : null; // 뷰어(엄마아빠)는 채영 피드를 보기 전용으로
     var who = vt || m;
-    var d = new Date();
-    var dateStr = (d.getMonth() + 1) + '월 ' + d.getDate() + '일 ' + ['일', '월', '화', '수', '목', '금', '토'][d.getDay()];
-    var shots = vt ? {} : loadShots();
-    // 피드 항목: 서버(이미 저장된 오늘 세션) + 로컬(진행 중 세션의 완료 구간)
+    var isToday = !feedDate;
+    var dayData = isToday ? null : feedDayCache[feedDate];
+    var nd;
+    if (isToday) nd = new Date();
+    else { var np = feedDate.split('-'); nd = new Date(+np[0], +np[1] - 1, +np[2]); }
+    var dateStr = (nd.getMonth() + 1) + '월 ' + nd.getDate() + '일 ' + ['일', '월', '화', '수', '목', '금', '토'][nd.getDay()];
+    var shots = (vt || !isToday) ? {} : loadShots();
+    // 피드 항목: 오늘=서버 today + 로컬(진행 중 세션) / 과거=api=day
     var evs = [];
-    ((BOOT.today && BOOT.today.segs) || []).forEach(function (sg) {
-      evs.push({ brk: sg.k === '휴식', k: sg.k, s: sg.s, e: sg.e, min: Math.max(0, toMin_(sg.e) - toMin_(sg.s)) });
-    });
-    if (sess) sess.segments.forEach(function (s) {
-      evs.push({ brk: s.type === 'break', k: s.type === 'break' ? '휴식' : (s.kind || sess.kind), s: hmOf(s.start), e: hmOf(s.end), min: Math.round((s.end - s.start) / 60000) });
-    });
+    if (isToday) {
+      ((BOOT.today && BOOT.today.segs) || []).forEach(function (sg) {
+        evs.push({ brk: sg.k === '휴식', k: sg.k, s: sg.s, e: sg.e, min: Math.max(0, toMin_(sg.e) - toMin_(sg.s)) });
+      });
+      if (sess) sess.segments.forEach(function (s) {
+        evs.push({ brk: s.type === 'break', k: s.type === 'break' ? '휴식' : (s.kind || sess.kind), s: hmOf(s.start), e: hmOf(s.end), min: Math.round((s.end - s.start) / 60000) });
+      });
+    } else if (dayData) {
+      (dayData.segs || []).forEach(function (sg) {
+        evs.push({ brk: sg.k === '휴식', k: sg.k, s: sg.s, e: sg.e, min: Math.max(0, toMin_(sg.e) - toMin_(sg.s)) });
+      });
+    }
 
     var h = '<div class="fd-top"><span>' + ddayFd(who) + '</span><div class="r">' +
       '<button class="fd-ic" id="fdCal" title="가족 캘린더 열기" aria-label="가족 캘린더 열기">📅</button>' +
       '<button class="fd-who" id="fdWho" title="이름 바꾸기">' + esc(m.name) + '</button></div></div>';
-    h += '<div class="fd-hd"><span class="d">' + esc(who.name) + (vt ? ' 👀' : '') + '<small>' + dateStr + '</small></span>' +
-      '<span class="tot">오늘 <b id="fdTotal">' + fmtHMS(feedTotalSec()) + '</b></span></div>';
+    h += '<div class="fd-hd"><span class="d">' + esc(who.name) + (vt ? ' 👀' : '') + '</span>' +
+      '<span class="tot">' + (isToday ? '오늘' : '합계') + ' <b id="fdTotal">' + (isToday ? fmtHMS(feedTotalSec()) : fmtHMS((dayData ? dayData.totalMin : 0) * 60)) + '</b></span></div>';
 
-    var liveShown = !!(vt && BOOT.live);
+    // 날짜 네비: ‹ 날짜(탭=달력) › + 오늘로
+    h += '<div class="fd-nav">' +
+      '<button class="arr" id="fdPrev" aria-label="전날">‹</button>' +
+      '<span class="dt">' + dateStr + '<input type="date" id="fdDateIn" value="' + (feedDate || todayStr()) + '" max="' + todayStr() + '" aria-label="날짜 선택"></span>' +
+      '<button class="arr" id="fdNext"' + (isToday ? ' disabled' : '') + ' aria-label="다음날">›</button>' +
+      (isToday ? '' : '<button class="today-btn" id="fdToday">오늘로 →</button>') + '</div>';
+
+    var liveShown = !!(isToday && vt && BOOT.live);
     h += '<div class="fd-feed">';
-    if (!evs.length && !sess && !liveShown) h += '<div class="fd-empty">' + (vt ? '오늘 아직 기록이 없어요' : '아직 기록이 없어요.<br>아래 버튼으로 오늘 연습을 시작해보세요!') + '</div>';
+    if (!evs.length && !(isToday && sess) && !liveShown) {
+      h += '<div class="fd-empty">' + (isToday
+        ? (vt ? '오늘 아직 기록이 없어요' : '아직 기록이 없어요.<br>아래 버튼으로 오늘 연습을 시작해보세요!')
+        : (dayData ? '이날은 기록이 없어요' : '불러오는 중…')) + '</div>';
+    }
     evs.forEach(function (ev) {
       var shot = !ev.brk && shots[ev.s];
       h += '<div class="fd-ev ' + (ev.brk ? 'b' : 'p') + '"><span class="dot"></span><div class="bx">' +
@@ -867,7 +924,7 @@
         (shot ? '<div class="fd-shot"><img src="' + shot + '" alt="인증샷"></div>' : '') +
         '</div></div>';
     });
-    if (sess) {
+    if (isToday && sess) {
       var isBrk = sess.state === 'break';
       h += '<div class="fd-ev fd-live' + (isBrk ? ' brk' : '') + '" id="fdLive"><span class="dot"></span><div class="bx">' +
         '<div class="r1"><span>' + (isBrk ? '☁️ 휴식 중' : '🎸 ' + esc(sess.kind) + ' 연습 중') + '</span><small>' + hmOf(sess.segStart) + ' 시작</small></div>' +
@@ -888,6 +945,10 @@
     $('fdCal').addEventListener('click', openCalendar);
     $('fdWho').addEventListener('click', function () { if (confirm('이름을 다시 고를까요?')) { store('famcode', null); init(); } });
     if ($('fdLive')) $('fdLive').addEventListener('click', function () { overlayOpen = true; view = 'timer'; render(); });
+    $('fdPrev').addEventListener('click', function () { shiftFeedDay(-1); });
+    $('fdNext').addEventListener('click', function () { shiftFeedDay(1); });
+    if ($('fdToday')) $('fdToday').addEventListener('click', function () { feedDate = null; renderFeed(); });
+    $('fdDateIn').addEventListener('change', function () { if (this.value) setFeedDate(this.value); });
     if (sess) acquireWake();
     startTick();
   }
@@ -1294,6 +1355,7 @@
         return;
       }
       if (view === 'feed') {
+        if (feedDate) return; // 과거 날짜 조회 중엔 고정 표시
         var ft = $('fdTotal'); if (ft) ft.textContent = fmtHMS(feedTotalSec());
         var lt = $('fdLiveT');
         if (lt && sess) lt.textContent = fmt(Date.now() - sess.segStart);
