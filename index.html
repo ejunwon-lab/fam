@@ -588,6 +588,13 @@
   function loadSess() {
     try { var s = JSON.parse(read(SKEY) || 'null'); return (s && (s.state === 'practice' || s.state === 'break')) ? s : null; } catch (e) { return null; }
   }
+  /** 뷰어(엄마아빠): 통계전체 Y + 비연습 — 채영 피드 보기 전용 */
+  function isViewer() { return !!(BOOT && BOOT.member && BOOT.member.statsAll && !BOOT.member.practice && BOOT.viewTarget); }
+  function defaultView(d) {
+    var m = d && d.member;
+    if (!m) return 'home';
+    return (sess || m.practice || (m.statsAll && d.viewTarget)) ? 'feed' : 'home';
+  }
   function saveSess() { store(SKEY, sess ? JSON.stringify(sess) : null); }
 
   function bootKey(code) { return 'bootcache:' + code; }
@@ -604,7 +611,7 @@
     if (code) { try { cached = JSON.parse(read(bootKey(code)) || 'null'); } catch (e) {} }
     if (cached && cached.member) {
       BOOT = cached;
-      view = (sess || cached.member.practice) ? 'feed' : 'home';
+      view = defaultView(cached);
       render();
     } else {
       $('app').innerHTML = '<div class="loading"><div class="spin"></div>불러오는 중…</div>';
@@ -615,7 +622,7 @@
         BOOT = data;
         saveBoot(data);
         flushEvents(); // 밀린 전환 이벤트(오프라인 인증샷 등) 재전송
-        if (!cached) view = (sess || (data.member && data.member.practice)) ? 'feed' : 'home';
+        if (!cached) view = defaultView(data);
         // 사용자가 시트·요약을 보는 중이면 화면은 두고 데이터만 갱신
         if (!document.body.classList.contains('open') && !document.body.classList.contains('summary-on') && view !== 'stats') {
           render();
@@ -669,7 +676,7 @@
   /** 공통 하단 메뉴 — 피드 도크와 다른 화면(#tabbar) 모두 같은 항목·같은 카드 스타일 */
   function menuTabs() {
     var t = [];
-    if (BOOT.member.practice) t.push({ k: 'feed', i: '🏠', l: '홈' });
+    if (BOOT.member.practice || isViewer()) t.push({ k: 'feed', i: '🏠', l: '홈' });
     t.push({ k: 'home', i: '📅', l: '일정 등록' });
     if (BOOT.member.practice) t.push({ k: 'timer', i: '✅', l: '할 일' });
     t.push({ k: 'stats', i: '📊', l: '통계' });
@@ -687,7 +694,7 @@
         if (k === view) return;
         overlayOpen = false;
         view = k;
-        if (k === 'stats') { statsOff = 0; statsTarget = ''; statsData = null; loadStats(); }
+        if (k === 'stats') { statsOff = 0; statsTarget = isViewer() ? BOOT.viewTarget.code : ''; statsData = null; loadStats(); }
         else render();
       });
     });
@@ -700,7 +707,8 @@
       $('retryBtn').addEventListener('click', init); return;
     }
     if (!BOOT.member) return renderPicker();
-    if ((view === 'timer' || view === 'feed') && !BOOT.member.practice && !sess) view = 'home';
+    if (view === 'timer' && !BOOT.member.practice && !sess) view = 'home';
+    if (view === 'feed' && !BOOT.member.practice && !sess && !isViewer()) view = 'home';
     if (view === 'feed') return renderFeed();
     if (view === 'timer') return renderTimer();
     if (view === 'stats') return renderStats();
@@ -819,11 +827,20 @@
     return '<span class="fd-dday">' + esc(m.ddayName || '디데이') + ' ' + tag + '</span>';
   }
 
+  /** 피드 합계 — 뷰어는 라이브 연습 경과를 서버 누적에 더해 표시 */
+  function feedTotalSec() {
+    var base = todaySec(null);
+    if (!sess && isViewer() && BOOT.live && BOOT.live.state === 'practice') base += Math.floor((Date.now() - BOOT.live.at) / 1000);
+    return base;
+  }
+
   function renderFeed() {
     var m = BOOT.member;
+    var vt = isViewer() ? BOOT.viewTarget : null; // 뷰어(엄마아빠)는 채영 피드를 보기 전용으로
+    var who = vt || m;
     var d = new Date();
     var dateStr = (d.getMonth() + 1) + '월 ' + d.getDate() + '일 ' + ['일', '월', '화', '수', '목', '금', '토'][d.getDay()];
-    var shots = loadShots();
+    var shots = vt ? {} : loadShots();
     // 피드 항목: 서버(이미 저장된 오늘 세션) + 로컬(진행 중 세션의 완료 구간)
     var evs = [];
     ((BOOT.today && BOOT.today.segs) || []).forEach(function (sg) {
@@ -833,14 +850,15 @@
       evs.push({ brk: s.type === 'break', k: s.type === 'break' ? '휴식' : (s.kind || sess.kind), s: hmOf(s.start), e: hmOf(s.end), min: Math.round((s.end - s.start) / 60000) });
     });
 
-    var h = '<div class="fd-top"><span>' + ddayFd(m) + '</span><div class="r">' +
+    var h = '<div class="fd-top"><span>' + ddayFd(who) + '</span><div class="r">' +
       '<button class="fd-ic" id="fdCal" title="가족 캘린더 열기" aria-label="가족 캘린더 열기">📅</button>' +
       '<button class="fd-who" id="fdWho" title="이름 바꾸기">' + esc(m.name) + '</button></div></div>';
-    h += '<div class="fd-hd"><span class="d">' + esc(m.name) + '<small>' + dateStr + '</small></span>' +
-      '<span class="tot">오늘 <b id="fdTotal">' + fmtHMS(todaySec(null)) + '</b></span></div>';
+    h += '<div class="fd-hd"><span class="d">' + esc(who.name) + (vt ? ' 👀' : '') + '<small>' + dateStr + '</small></span>' +
+      '<span class="tot">오늘 <b id="fdTotal">' + fmtHMS(feedTotalSec()) + '</b></span></div>';
 
+    var liveShown = !!(vt && BOOT.live);
     h += '<div class="fd-feed">';
-    if (!evs.length && !sess) h += '<div class="fd-empty">아직 기록이 없어요.<br>아래 버튼으로 오늘 연습을 시작해보세요!</div>';
+    if (!evs.length && !sess && !liveShown) h += '<div class="fd-empty">' + (vt ? '오늘 아직 기록이 없어요' : '아직 기록이 없어요.<br>아래 버튼으로 오늘 연습을 시작해보세요!') + '</div>';
     evs.forEach(function (ev) {
       var shot = !ev.brk && shots[ev.s];
       h += '<div class="fd-ev ' + (ev.brk ? 'b' : 'p') + '"><span class="dot"></span><div class="bx">' +
@@ -855,6 +873,13 @@
         '<div class="r1"><span>' + (isBrk ? '☁️ 휴식 중' : '🎸 ' + esc(sess.kind) + ' 연습 중') + '</span><small>' + hmOf(sess.segStart) + ' 시작</small></div>' +
         '<div class="t" id="fdLiveT">' + fmt(Date.now() - sess.segStart) + '</div>' +
         '<small>탭하면 집중 화면 (할 일 체크)</small></div></div>';
+    } else if (liveShown) {
+      // 뷰어 라이브 카드 — practice_event 기반 실시간 상태 (보기 전용)
+      var lv = BOOT.live, lvBrk = lv.state === 'break';
+      h += '<div class="fd-ev fd-live' + (lvBrk ? ' brk' : '') + '"><span class="dot"></span><div class="bx" style="cursor:default">' +
+        '<div class="r1"><span>' + (lvBrk ? '☁️ 휴식 중' : '🎸 ' + esc(lv.kind || '연습') + ' 연습 중') + '</span><small>' + hmOf(lv.at) + ' 시작</small></div>' +
+        '<div class="t" id="fdLiveT">' + fmt(Date.now() - lv.at) + '</div>' +
+        '<small>👀 실시간 — ' + esc(who.name) + ' 폰 기준</small></div></div>';
     }
     h += '</div>';
 
@@ -1269,8 +1294,10 @@
         return;
       }
       if (view === 'feed') {
-        var ft = $('fdTotal'); if (ft) ft.textContent = fmtHMS(todaySec(null));
-        var lt = $('fdLiveT'); if (lt && sess) lt.textContent = fmt(Date.now() - sess.segStart);
+        var ft = $('fdTotal'); if (ft) ft.textContent = fmtHMS(feedTotalSec());
+        var lt = $('fdLiveT');
+        if (lt && sess) lt.textContent = fmt(Date.now() - sess.segStart);
+        else if (lt && isViewer() && BOOT.live) lt.textContent = fmt(Date.now() - BOOT.live.at);
         return;
       }
       if (view !== 'timer') return;
@@ -1581,6 +1608,11 @@
         showToast('등록 완료 — ' + title + ' (' + subjectName + ') ' + startLabel + ', 가족 캘린더에 올라갔어요');
       })
       .catch(function () { sending = false; btn.disabled = false; btn.textContent = '캘린더에 등록'; showToast('등록에 실패했어요. 인터넷 연결을 확인하고 다시 시도해주세요.', true); });
+  });
+
+  // 뷰어: 앱 복귀 시 채영 피드·라이브 상태 재조회 (폴링 없음 — GAS 부하 최소)
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden && isViewer() && view === 'feed') init();
   });
 
   if ('serviceWorker' in navigator) { try { navigator.serviceWorker.register('sw.js'); } catch (e) {} }
