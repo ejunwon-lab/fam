@@ -484,13 +484,21 @@
   .fd-live.brk .bx { background: linear-gradient(135deg, #5fb4ec, #3e8fd8); box-shadow: 0 10px 26px rgba(80, 150, 210, .3); }
   .fd-live.brk .bx small { color: #d8ecfb; }
   .fd-empty { text-align: center; color: #b8ae99; font-size: 13.5px; padding: 30px 0 22px; }
-  .fd-main { display: flex; gap: 10px; }
-  .fd-big { flex: 1.7; border: none; border-radius: 18px; background: linear-gradient(135deg, #ff9548, #ff6b35); color: #fff; padding: 15px 8px; font: inherit; font-size: 17px; font-weight: 800; cursor: pointer; box-shadow: 0 8px 22px rgba(255, 107, 53, .3); }
-  .fd-big small { display: block; font-size: 10.5px; font-weight: 600; margin-top: 2px; opacity: .85; }
-  .fd-big.blue { background: linear-gradient(135deg, #5fb4ec, #3e8fd8); box-shadow: 0 8px 22px rgba(80, 150, 210, .3); }
-  .fd-big:active { filter: brightness(.94); }
-  .fd-sm { flex: 1; border: none; border-radius: 18px; background: #f4f1ea; color: #8a8272; padding: 15px 6px; font: inherit; font-size: 13.5px; font-weight: 800; cursor: pointer; }
-  .fd-sm:disabled { opacity: .5; cursor: default; }
+  /* 도크 확정안 A — 큰 버튼=현재 상태(중앙)+행동 칩(전환될 상태 색), 종료=축소 고정폭 */
+  .fd-main { display: flex; gap: 10px; align-items: stretch; }
+  .dk-big { flex: 1; border: none; font: inherit; cursor: pointer; border-radius: 18px; padding: 11px 12px; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-align: center; }
+  .dk-big.prac { background: linear-gradient(135deg, #ff9548, #ff6b35); box-shadow: 0 8px 22px rgba(255, 107, 53, .3); }
+  .dk-big.brk { background: linear-gradient(135deg, #5fb4ec, #3e8fd8); box-shadow: 0 8px 22px rgba(80, 150, 210, .3); }
+  .dk-big:active { filter: brightness(.94); }
+  .dk-st { display: flex; align-items: baseline; justify-content: center; gap: 8px; font-size: 16px; font-weight: 800; }
+  .dk-st b { font-size: 19px; font-variant-numeric: tabular-nums; font-weight: 800; }
+  .dk-act { font-size: 11.5px; font-weight: 800; border-radius: 99px; padding: 4px 12px; color: #fff; }
+  .dk-act.to-brk { background: #3e8fd8; box-shadow: 0 3px 10px rgba(62, 143, 216, .4); }
+  .dk-act.to-prac { background: #f4652f; box-shadow: 0 3px 10px rgba(244, 101, 47, .4); }
+  .dk-act.neutral { background: rgba(255, 255, 255, .2); }
+  .dk-end { flex: none; width: 86px; border: none; font: inherit; cursor: pointer; border-radius: 14px; background: #f4f1ea; color: #8a8272; font-size: 11.5px; font-weight: 800; line-height: 1.35; padding: 8px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-align: center; }
+  .dk-end .ic { font-size: 14px; }
+  .dk-end:disabled { opacity: .55; cursor: default; }
 
   /* 과목 선택 (연습 시작 전) */
   .fd-pick { position: fixed; inset: 0; z-index: 9; background: rgba(30, 20, 10, .45); display: flex; align-items: flex-end; justify-content: center; }
@@ -498,6 +506,9 @@
   .fd-pick h3 { margin: 0 0 14px; font-size: 16px; color: #33302a; }
   .fd-pick .k { width: 100%; display: flex; align-items: center; gap: 10px; margin-bottom: 8px; background: #fff9f0; border: 1px solid #f0e4d0; border-radius: 16px; padding: 15px 16px; font: inherit; font-size: 16px; font-weight: 700; color: #33302a; cursor: pointer; }
   .fd-pick .k .kd { width: 12px; height: 12px; border-radius: 50%; flex: none; }
+  .fd-pick .k.main { background: linear-gradient(135deg, #ff9548, #ff6b35); border: none; color: #fff; font-size: 17px; font-weight: 800; padding: 17px 16px; box-shadow: 0 8px 22px rgba(255, 107, 53, .3); }
+  .fd-pick .done-b { margin-left: auto; font-size: 11px; font-weight: 800; color: #2f9e63; background: #e2f4ea; border-radius: 99px; padding: 2px 9px; flex: none; }
+  .fd-pick .k.main .done-b { color: #fff; background: rgba(255, 255, 255, .25); }
 
   /* 인증샷 카메라 오버레이 */
   .cam { position: fixed; inset: 0; z-index: 10; background: #000; display: none; align-items: center; justify-content: center; }
@@ -629,8 +640,7 @@
     bar.innerHTML = (prac ? dockHtml() : '') + menuHtml();
     bindMenu(bar);
     if ($('fdStart')) $('fdStart').addEventListener('click', function () {
-      if (sess) openCam(sess.kind, true);                    // 휴식 → 재개 (인증샷)
-      else chooseKind(function (k) { openCam(k, false); }); // 새 세션
+      chooseKind(function (k) { openCam(k, !!sess); }); // 세션 있으면 재개(과목 전환 가능) → 📷
     });
     if ($('fdRest')) $('fdRest').addEventListener('click', doBreak);
     if ($('fdEnd')) $('fdEnd').addEventListener('click', tFinish);
@@ -641,14 +651,17 @@
   function dockHtml() {
     var h = '<div class="fd-main">';
     if (!sess) {
-      h += '<button class="fd-big" id="fdStart">▶ 연습 시작<small>오늘 ' + clockHM(Math.floor(todaySec(null) / 60)) + ' · 📷 인증샷 찍고 출발!</small></button>' +
-        '<button class="fd-sm" disabled>☁️ 휴식</button>';
+      h += '<button class="dk-big prac" id="fdStart"><span class="dk-st">▶ 연습 시작</span>' +
+        '<span class="dk-act neutral">오늘 ' + clockHM(Math.floor(todaySec(null) / 60)) + ' · 📷 인증샷 찍고 출발!</span></button>' +
+        '<button class="dk-end" disabled>☁️ 휴식</button>';
     } else if (sess.state === 'practice') {
-      h += '<button class="fd-big blue" id="fdRest">☁️ 휴식<small>⏱ <b id="dkTime">' + fmt(Date.now() - sess.segStart) + '</b> ' + esc(sess.kind) + ' 연습 중</small></button>' +
-        '<button class="fd-sm" id="fdEnd">⏹ 오늘 연습 종료</button>';
+      h += '<button class="dk-big prac" id="fdRest"><span class="dk-st">🎸 ' + esc(sess.kind) + ' 연습 중 <b id="dkTime">' + fmt(Date.now() - sess.segStart) + '</b></span>' +
+        '<span class="dk-act to-brk">누르면 ☁️ 휴식</span></button>' +
+        '<button class="dk-end" id="fdEnd"><span class="ic">⏹</span>오늘 연습<br>종료</button>';
     } else {
-      h += '<button class="fd-big" id="fdStart">▶ 연습 시작<small>☁️ <b id="dkTime">' + fmt(Date.now() - sess.segStart) + '</b> 휴식 중 · 📷 인증샷</small></button>' +
-        '<button class="fd-sm" id="fdEnd">⏹ 오늘 연습 종료</button>';
+      h += '<button class="dk-big brk" id="fdStart"><span class="dk-st">☁️ 휴식 중 <b id="dkTime">' + fmt(Date.now() - sess.segStart) + '</b></span>' +
+        '<span class="dk-act to-prac">누르면 ▶ 연습 시작 📷</span></button>' +
+        '<button class="dk-end" id="fdEnd"><span class="ic">⏹</span>오늘 연습<br>종료</button>';
     }
     return h + '</div>';
   }
@@ -817,7 +830,7 @@
       evs.push({ brk: sg.k === '휴식', k: sg.k, s: sg.s, e: sg.e, min: Math.max(0, toMin_(sg.e) - toMin_(sg.s)) });
     });
     if (sess) sess.segments.forEach(function (s) {
-      evs.push({ brk: s.type === 'break', k: s.type === 'break' ? '휴식' : sess.kind, s: hmOf(s.start), e: hmOf(s.end), min: Math.round((s.end - s.start) / 60000) });
+      evs.push({ brk: s.type === 'break', k: s.type === 'break' ? '휴식' : (s.kind || sess.kind), s: hmOf(s.start), e: hmOf(s.end), min: Math.round((s.end - s.start) / 60000) });
     });
 
     var h = '<div class="fd-top"><span>' + ddayFd(m) + '</span><div class="r">' +
@@ -854,17 +867,35 @@
     startTick();
   }
 
+  /** 주과목 = 주1회가 아닌 첫 과목(베이스). 디폴트: 직전 과목, 단 주1회 과목(휴식=그 과목 종료 개념)이면 주과목 복귀 */
+  function primaryKind() {
+    var subs = BOOT.subjects || [];
+    for (var i = 0; i < subs.length; i++) if (!subs[i].weekly) return subs[i].name;
+    return subs.length ? subs[0].name : '베이스';
+  }
+  function defaultKind() {
+    if (!sess) return primaryKind();
+    var cur = (BOOT.subjects || []).find(function (s) { return s.name === sess.kind; });
+    return (cur && cur.weekly) ? primaryKind() : sess.kind;
+  }
   function chooseKind(cb) {
     var subs = BOOT.subjects || [];
     if (subs.length <= 1) return cb(subs.length ? subs[0].name : '베이스');
+    var dflt = defaultKind();
+    var sorted = subs.filter(function (s) { return s.name === dflt; })
+      .concat(subs.filter(function (s) { return s.name !== dflt; }));
     var ov = document.createElement('div'); ov.className = 'fd-pick';
-    ov.innerHTML = '<div class="pk"><h3>어떤 연습이에요?</h3>' + subs.map(function (s, i) {
-      return '<button class="k" data-i="' + i + '"><span class="kd" style="background:' + (s.color || '#9aa4b2') + '"></span>' + esc(s.name) + '</button>';
+    ov.innerHTML = '<div class="pk"><h3>어떤 연습이에요?</h3>' + sorted.map(function (s) {
+      var main = s.name === dflt;
+      var badge = (s.weekly && todaySec(s.name) > 0) ? '<span class="done-b">✓ 오늘 완료</span>' : '';
+      return '<button class="k' + (main ? ' main' : '') + '" data-k="' + esc(s.name) + '">' +
+        '<span class="kd" style="background:' + (main ? 'rgba(255,255,255,.65)' : (s.color || '#9aa4b2')) + '"></span>' +
+        (main ? '▶ ' + esc(s.name) + ' 시작' : esc(s.name)) + badge + '</button>';
     }).join('') + '</div>';
     document.body.appendChild(ov);
     ov.addEventListener('click', function (e) { if (e.target === ov) document.body.removeChild(ov); });
     ov.querySelectorAll('.k').forEach(function (b) {
-      b.addEventListener('click', function () { var k = subs[+b.getAttribute('data-i')].name; document.body.removeChild(ov); cb(k); });
+      b.addEventListener('click', function () { var k = b.getAttribute('data-k'); document.body.removeChild(ov); cb(k); });
     });
   }
 
@@ -933,7 +964,7 @@
     document.body.classList.remove('cam-on'); $('cam').innerHTML = '';
     var ctx = camCtx; camCtx = null;
     if (!ctx) return;
-    if (ctx.resume) doResume(photo, thumb); else doStart(ctx.kind, photo, thumb);
+    if (ctx.resume) doResume(ctx.kind, photo, thumb); else doStart(ctx.kind, photo, thumb);
   }
 
   /** 전환 이벤트 서버 통지 — 실패해도 타이머·기록은 계속. 실패분은 큐에 남겨 인터넷 복귀 시 자동 재전송 */
@@ -992,10 +1023,11 @@
   }
   function localPracticeSec(kind) {
     if (!sess) return 0;
-    if (kind && sess.kind !== kind) return 0;
-    var t = 0;
-    sess.segments.forEach(function (s) { if (s.type === 'practice') t += s.end - s.start; });
-    if (sess.state === 'practice') t += Date.now() - sess.segStart;
+    var t = 0; // 구간별 kind — 한 세션 안 과목 전환 지원
+    sess.segments.forEach(function (s) {
+      if (s.type === 'practice' && (!kind || (s.kind || sess.kind) === kind)) t += s.end - s.start;
+    });
+    if (sess.state === 'practice' && (!kind || sess.kind === kind)) t += Date.now() - sess.segStart;
     return Math.floor(t / 1000);
   }
   function todaySec(kind) {
@@ -1268,16 +1300,16 @@
   function doBreak() {
     if (!sess || sess.state !== 'practice') return;
     var segMin = Math.round((Date.now() - sess.segStart) / 60000);
-    sess.segments.push({ type: 'practice', start: sess.segStart, end: Date.now() });
+    sess.segments.push({ type: 'practice', kind: sess.kind, start: sess.segStart, end: Date.now() });
     sess.state = 'break'; sess.segStart = Date.now(); saveSess();
     sendEvent('break', segMin, null);
     if (document.body.classList.contains('measuring')) renderMeasure(); else render();
   }
-  function doResume(photo, thumb) {
-    if (!sess || sess.state !== 'break') { camCtx = null; return; }
+  function doResume(kind, photo, thumb) {
+    if (!sess || sess.state !== 'break') return;
     var brkMin = Math.round((Date.now() - sess.segStart) / 60000);
     sess.segments.push({ type: 'break', start: sess.segStart, end: Date.now() });
-    sess.state = 'practice'; sess.segStart = Date.now(); saveSess();
+    sess.state = 'practice'; sess.kind = kind || sess.kind; sess.segStart = Date.now(); saveSess();
     if (thumb) saveShot(hmOf(sess.segStart), thumb);
     sendEvent('resume', brkMin, photo);
     if (document.body.classList.contains('measuring')) renderMeasure(); else render();
@@ -1286,7 +1318,7 @@
     if (!sess) return;
     var btn = $('bStop') || $('fdEnd'), orig = btn ? btn.textContent : '';
     if (btn) { btn.disabled = true; btn.textContent = '저장 중…'; }
-    sess.segments.push({ type: sess.state, start: sess.segStart, end: Date.now() });
+    sess.segments.push({ type: sess.state, kind: sess.state === 'practice' ? sess.kind : '', start: sess.segStart, end: Date.now() });
     var payload = { action: 'session', u: BOOT.member.code, kind: sess.kind, segments: sess.segments };
     fetch(API, { method: 'POST', body: JSON.stringify(payload) })
       .then(function (r) { return r.json(); })
@@ -1302,9 +1334,13 @@
 
   function showSummary(sm) {
     var pMin = sm.practiceMin || 0, sets = sm.sets || 0, kind = sm.kind || '베이스';
+    // 과목별 분해 (한 세션 안 과목 전환 시 "베이스 52분 + 화성학 48분")
+    var title = (sm.kinds && sm.kinds.length)
+      ? sm.kinds.map(function (k) { return esc(k.kind) + ' ' + human(k.min * 60000); }).join(' + ')
+      : esc(kind) + ' 연습 · ' + human(pMin * 60000);
     $('summary').innerHTML =
       '<div class="done-ic">🎉</div><h2>오늘 연습 끝!</h2><p class="ssub">실연습 ' + human(pMin * 60000) + ' · 잘했어요</p>' +
-      '<div class="evt-card"><div class="cal-row">🎸 연습 기록 저장됐어요</div><div class="etitle">' + esc(kind) + ' 연습 · ' + human(pMin * 60000) + '</div>' +
+      '<div class="evt-card"><div class="cal-row">🎸 연습 기록 저장됐어요</div><div class="etitle">' + title + '</div>' +
       '<div class="edesc">' + sets + '세트 · 통계 탭에서 오늘 잔디와 시간을 볼 수 있어요</div></div>' +
       '<button class="close" id="sClose">확인</button>';
     document.body.classList.add('summary-on');
