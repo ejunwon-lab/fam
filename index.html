@@ -531,7 +531,7 @@
     <div class="chips" id="durChips"></div>
     <div class="dt-row" id="endRow" style="display:none; margin-top:8px"><input type="time" id="shEnd" aria-label="끝나는 시간"></div>
     <div class="endline" id="endline"></div>
-    <button class="cta" id="ctaBtn">가족 캘린더에 등록</button>
+    <button class="cta" id="ctaBtn">캘린더에 등록</button>
   </div>
 
   <div class="tsheet" id="todoSheet"></div>
@@ -1539,12 +1539,12 @@
     fetch(API, { method: 'POST', body: JSON.stringify(payload) })
       .then(function (r) { return r.json(); })
       .then(function (res) {
-        sending = false; btn.disabled = false; btn.textContent = '가족 캘린더에 등록';
+        sending = false; btn.disabled = false; btn.textContent = '캘린더에 등록';
         if (res && res.error) { showToast(res.error, true); return; }
         BOOT = res; saveBoot(res); render(); closeSheet();
         showToast('등록 완료 — ' + title + ' (' + subjectName + ') ' + startLabel + ', 가족 캘린더에 올라갔어요');
       })
-      .catch(function () { sending = false; btn.disabled = false; btn.textContent = '가족 캘린더에 등록'; showToast('등록에 실패했어요. 인터넷 연결을 확인하고 다시 시도해주세요.', true); });
+      .catch(function () { sending = false; btn.disabled = false; btn.textContent = '캘린더에 등록'; showToast('등록에 실패했어요. 인터넷 연결을 확인하고 다시 시도해주세요.', true); });
   });
 
   if ('serviceWorker' in navigator) { try { navigator.serviceWorker.register('sw.js'); } catch (e) {} }
