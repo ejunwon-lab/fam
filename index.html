@@ -446,6 +446,68 @@
   .install p { margin: 0; font-size: 12.5px; color: var(--sub); }
   .install .x { position: absolute; top: 8px; right: 8px; background: none; border: none; color: var(--sub); font-size: 16px; padding: 4px 8px; cursor: pointer; }
 
+  /* ── CY 세션 피드 홈 — 밝은 톤 (이 뷰 한정, 나머지 앱은 다크 유지) ── */
+  body.feed-on { background: #fff9f0; }
+  body.feed-on .screen { padding-bottom: 196px; }
+  .fd-top { display: flex; justify-content: space-between; align-items: center; padding: 6px 2px 0; }
+  .fd-top .r { display: flex; gap: 8px; align-items: center; }
+  .fd-ic { width: 32px; height: 32px; border-radius: 11px; padding: 0; background: #fff; border: 1px solid #f0e4d0; font-size: 15px; cursor: pointer; display: grid; place-items: center; }
+  .fd-who { font-size: 13px; font-weight: 700; color: #f4652f; background: #fff; border: 1px solid #f0e4d0; border-radius: 99px; padding: 6px 12px; cursor: pointer; font-family: inherit; }
+  .fd-hd { display: flex; justify-content: space-between; align-items: baseline; padding: 12px 2px 6px; color: #33302a; }
+  .fd-hd .d { font-size: 17px; font-weight: 800; }
+  .fd-hd .d small { color: #98917f; font-weight: 600; font-size: 13px; margin-left: 7px; }
+  .fd-hd .tot { font-size: 13px; color: #98917f; }
+  .fd-hd .tot b { color: #f4652f; font-size: 16px; font-variant-numeric: tabular-nums; }
+  .fd-dday { display: inline-block; background: #fff; border: 1px solid #f0e4d0; color: #a06b33; font-size: 11.5px; font-weight: 700; border-radius: 99px; padding: 3px 10px; }
+  .fd-feed { position: relative; padding: 4px 0 8px; }
+  .fd-feed::before { content: ""; position: absolute; left: 9px; top: 14px; bottom: 12px; width: 2px; background: #f0e4d0; }
+  .fd-ev { display: flex; gap: 13px; padding: 8px 0; position: relative; }
+  .fd-ev .dot { width: 20px; height: 20px; border-radius: 50%; background: #f0e4d0; border: 3px solid #fff9f0; flex: none; z-index: 1; }
+  .fd-ev.p .dot { background: #ff8a3d; }
+  .fd-ev.b .dot { background: #5fb4ec; }
+  .fd-ev .bx { flex: 1; min-width: 0; background: #fff; border-radius: 14px; padding: 11px 13px; font-size: 13px; box-shadow: 0 3px 14px rgba(120, 90, 40, .08); color: #33302a; }
+  .fd-ev .r1 { display: flex; justify-content: space-between; gap: 8px; font-weight: 700; }
+  .fd-ev .r1 .dur { color: #f4652f; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .fd-ev small { color: #98917f; font-weight: 500; font-variant-numeric: tabular-nums; }
+  .fd-ev.b .bx { background: #eaf4fd; box-shadow: none; color: #3e7fb4; }
+  .fd-ev.b .r1 .dur { color: #3e7fb4; }
+  .fd-ev.b small { color: #7fa5c4; }
+  .fd-shot { margin-top: 8px; height: 64px; border-radius: 10px; overflow: hidden; background: linear-gradient(135deg, #ffe3c2, #ffd1a6); display: flex; align-items: center; justify-content: center; font-size: 11px; color: #a06b33; font-weight: 600; }
+  .fd-shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .fd-live .dot { background: #ff8a3d; box-shadow: 0 0 0 4px rgba(255, 138, 61, .25); }
+  .fd-live .bx { background: linear-gradient(135deg, #ff9548, #ff6b35); color: #fff6ec; box-shadow: 0 10px 26px rgba(255, 107, 53, .32); cursor: pointer; }
+  .fd-live .bx small { color: #ffdcc2; }
+  .fd-live .t { font-size: 32px; font-weight: 800; font-variant-numeric: tabular-nums; margin-top: 2px; }
+  .fd-live.brk .dot { background: #5fb4ec; box-shadow: 0 0 0 4px rgba(95, 180, 236, .25); }
+  .fd-live.brk .bx { background: linear-gradient(135deg, #5fb4ec, #3e8fd8); box-shadow: 0 10px 26px rgba(80, 150, 210, .3); }
+  .fd-live.brk .bx small { color: #d8ecfb; }
+  .fd-empty { text-align: center; color: #b8ae99; font-size: 13.5px; padding: 30px 0 22px; }
+  .fd-dock { position: fixed; left: 50%; transform: translateX(-50%); bottom: 0; width: 100%; max-width: 480px; background: #fff; border-top: 1px solid #f3eada; padding: 12px 16px calc(14px + env(safe-area-inset-bottom)); z-index: 4; }
+  .fd-main { display: flex; gap: 10px; }
+  .fd-big { flex: 1.7; border: none; border-radius: 18px; background: linear-gradient(135deg, #ff9548, #ff6b35); color: #fff; padding: 15px 8px; font: inherit; font-size: 17px; font-weight: 800; cursor: pointer; box-shadow: 0 8px 22px rgba(255, 107, 53, .3); }
+  .fd-big small { display: block; font-size: 10.5px; font-weight: 600; margin-top: 2px; opacity: .85; }
+  .fd-big.blue { background: linear-gradient(135deg, #5fb4ec, #3e8fd8); box-shadow: 0 8px 22px rgba(80, 150, 210, .3); }
+  .fd-big:active { filter: brightness(.94); }
+  .fd-sm { flex: 1; border: none; border-radius: 18px; background: #f4f1ea; color: #8a8272; padding: 15px 6px; font: inherit; font-size: 13.5px; font-weight: 800; cursor: pointer; }
+  .fd-sm:disabled { opacity: .5; cursor: default; }
+  .fd-foot { display: flex; gap: 8px; margin-top: 11px; }
+  .fd-foot button { flex: 1; font: inherit; text-align: center; background: #fff; border: 1px solid #ede5d4; border-radius: 16px; padding: 12px 2px; font-size: 12.5px; font-weight: 700; color: #33302a; cursor: pointer; box-shadow: 0 2px 8px rgba(120, 90, 40, .06); }
+
+  /* 과목 선택 (연습 시작 전) */
+  .fd-pick { position: fixed; inset: 0; z-index: 9; background: rgba(30, 20, 10, .45); display: flex; align-items: flex-end; justify-content: center; }
+  .fd-pick .pk { background: #fff; border-radius: 22px 22px 0 0; width: 100%; max-width: 480px; padding: 20px 18px calc(24px + env(safe-area-inset-bottom)); }
+  .fd-pick h3 { margin: 0 0 14px; font-size: 16px; color: #33302a; }
+  .fd-pick .k { width: 100%; display: flex; align-items: center; gap: 10px; margin-bottom: 8px; background: #fff9f0; border: 1px solid #f0e4d0; border-radius: 16px; padding: 15px 16px; font: inherit; font-size: 16px; font-weight: 700; color: #33302a; cursor: pointer; }
+  .fd-pick .k .kd { width: 12px; height: 12px; border-radius: 50%; flex: none; }
+
+  /* 인증샷 카메라 오버레이 */
+  .cam { position: fixed; inset: 0; z-index: 10; background: #000; display: none; align-items: center; justify-content: center; }
+  body.cam-on .cam { display: flex; }
+  .cam video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+  .cam .cam-top { position: absolute; top: calc(20px + env(safe-area-inset-top)); left: 0; right: 0; text-align: center; color: #fff; font-weight: 800; font-size: 16px; text-shadow: 0 2px 8px rgba(0, 0, 0, .55); z-index: 1; }
+  .cam .cnt { position: relative; z-index: 1; font-size: 92px; font-weight: 800; color: #fff; text-shadow: 0 4px 18px rgba(0, 0, 0, .55); }
+  .cam .cam-skip { position: absolute; bottom: calc(28px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); z-index: 1; background: rgba(0, 0, 0, .45); color: #fff; border: 1px solid rgba(255, 255, 255, .4); border-radius: 99px; padding: 10px 18px; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+
   @media (prefers-reduced-motion: reduce) { .sheet, .backdrop, .toast, .preset, .spin, .summary, .dial { transition: none; animation: none; } }
 </style>
 </head>
@@ -478,6 +540,9 @@
   <div class="measure" id="measure"></div>
 
   <div class="summary" id="summary"></div>
+
+  <div class="cam" id="cam"></div>
+  <input type="file" id="camFile" accept="image/*" capture="user" style="display:none">
 
 <script>
   var API = 'https://script.google.com/macros/s/AKfycbxCMHMAE-br_i_MuSG7kQx-Jk6RZW-bqSQVBEorqXo0_EIa0BmujdHZJCNb_n0sSvU4lA/exec';
@@ -523,13 +588,13 @@
   function init() {
     var code = myCode();
     sess = loadSess();
-    if (sess) overlayOpen = true; // 측정 중이던 세션은 측정 화면으로 복귀
+    // 진행 중 세션이 있어도 피드 홈으로 복귀 — 라이브 카드 탭으로 측정 화면 진입
     // 캐시 우선: 지난 데이터로 즉시 그리고, 최신은 뒤에서 받아 갱신 (앱 시작 체감 0초)
     var cached = null;
     if (code) { try { cached = JSON.parse(read(bootKey(code)) || 'null'); } catch (e) {} }
     if (cached && cached.member) {
       BOOT = cached;
-      view = sess ? 'timer' : (cached.member.practice ? 'timer' : 'home');
+      view = (sess || cached.member.practice) ? 'feed' : 'home';
       render();
     } else {
       $('app').innerHTML = '<div class="loading"><div class="spin"></div>불러오는 중…</div>';
@@ -539,7 +604,7 @@
       .then(function (data) {
         BOOT = data;
         saveBoot(data);
-        if (!cached) view = (sess || (data.member && data.member.practice)) ? 'timer' : 'home';
+        if (!cached) view = (sess || (data.member && data.member.practice)) ? 'feed' : 'home';
         // 사용자가 시트·요약을 보는 중이면 화면은 두고 데이터만 갱신
         if (!document.body.classList.contains('open') && !document.body.classList.contains('summary-on') && view !== 'stats') {
           render();
@@ -556,8 +621,11 @@
 
   function renderTabs() {
     var bar = $('tabbar');
+    document.body.classList.toggle('feed-on', view === 'feed' && !!(BOOT && BOOT.member));
     if (!BOOT || BOOT.error || !BOOT.member) { bar.style.display = 'none'; return; }
+    if (view === 'feed') { bar.style.display = 'none'; return; } // 피드 홈은 자체 도크 사용
     var tabs = [];
+    if (BOOT.member.practice) tabs.push({ k: 'feed', i: '🏠', l: '홈' });
     tabs.push({ k: 'home', i: '📝', l: '일정 등록' });
     if (BOOT.member.practice) tabs.push({ k: 'timer', i: '🎸', l: '연습' });
     tabs.push({ k: 'stats', i: '📊', l: '통계' });
@@ -584,8 +652,9 @@
       $('retryBtn').addEventListener('click', init); return;
     }
     if (!BOOT.member) return renderPicker();
-    if (view === 'timer' && !BOOT.member.practice) view = 'home';
-    if (view !== 'timer') stopTick();
+    if ((view === 'timer' || view === 'feed') && !BOOT.member.practice && !sess) view = 'home';
+    if (view !== 'timer' && view !== 'feed') stopTick();
+    if (view === 'feed') return renderFeed();
     if (view === 'timer') return renderTimer();
     if (view === 'stats') return renderStats();
     return renderHome();
@@ -692,6 +761,177 @@
     window.addEventListener('pagehide', clear, { once: true });
     document.addEventListener('visibilitychange', function v() { if (document.hidden) { clear(); document.removeEventListener('visibilitychange', v); } });
     location.href = 'googlecalendar://';
+  }
+
+  // ── CY 세션 피드 홈 (밝은 톤) — 서버 today.segs + 진행 중 로컬 세션 ──
+  function hmOf(ep) { var d = new Date(ep); return pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+  function ddayFd(m) {
+    if (!m.dday) return '';
+    var dd = Math.ceil((new Date(m.dday + 'T00:00:00') - new Date(todayStr() + 'T00:00:00')) / 86400000);
+    var tag = dd > 0 ? 'D-' + dd : (dd === 0 ? 'D-DAY' : 'D+' + (-dd));
+    return '<span class="fd-dday">' + esc(m.ddayName || '디데이') + ' ' + tag + '</span>';
+  }
+
+  function renderFeed() {
+    var m = BOOT.member;
+    var d = new Date();
+    var dateStr = (d.getMonth() + 1) + '월 ' + d.getDate() + '일 ' + ['일', '월', '화', '수', '목', '금', '토'][d.getDay()];
+    var shots = loadShots();
+    // 피드 항목: 서버(이미 저장된 오늘 세션) + 로컬(진행 중 세션의 완료 구간)
+    var evs = [];
+    ((BOOT.today && BOOT.today.segs) || []).forEach(function (sg) {
+      evs.push({ brk: sg.k === '휴식', k: sg.k, s: sg.s, e: sg.e, min: Math.max(0, toMin_(sg.e) - toMin_(sg.s)) });
+    });
+    if (sess) sess.segments.forEach(function (s) {
+      evs.push({ brk: s.type === 'break', k: s.type === 'break' ? '휴식' : sess.kind, s: hmOf(s.start), e: hmOf(s.end), min: Math.round((s.end - s.start) / 60000) });
+    });
+
+    var h = '<div class="fd-top"><span>' + ddayFd(m) + '</span><div class="r">' +
+      '<button class="fd-ic" id="fdCal" title="가족 캘린더 열기" aria-label="가족 캘린더 열기">📅</button>' +
+      '<button class="fd-who" id="fdWho" title="이름 바꾸기">' + esc(m.name) + '</button></div></div>';
+    h += '<div class="fd-hd"><span class="d">' + esc(m.name) + '<small>' + dateStr + '</small></span>' +
+      '<span class="tot">오늘 <b id="fdTotal">' + fmtHMS(todaySec(null)) + '</b></span></div>';
+
+    h += '<div class="fd-feed">';
+    if (!evs.length && !sess) h += '<div class="fd-empty">아직 기록이 없어요.<br>아래 버튼으로 오늘 연습을 시작해보세요!</div>';
+    evs.forEach(function (ev) {
+      var shot = !ev.brk && shots[ev.s];
+      h += '<div class="fd-ev ' + (ev.brk ? 'b' : 'p') + '"><span class="dot"></span><div class="bx">' +
+        '<div class="r1"><span>' + (ev.brk ? '☁️ 휴식' : '🎸 ' + esc(ev.k)) + '</span><span class="dur">' + durLabel(Math.max(1, ev.min)) + '</span></div>' +
+        (ev.brk ? '' : '<small>' + ev.s + ' – ' + ev.e + '</small>') +
+        (shot ? '<div class="fd-shot"><img src="' + shot + '" alt="인증샷"></div>' : '') +
+        '</div></div>';
+    });
+    if (sess) {
+      var isBrk = sess.state === 'break';
+      h += '<div class="fd-ev fd-live' + (isBrk ? ' brk' : '') + '" id="fdLive"><span class="dot"></span><div class="bx">' +
+        '<div class="r1"><span>' + (isBrk ? '☁️ 휴식 중' : '🎸 ' + esc(sess.kind) + ' 연습 중') + '</span><small>' + hmOf(sess.segStart) + ' 시작</small></div>' +
+        '<div class="t" id="fdLiveT">' + fmt(Date.now() - sess.segStart) + '</div>' +
+        '<small>탭하면 집중 화면 (할 일 체크)</small></div></div>';
+    }
+    h += '</div>';
+
+    // 하단 도크 — 상태별 큰 버튼 + 흰 카드 3개
+    h += '<div class="fd-dock"><div class="fd-main">';
+    if (!sess) {
+      h += '<button class="fd-big" id="fdStart">▶ 연습 시작<small>📷 인증샷 찍고 출발!</small></button>' +
+        '<button class="fd-sm" disabled>☁️ 휴식</button>';
+    } else if (sess.state === 'practice') {
+      h += '<button class="fd-big blue" id="fdRest">☁️ 휴식<small>연습 시간 저장</small></button>' +
+        '<button class="fd-sm" id="fdEnd">⏹ 오늘 연습 종료</button>';
+    } else {
+      h += '<button class="fd-big" id="fdStart">▶ 연습 시작<small>📷 인증샷 찍고 출발!</small></button>' +
+        '<button class="fd-sm" id="fdEnd">⏹ 오늘 연습 종료</button>';
+    }
+    h += '</div><div class="fd-foot">' +
+      '<button id="fdReg">📅 일정 등록</button><button id="fdTodo">✅ 할 일 등록</button><button id="fdStats">📊 통계</button></div></div>';
+
+    $('app').innerHTML = h;
+    $('fdCal').addEventListener('click', openCalendar);
+    $('fdWho').addEventListener('click', function () { if (confirm('이름을 다시 고를까요?')) { store('famcode', null); init(); } });
+    if ($('fdStart')) $('fdStart').addEventListener('click', function () {
+      if (sess) openCam(sess.kind, true);                    // 휴식 → 재개 (인증샷)
+      else chooseKind(function (k) { openCam(k, false); }); // 새 세션
+    });
+    if ($('fdRest')) $('fdRest').addEventListener('click', doBreak);
+    if ($('fdEnd')) $('fdEnd').addEventListener('click', tFinish);
+    if ($('fdLive')) $('fdLive').addEventListener('click', function () { overlayOpen = true; view = 'timer'; render(); });
+    $('fdReg').addEventListener('click', function () { view = 'home'; render(); });
+    $('fdTodo').addEventListener('click', function () { overlayOpen = false; view = 'timer'; render(); openTodoSheet(); });
+    $('fdStats').addEventListener('click', function () { view = 'stats'; statsOff = 0; statsTarget = ''; statsData = null; loadStats(); });
+    if (sess) acquireWake();
+    startTick();
+  }
+
+  function chooseKind(cb) {
+    var subs = BOOT.subjects || [];
+    if (subs.length <= 1) return cb(subs.length ? subs[0].name : '베이스');
+    var ov = document.createElement('div'); ov.className = 'fd-pick';
+    ov.innerHTML = '<div class="pk"><h3>어떤 연습이에요?</h3>' + subs.map(function (s, i) {
+      return '<button class="k" data-i="' + i + '"><span class="kd" style="background:' + (s.color || '#9aa4b2') + '"></span>' + esc(s.name) + '</button>';
+    }).join('') + '</div>';
+    document.body.appendChild(ov);
+    ov.addEventListener('click', function (e) { if (e.target === ov) document.body.removeChild(ov); });
+    ov.querySelectorAll('.k').forEach(function (b) {
+      b.addEventListener('click', function () { var k = subs[+b.getAttribute('data-i')].name; document.body.removeChild(ov); cb(k); });
+    });
+  }
+
+  // ── 인증샷 카메라 — getUserMedia 자동촬영 + <input capture> 폴백. 실패해도 연습은 시작된다 ──
+  var SHOTKEY = 'famshots';
+  function loadShots() { try { var s = JSON.parse(read(SHOTKEY) || 'null'); if (s && s.date === todayStr()) return s.shots || {}; } catch (e) {} return {}; }
+  function saveShot(hm, dataUrl) { var shots = loadShots(); shots[hm] = dataUrl; try { store(SHOTKEY, JSON.stringify({ date: todayStr(), shots: shots })); } catch (e) {} }
+
+  var camStream = null, camTimer = null, camCtx = null;
+  function openCam(kind, resume) {
+    camCtx = { kind: kind, resume: resume };
+    $('cam').innerHTML = '<video id="camV" autoplay playsinline muted></video>' +
+      '<div class="cam-top" id="camTop">📷 인증샷 — 곧 자동으로 찍혀요</div><div class="cnt" id="camCnt"></div>' +
+      '<button class="cam-skip" id="camSkip">사진 없이 시작</button>';
+    document.body.classList.add('cam-on');
+    $('camSkip').addEventListener('click', function () { camDone(null); });
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false })
+        .then(function (st) {
+          if (!camCtx) { try { st.getTracks().forEach(function (t) { t.stop(); }); } catch (e) {} return; }
+          camStream = st; $('camV').srcObject = st;
+          var n = 3; $('camCnt').textContent = n;
+          camTimer = setInterval(function () {
+            n--; if (n > 0) { $('camCnt').textContent = n; return; }
+            clearInterval(camTimer); camTimer = null; camSnap();
+          }, 1000);
+        })
+        .catch(function () { camFilePick(); });
+    } else camFilePick();
+  }
+  function scaleTo_(src, w, hgt, max, q) {
+    var sc = Math.min(1, max / Math.max(w, hgt));
+    var c = document.createElement('canvas');
+    c.width = Math.max(1, Math.round(w * sc)); c.height = Math.max(1, Math.round(hgt * sc));
+    c.getContext('2d').drawImage(src, 0, 0, c.width, c.height);
+    return c.toDataURL('image/jpeg', q);
+  }
+  function camSnap() {
+    try {
+      var v = $('camV'), w = v.videoWidth, hgt = v.videoHeight;
+      if (!w || !hgt) return camDone(null);
+      camDone(scaleTo_(v, w, hgt, 1280, .72), scaleTo_(v, w, hgt, 240, .6));
+    } catch (e) { camDone(null); }
+  }
+  function camFilePick() {
+    if ($('camTop')) $('camTop').textContent = '📷 카메라로 인증샷을 찍어주세요';
+    var f = $('camFile'); f.value = '';
+    f.onchange = function () {
+      var file = f.files && f.files[0];
+      if (!file) return camDone(null);
+      var img = new Image();
+      img.onload = function () {
+        try { camDone(scaleTo_(img, img.width, img.height, 1280, .72), scaleTo_(img, img.width, img.height, 240, .6)); }
+        catch (e) { camDone(null); }
+        URL.revokeObjectURL(img.src);
+      };
+      img.onerror = function () { camDone(null); };
+      img.src = URL.createObjectURL(file);
+    };
+    f.click();
+  }
+  function camDone(photo, thumb) {
+    if (camTimer) { clearInterval(camTimer); camTimer = null; }
+    if (camStream) { try { camStream.getTracks().forEach(function (t) { t.stop(); }); } catch (e) {} camStream = null; }
+    document.body.classList.remove('cam-on'); $('cam').innerHTML = '';
+    var ctx = camCtx; camCtx = null;
+    if (!ctx) return;
+    if (ctx.resume) doResume(photo, thumb); else doStart(ctx.kind, photo, thumb);
+  }
+
+  /** 전환 이벤트 서버 통지 — fire-and-forget: 실패해도 타이머·기록은 계속 (설계 노트 결정 1) */
+  function sendEvent(type, segMin, photo) {
+    try {
+      fetch(API, { method: 'POST', body: JSON.stringify({ action: 'practice_event', u: BOOT.member.code, type: type, kind: sess ? sess.kind : '', segMin: segMin || 0, photo: photo || '' }) })
+        .then(function (r) { return r.json(); })
+        .then(function (res) { if (photo && (!res || res.error)) showToast('인증샷 전송이 안 됐어요 — 연습 기록은 정상이에요', true); })
+        .catch(function () { if (photo) showToast('인증샷 전송이 안 됐어요 — 연습 기록은 정상이에요', true); });
+    } catch (e) {}
   }
 
   // ── 타이머 ──
@@ -925,11 +1165,11 @@
       (st === 'practice'
         ? '<button class="tbtn rest" id="bRest">☕ 휴식하기</button>'
         : '<button class="tbtn resume" id="bResume">▶ 연습 다시 시작</button>') +
-      '<button class="tbtn stop" id="bStop">■ 끝내기</button></div>';
+      '<button class="tbtn stop" id="bStop">⏹ 오늘 연습 종료</button></div>';
     document.body.classList.add('measuring');
     $('mCollapse').addEventListener('click', function () { overlayOpen = false; closeMeasure(); render(); });
-    if ($('bRest')) $('bRest').addEventListener('click', tBreak);
-    if ($('bResume')) $('bResume').addEventListener('click', tResume);
+    if ($('bRest')) $('bRest').addEventListener('click', doBreak);
+    if ($('bResume')) $('bResume').addEventListener('click', function () { openCam(sess.kind, true); });
     $('bStop').addEventListener('click', tFinish);
     var mtds = $('measure').querySelectorAll('.yp-todo');
     for (var i = 0; i < mtds.length; i++) (function (b) {
@@ -956,6 +1196,11 @@
         var t = $('mToday'); if (t) t.textContent = fmtHMS(todaySec(null));
         return;
       }
+      if (view === 'feed') {
+        var ft = $('fdTotal'); if (ft) ft.textContent = fmtHMS(todaySec(null));
+        var lt = $('fdLiveT'); if (lt && sess) lt.textContent = fmt(Date.now() - sess.segStart);
+        return;
+      }
       if (view !== 'timer') return;
       var hc = $('heroClock'); if (hc) hc.textContent = hmShort(todaySec(null));
       var m = BOOT.member;
@@ -970,28 +1215,49 @@
   }
   function stopTick() { if (tick) { clearInterval(tick); tick = null; } }
 
-  function startSession(kind) {
+  /** 연습 시작(연습 탭 진입점) — 인증샷 카메라를 거쳐 doStart로 */
+  function startSession(kind) { openCam(kind, false); }
+  function doStart(kind, photo, thumb) {
     sess = { kind: kind, sessionStart: Date.now(), state: 'practice', segStart: Date.now(), segments: [] };
-    overlayOpen = true;
-    saveSess(); render();
+    saveSess();
+    if (thumb) saveShot(hmOf(sess.segStart), thumb);
+    sendEvent('start', 0, photo);
+    if (view === 'timer') overlayOpen = true; // 연습 탭에서 시작하면 기존처럼 측정 화면
+    render();
   }
-  function tBreak() { sess.segments.push({ type: 'practice', start: sess.segStart, end: Date.now() }); sess.state = 'break'; sess.segStart = Date.now(); saveSess(); renderMeasure(); }
-  function tResume() { sess.segments.push({ type: 'break', start: sess.segStart, end: Date.now() }); sess.state = 'practice'; sess.segStart = Date.now(); saveSess(); renderMeasure(); }
+  function doBreak() {
+    if (!sess || sess.state !== 'practice') return;
+    var segMin = Math.round((Date.now() - sess.segStart) / 60000);
+    sess.segments.push({ type: 'practice', start: sess.segStart, end: Date.now() });
+    sess.state = 'break'; sess.segStart = Date.now(); saveSess();
+    sendEvent('break', segMin, null);
+    if (document.body.classList.contains('measuring')) renderMeasure(); else render();
+  }
+  function doResume(photo, thumb) {
+    if (!sess || sess.state !== 'break') { camCtx = null; return; }
+    var brkMin = Math.round((Date.now() - sess.segStart) / 60000);
+    sess.segments.push({ type: 'break', start: sess.segStart, end: Date.now() });
+    sess.state = 'practice'; sess.segStart = Date.now(); saveSess();
+    if (thumb) saveShot(hmOf(sess.segStart), thumb);
+    sendEvent('resume', brkMin, photo);
+    if (document.body.classList.contains('measuring')) renderMeasure(); else render();
+  }
   function tFinish() {
     if (!sess) return;
-    var btn = $('bStop'); if (btn) { btn.disabled = true; btn.textContent = '저장 중…'; }
+    var btn = $('bStop') || $('fdEnd'), orig = btn ? btn.textContent : '';
+    if (btn) { btn.disabled = true; btn.textContent = '저장 중…'; }
     sess.segments.push({ type: sess.state, start: sess.segStart, end: Date.now() });
     var payload = { action: 'session', u: BOOT.member.code, kind: sess.kind, segments: sess.segments };
     fetch(API, { method: 'POST', body: JSON.stringify(payload) })
       .then(function (r) { return r.json(); })
       .then(function (res) {
-        if (res && res.error) { showToast(res.error, true); sess.segments.pop(); if (btn) { btn.disabled = false; btn.textContent = '■ 끝내기'; } return; }
+        if (res && res.error) { showToast(res.error, true); sess.segments.pop(); if (btn) { btn.disabled = false; btn.textContent = orig; } return; }
         BOOT = res; saveBoot(res); store(SKEY, null);
         sess = null; overlayOpen = false;
         closeMeasure();
         showSummary(res.sessionSummary || {});
       })
-      .catch(function () { showToast('저장 실패 — 인터넷 확인 후 다시 끝내기를 눌러주세요.', true); sess.segments.pop(); if (btn) { btn.disabled = false; btn.textContent = '■ 끝내기'; } });
+      .catch(function () { showToast('저장 실패 — 인터넷 확인 후 다시 눌러주세요.', true); sess.segments.pop(); if (btn) { btn.disabled = false; btn.textContent = orig; } });
   }
 
   function showSummary(sm) {
@@ -1002,7 +1268,7 @@
       '<div class="edesc">' + sets + '세트 · 통계 탭에서 오늘 잔디와 시간을 볼 수 있어요</div></div>' +
       '<button class="close" id="sClose">확인</button>';
     document.body.classList.add('summary-on');
-    $('sClose').addEventListener('click', function () { document.body.classList.remove('summary-on'); view = BOOT.member.practice ? 'timer' : 'home'; render(); });
+    $('sClose').addEventListener('click', function () { document.body.classList.remove('summary-on'); view = BOOT.member.practice ? 'feed' : 'home'; render(); });
   }
 
   // ── 통계 ──
