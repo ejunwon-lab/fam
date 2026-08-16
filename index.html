@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>가족 일정</title>
-<!-- v35 🌙 요약 배너 항상 표시 — 2026-08-16 -->
+<!-- v36 '오늘 돌아보기' 이름 확정(REVIEW_NAME/ICON 상수) — 2026-08-16 -->
 <meta name="theme-color" content="#e9f3fb">
 <link rel="preconnect" href="https://script.google.com">
 <link rel="preconnect" href="https://script.googleusercontent.com">
@@ -805,6 +805,7 @@
   var CHEER_ON = true;   // ❤️ 응원 — 부모 도크 버튼 + CY 홈 하트 애니메이션(앱 다시 열 때 안 본 응원만 1회). 상시 배너는 CHEER_BANNER
   var CHEER_BANNER = false; // 구 상시 배너 '…가 응원해요' — 2026-08-16 숨김(애니메이션으로 대체)
   var ADMIN_CODE = 'dad'; // 이름(기기 사용자) 바꾸기는 아빠만
+  var REVIEW_ICON = '🌙', REVIEW_NAME = '오늘 돌아보기'; // 하루 정리 화면 이름·로고 (2026-08-16 주인님 — 이름 확정, 로고 후보 검토 중)
 
   var BOOT = null, view = 'home', lastInitAt = 0;
   var cur = null, curDur = 60, customEnd = false, sending = false, othersOpen = false;
@@ -1136,7 +1137,7 @@
     if (isToday) {
       var ch = BOOT.cheers || [];
       if (CHEER_BANNER && ch.length) h += '<div class="cheer">❤️ ' + esc(ch.map(function (c) { return c.name; }).join(' · ')) + '가 응원해요<small>' + esc(ch[ch.length - 1].at) + '</small></div>';
-      if (m.practice) h += '<button class="night" id="fdNight">🌙 오늘 요약 보기<small>' + (BOOT.note ? '한마디 남김 ✓' : '자기 전에 1분 →') + '</small></button>'; // 항상 표시 (2026-08-16 주인님 — 21시 제한 해제)
+      if (m.practice) h += '<button class="night" id="fdNight">' + REVIEW_ICON + ' ' + REVIEW_NAME + '<small>' + (BOOT.note ? '한마디 남김 ✓' : '자기 전에 1분 →') + '</small></button>'; // 항상 표시 (2026-08-16 주인님 — 21시 제한 해제)
       if (BOOT.note && vt) h += '<div class="cheer" style="background:#eef2fb;border-color:#cdd8f2;color:#2c3e6b">🌙 ' + esc(who.name) + '의 한마디 — "' + esc(BOOT.note) + '"</div>';
       h += lessonLineHtml();
       if (BOOT.recall && BOOT.recall.memo) { var rc = BOOT.recall, rsj = subjByName(rc.k), rpb = rc.k === '독서' ? parseBookF_(rc.memo) : null;
@@ -1449,7 +1450,7 @@
     var doneN = rg.rings.filter(function (r) { return r.done; }).length;
     var total = rg.rings.reduce(function (a, r) { return a + r.doneMin; }, 0);
     var h = '<div class="rt">' + (d.getMonth() + 1) + '월 ' + d.getDate() + '일 ' + dow + '요일 · ' + nowHM_() + '</div>' +
-      '<h2>오늘도 수고했어 🌙</h2>' +
+      '<h2>오늘도 수고했어 ' + REVIEW_ICON + '</h2>' +
       '<div class="sub">소루틴 ' + rg.rings.filter(function (r) { return !r.main && r.done; }).length + ' / ' + rg.rings.filter(function (r) { return !r.main; }).length + (rg.goalHit ? ' · 🎯 연습 목표 달성' : '') + ' · 총 ' + durLabel(total) + (rg.academy ? ' · 🏫 학원 날' : '') + '</div>';
     h += '<div class="rings">' + rg.rings.map(function (r) {
       return '<div class="rg' + (r.done ? ' done' : '') + '" style="--c:' + esc(r.color) + ';--p:' + r.pct + '"><div class="r"><i>' + (r.done ? '✓' : subjIcon(r)) + '</i></div><div class="n">' + esc(r.name) + '</div><div class="v">' +
