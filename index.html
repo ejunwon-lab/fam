@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>가족 일정</title>
-<!-- v33 기록 칩 한 줄 균등 배치 — 2026-08-16 -->
+<!-- v34 홈 헤더 한 줄(날짜 제목·D-day·이름) — 2026-08-16 -->
 <meta name="theme-color" content="#e9f3fb">
 <link rel="preconnect" href="https://script.google.com">
 <link rel="preconnect" href="https://script.googleusercontent.com">
@@ -452,7 +452,11 @@
   /* ── CY 세션 피드 홈 ── */
   body.dock-big .screen { padding-bottom: 216px; } /* 큰 버튼 도크가 있는 화면(연습 멤버) */
   .tabbar .fd-main { margin-bottom: 10px; }
-  .fd-top { display: flex; justify-content: space-between; align-items: center; padding: 6px 2px 0; }
+  .fd-top { display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 2px 4px; }
+  .hdt { display: flex; flex-direction: column; gap: 2px; background: none; border: none; font: inherit; text-align: left; padding: 0; cursor: pointer; color: #24303b; }
+  .hdt .d { font-size: 20px; font-weight: 800; letter-spacing: -.01em; }
+  .hdt .d small { font-size: 14px; color: #a9b9c8; font-weight: 700; margin-left: 6px; }
+  .hdt .dd { font-size: 12px; font-weight: 700; color: #3d6f9e; }
   .fd-top .r { display: flex; gap: 8px; align-items: center; }
   .fd-ic { width: 32px; height: 32px; border-radius: 11px; padding: 0; background: #fff; border: 1px solid #d6e6f3; font-size: 15px; cursor: pointer; display: grid; place-items: center; }
   .fd-who { font-size: 13px; font-weight: 700; color: #24303b; background: #fff; border: 1px solid #d6e6f3; border-radius: 99px; padding: 6px 12px; cursor: pointer; font-family: inherit; }
@@ -1088,7 +1092,7 @@
     if (!m.dday) return '';
     var dd = Math.ceil((new Date(m.dday + 'T00:00:00') - new Date(todayStr() + 'T00:00:00')) / 86400000);
     var tag = dd > 0 ? 'D-' + dd : (dd === 0 ? 'D-DAY' : 'D+' + (-dd));
-    return '<span class="fd-dday">' + esc(m.ddayName || '디데이') + ' ' + tag + '</span>';
+    return '<span class="dd">' + esc(m.ddayName || '디데이') + ' ' + tag + '</span>';
   }
 
   /** 피드 합계 — 뷰어는 라이브 연습 경과를 서버 누적에 더해 표시 */
@@ -1122,14 +1126,8 @@
       (dayData.segs || []).forEach(pushSeg);
     }
 
-    var h = '<div class="fd-top"><span>' + ddayFd(who) + '</span><div class="r">' +
-      (m.practice ? '<button class="fd-moon" id="fdMoon" title="오늘 요약" aria-label="오늘 요약">🌙 오늘 요약</button>' : '') +
-      whoChip('fd-who', 'fdWho', m.name) + '</div></div>';
-    h += '<div class="fd-hd"><span></span>' + // 좌측 이름 제거(2026-08-16) — 오늘 합계만
-      '<span class="tot">' + (isToday ? '오늘' : '합계') + ' <b id="fdTotal">' + (isToday ? durLabel(Math.floor(feedTotalSec() / 60)) : durLabel(dayData ? dayData.totalMin : 0)) + '</b></span></div>';
-
-    // 날짜 → 👣 나의 발자국 일 뷰(오늘). 과거 보기는 캘린더로 일원화
-    h += '<button class="fd-date" id="fdDate" title="나의 발자국에서 보기">👣 ' + dateStr + ' <small>›</small></button>';
+    // 헤더 한 줄(2026-08-16 정돈): 날짜 제목(탭→발자국 일 뷰) + D-day(있을 때) / 우측 이름 칩. 🌙 버튼·오늘 합계는 제거(21시 배너·발자국 일 뷰로)
+    var h = '<div class="fd-top"><button class="hdt" id="fdDate" title="발자국에서 오늘 보기"><span class="d">' + (nd.getMonth() + 1) + '월 ' + nd.getDate() + '일 ' + DOW_KO[nd.getDay()] + '요일 <small>›</small></span>' + ddayFd(who) + '</button><div class="r">' + whoChip('fd-who', 'fdWho', m.name) + '</div></div>';
 
     // 루틴 링 카드 (오늘=BOOT.rings 실시간 / 과거=dayData.rings)
     var rg = isToday ? BOOT.rings : (dayData && dayData.rings);
