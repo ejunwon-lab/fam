@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>가족 일정</title>
-<!-- v24 홈 링: 큰 링 아이콘 제거·작은 링 확대·뉴스=네이버 N — 2026-08-16 -->
+<!-- v25 타임라인 카드 배경 사진(A안, 베이스 가로) — 2026-08-16 -->
 <meta name="theme-color" content="#e9f3fb">
 <link rel="preconnect" href="https://script.google.com">
 <link rel="preconnect" href="https://script.googleusercontent.com">
@@ -572,6 +572,12 @@
   .fd-ev.ap .bx { background: transparent; border: 1px dashed #c3d4e3; color: #7d8fa0; box-shadow: none; }
   .fd-ev.ap .r1 .dur { color: #7d8fa0; font-weight: 600; }
   .fd-ev .memo { display: block; font-size: 12px; color: #5b6b7a; font-weight: 500; margin-top: 3px; }
+  /* 배경 사진 카드(A안) — 사진 + 좌→우 어두운 오버레이 + 흰 글자 */
+  .fd-ev .bx.ph { position: relative; overflow: hidden; background-size: cover; background-position: center; color: #fff; min-height: 84px; text-shadow: 0 1px 4px rgba(0, 0, 0, .6); }
+  .fd-ev .bx.ph::before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(0, 0, 0, .72) 0%, rgba(0, 0, 0, .55) 45%, rgba(0, 0, 0, .18) 100%); }
+  .fd-ev .bx.ph > * { position: relative; }
+  .fd-ev .bx.ph small, .fd-ev .bx.ph .memo, .fd-ev .bx.ph .memo-edit { color: rgba(255, 255, 255, .85); }
+  .fd-ev .bx.ph .r1 .dur { color: #fff; }
   .fd-live.rt .dot { background: var(--rc, #34a86b); box-shadow: 0 0 0 4px rgba(52, 168, 107, .25); }
   .fd-live.rt .bx { background: linear-gradient(135deg, var(--rc1, #3fbf7f), var(--rc, #2a9660)); box-shadow: 0 10px 26px rgba(0, 0, 0, .15); }
   .fd-live.rt .bx small { color: rgba(255, 255, 255, .8); }
@@ -858,6 +864,8 @@
   function bindWho(id) { var b = $(id); if (b && b.tagName === 'BUTTON') b.addEventListener('click', function () { if (confirm('이름을 다시 고를까요?')) { store('famcode', null); init(); } }); }
   /** 과목 아이콘 — 시트 이모지 기본, 오버라이드(뉴스=네이버 N 배지, 2026-08-16) */
   var ICON_OVERRIDE = { '뉴스': '<span class="ico-n">N</span>' };
+  /** 타임라인 카드 배경 사진(A안, 2026-08-16) — 과목명→파일(tl/, 720×300). 베이스=홈 링 사진을 가로로, 나머지=Unsplash 무료 */
+  var TL_PHOTO = { '베이스': 'tl/bass.jpg', '독서': 'tl/book.jpg', '뉴스': 'tl/news.jpg', '음악이론': 'tl/theory.jpg', '운동': 'tl/gym.jpg' };
   function subjIcon(s) { if (!s) return '🎵'; return ICON_OVERRIDE[s.name] || esc(s.emoji || '🎵'); }
   function isRoutineKind(k) { var s = subjByName(k); return !!(s && s.mode !== 'timer'); }
   function subjByName(k) { return ((BOOT && BOOT.subjects) || []).find(function (s) { return s.name === k; }) || null; }
@@ -1112,8 +1120,9 @@
         h += '<div class="fd-ev ap"><span class="dot"></span><div class="bx"><div class="r1"><span>📅 ' + esc(ev.k) + '</span><span class="dur">' + ev.s + '–' + ev.e + '</span></div></div></div>';
         return;
       }
-      h += '<div class="fd-ev ' + (ev.brk ? 'b' : 'p') + '"><span class="dot"' + (col ? ' style="background:' + col + '"' : '') + '></span><div class="bx">' +
-        '<div class="r1"><span>' + em + ' ' + (ev.brk ? '휴식' : esc(ev.k)) + '</span><span class="dur"' + (col ? ' style="color:' + col + '"' : '') + '>' + durLabel(Math.max(1, ev.min)) + '</span></div>' +
+      var ph = !ev.brk && TL_PHOTO[ev.k];
+      h += '<div class="fd-ev ' + (ev.brk ? 'b' : 'p') + '"><span class="dot"' + (col ? ' style="background:' + col + '"' : '') + '></span><div class="bx' + (ph ? ' ph' : '') + '"' + (ph ? ' style="background-image:url(' + ph + ')"' : '') + '>' +
+        '<div class="r1"><span>' + em + ' ' + (ev.brk ? '휴식' : esc(ev.k)) + '</span><span class="dur"' + (col && !ph ? ' style="color:' + col + '"' : '') + '>' + durLabel(Math.max(1, ev.min)) + '</span></div>' +
         (ev.brk ? '' : '<small>' + ev.s + ' – ' + ev.e + '</small>') +
         (ev.memo ? '<span class="memo">' + esc(ev.memo) + '</span>' : '') +
         ((!vt && isToday && ev.id && !ev.brk) ? '<button class="memo-edit" data-sid="' + esc(ev.id) + '" data-k="' + esc(ev.k) + '" data-memo="' + esc(ev.memo) + '" aria-label="메모">' + (ev.memo ? '✏️' : '✏️ 한 줄 남기기') + '</button>' : '') +
