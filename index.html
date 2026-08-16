@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>가족 일정</title>
-<!-- v28 진행 시간 표기 '1시간 12분 / 6시간' 통일 — 2026-08-16 -->
+<!-- v29 홈 작은 링·발자국 일 뷰 글자 확대 — 2026-08-16 -->
 <meta name="theme-color" content="#e9f3fb">
 <link rel="preconnect" href="https://script.google.com">
 <link rel="preconnect" href="https://script.googleusercontent.com">
@@ -472,7 +472,7 @@
   .clnav { display: flex; justify-content: center; gap: 16px; align-items: center; font-size: 16px; font-weight: 800; margin-bottom: 10px; font-variant-numeric: tabular-nums; }
   .clnav .a { width: 32px; height: 32px; border-radius: 11px; background: #f3f8fc; border: 1px solid var(--line); color: #5b6b7a; font: inherit; font-size: 17px; cursor: pointer; padding: 0; }
   .clnav .a:disabled { opacity: .35; cursor: default; }
-  .cltag { text-align: center; font-size: 11.5px; font-weight: 700; color: #3d6f9e; margin: -4px 0 8px; }
+  .cltag { text-align: center; font-size: 13.5px; font-weight: 700; color: #3d6f9e; margin: -4px 0 8px; }
   .clcal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
   .clcal .dow { text-align: center; font-size: 10.5px; color: #a9b9c8; font-weight: 700; }
   .clcal .c { aspect-ratio: 1; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; position: relative; background: #eef3f8; color: #7d8fa0; cursor: pointer; font-variant-numeric: tabular-nums; }
@@ -527,21 +527,21 @@
   .clnotes b.dim, .clnotes i { color: #c9d4e0; font-style: normal; }
   /* 일 */
   .clday { display: flex; gap: 12px; }
-  .clday .tt { width: 40%; max-width: 160px; flex: none; position: relative; background: #f3f8fc; border-radius: 10px; height: 340px; }
-  .clday .tt .lb { position: absolute; left: 4px; font-size: 8.5px; color: #a9b9c8; transform: translateY(-50%); }
-  .clday .tt .b { position: absolute; left: 22px; right: 3px; border-radius: 4px; color: #fff; font-size: 9px; font-weight: 800; padding: 1px 4px; overflow: hidden; white-space: nowrap; line-height: 1.3; }
+  .clday .tt { width: 40%; max-width: 170px; flex: none; position: relative; background: #f3f8fc; border-radius: 10px; height: 380px; }
+  .clday .tt .lb { position: absolute; left: 4px; font-size: 10.5px; color: #a9b9c8; transform: translateY(-50%); }
+  .clday .tt .b { position: absolute; left: 26px; right: 3px; border-radius: 4px; color: #fff; font-size: 11px; font-weight: 800; padding: 1px 4px; overflow: hidden; white-space: nowrap; line-height: 1.3; }
   .clday .tt .b small { font-weight: 600; opacity: .85; margin-left: 3px; }
   .clday .side { flex: 1; min-width: 0; }
-  .clday .rg { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; font-size: 12px; font-weight: 800; }
-  .clday .rg i { width: 30px; height: 30px; border-radius: 50%; background: conic-gradient(var(--c) calc(var(--p) * 1%), #e3edf5 0); display: grid; place-items: center; font-style: normal; flex: none; }
-  .clday .rg i b { width: 22px; height: 22px; border-radius: 50%; background: #fff; display: grid; place-items: center; font-size: 10.5px; }
+  .clday .rg { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; font-size: 14px; font-weight: 800; }
+  .clday .rg i { width: 36px; height: 36px; border-radius: 50%; background: conic-gradient(var(--c) calc(var(--p) * 1%), #e3edf5 0); display: grid; place-items: center; font-style: normal; flex: none; }
+  .clday .rg i b { width: 27px; height: 27px; border-radius: 50%; background: #fff; display: grid; place-items: center; font-size: 13px; }
   .clday .rg.done i b { background: var(--c); color: #fff; }
-  .clday .rg small { display: block; font-size: 10.5px; color: var(--sub); font-weight: 600; font-variant-numeric: tabular-nums; }
-  .clday .memo { background: #f3f8fc; border-radius: 10px; padding: 8px 10px; font-size: 11.5px; margin-top: 7px; word-break: break-all; }
-  .clday .memo b { font-size: 10.5px; color: var(--sub); display: block; }
+  .clday .rg small { display: block; font-size: 12.5px; color: var(--sub); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .clday .memo { background: #f3f8fc; border-radius: 10px; padding: 9px 11px; font-size: 13.5px; margin-top: 8px; word-break: break-all; }
+  .clday .memo b { font-size: 12.5px; color: var(--sub); display: block; }
   .clday .memo.nt { background: #eef2fb; }
-  .clempty { font-size: 12px; color: #a9b9c8; margin-top: 8px; }
-  .clsum { text-align: right; font-size: 11px; color: var(--sub); margin-top: 8px; font-variant-numeric: tabular-nums; }
+  .clempty { font-size: 14px; color: #a9b9c8; margin-top: 8px; }
+  .clsum { text-align: right; font-size: 13px; color: var(--sub); margin-top: 8px; font-variant-numeric: tabular-nums; }
   /* 홈 헤더 날짜 → 캘린더 일 뷰 */
   .fd-date { display: inline-flex; align-items: center; gap: 5px; font: inherit; font-size: 13px; font-weight: 800; color: #24303b; padding: 6px 12px; background: #fff; border: 1px solid #d6e6f3; border-radius: 11px; cursor: pointer; margin: 0 2px 6px; }
   .fd-date small { color: #7d8fa0; font-weight: 700; }
@@ -596,15 +596,15 @@
   .bigr .g { font-size: 10px; color: #e6e6ea; font-weight: 700; margin-top: 3px; }
   .bigr .e { font-size: 11px; font-weight: 800; color: #ffcf9e; letter-spacing: .06em; margin-bottom: 3px; }
   .bigr .tag { position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); background: #eef5fb; color: #3d6f9e; border: 1px solid #cfe0ef; border-radius: 99px; font-size: 9.5px; font-weight: 800; padding: 2px 8px; white-space: nowrap; }
-  .g22 { flex: 1; min-width: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 4px; }
+  .g22 { flex: 1; min-width: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 12px 4px; }
   .sr { display: flex; flex-direction: column; align-items: center; gap: 3px; text-align: center; cursor: pointer; border-radius: 12px; padding: 3px 0; min-width: 0; -webkit-touch-callout: none; user-select: none; }
   .sr:active { background: #f3f8fc; }
-  .sr .r { width: 54px; height: 54px; border-radius: 50%; flex: none; background: conic-gradient(var(--c) calc(var(--p) * 1%), #e3edf5 0); display: grid; place-items: center; }
-  .sr .r i { width: 42px; height: 42px; border-radius: 50%; background: #fff; display: grid; place-items: center; font-style: normal; font-size: 19px; }
-  .sr.done .r { background: var(--c); } .sr.done .r i { background: transparent; color: #fff; font-size: 15px; font-weight: 800; }
-  .sr.run .r { box-shadow: 0 0 0 3px rgba(0,0,0,.06); } .sr.run .r i { font-size: 11px; font-weight: 800; color: var(--c); font-variant-numeric: tabular-nums; }
-  .sr .n { width: 100%; min-width: 0; overflow: hidden; font-size: 11.5px; font-weight: 800; line-height: 1.1; }
-  .sr .n small { display: block; font-size: 10px; color: #7d8fa0; font-weight: 600; line-height: 1.2; }
+  .sr .r { width: 62px; height: 62px; border-radius: 50%; flex: none; background: conic-gradient(var(--c) calc(var(--p) * 1%), #e3edf5 0); display: grid; place-items: center; }
+  .sr .r i { width: 48px; height: 48px; border-radius: 50%; background: #fff; display: grid; place-items: center; font-style: normal; font-size: 22px; }
+  .sr.done .r { background: var(--c); } .sr.done .r i { background: transparent; color: #fff; font-size: 17px; font-weight: 800; }
+  .sr.run .r { box-shadow: 0 0 0 3px rgba(0,0,0,.06); } .sr.run .r i { font-size: 12px; font-weight: 800; color: var(--c); font-variant-numeric: tabular-nums; }
+  .sr .n { width: 100%; min-width: 0; overflow: hidden; font-size: 13px; font-weight: 800; line-height: 1.1; }
+  .sr .n small { display: block; font-size: 11px; color: #7d8fa0; font-weight: 600; line-height: 1.2; }
   .rc .foot { margin-top: 10px; padding-top: 8px; border-top: 1px solid #edf3f8; display: flex; justify-content: space-between; align-items: center; font-size: 10.5px; color: #7d8fa0; font-weight: 700; }
   .rc .foot b { color: #f4652f; }
   .rest { border: none; font: inherit; border-radius: 99px; background: #eef2f6; color: #5b6b7a; font-size: 11px; font-weight: 800; padding: 5px 11px; cursor: pointer; }
