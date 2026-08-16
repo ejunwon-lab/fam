@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>가족 일정</title>
-<!-- v21 홈 헤더 정리·이름 바꾸기 아빠만·응원 숨김 — 2026-08-16 -->
+<!-- v22 ❤️ 응원 재개 — 부모 도크 버튼 + CY 하트 애니메이션(앱 열 때 1회) — 2026-08-16 -->
 <meta name="theme-color" content="#e9f3fb">
 <link rel="preconnect" href="https://script.google.com">
 <link rel="preconnect" href="https://script.googleusercontent.com">
@@ -616,6 +616,15 @@
   .rsheet .bt small { display: block; font-size: 10px; font-weight: 600; opacity: .85; margin-top: 2px; }
   .rsheet .bt.ghost { background: #f3f8fc; color: #24303b; border: 1px solid var(--line); }
   .rsheet .pill { font-size: 10.5px; font-weight: 800; color: var(--sub); background: #eef2f6; border-radius: 99px; padding: 2px 8px; vertical-align: middle; }
+  /* ❤️ 응원 하트 애니메이션 (앱 다시 열 때 1회) */
+  .cheerfx { position: fixed; inset: 0; z-index: 30; pointer-events: none; overflow: hidden; }
+  .cheerfx .h { position: absolute; bottom: -40px; opacity: 0; line-height: 1; animation: cheerfly 2.6s ease-out forwards; filter: drop-shadow(0 4px 8px rgba(194, 64, 90, .35)); }
+  .cheerfx .h.big { left: 50%; animation: cheerflybig 3.4s ease-out forwards .9s; filter: drop-shadow(0 12px 24px rgba(194, 64, 90, .45)); }
+  @keyframes cheerfly { 0% { transform: translateY(0) scale(.5) rotate(0); opacity: 0; } 12% { opacity: 1; transform: translateY(-60px) scale(1.15) rotate(-6deg); } 70% { opacity: .95; } 100% { transform: translateY(-85vh) scale(.9) rotate(8deg); opacity: 0; } }
+  @keyframes cheerflybig { 0% { transform: translateY(0) scale(.6) rotate(0); opacity: 0; } 14% { opacity: 1; transform: translateY(-90px) scale(1) rotate(-3deg); } 70% { opacity: .95; } 100% { transform: translateY(-140vh) scale(.92) rotate(4deg); opacity: 0; } }
+  .cheerfx .ctoast { position: absolute; left: 50%; top: calc(64px + env(safe-area-inset-top)); transform: translateX(-50%); background: #fff; border: 1px solid #f7c6d3; color: #c2405a; border-radius: 16px; padding: 10px 16px; font-size: 13.5px; font-weight: 800; box-shadow: 0 8px 24px rgba(194, 64, 90, .18); white-space: nowrap; opacity: 0; animation: cheertoast 3.6s ease forwards .4s; }
+  .cheerfx .ctoast small { display: block; font-weight: 600; color: #d98a9a; font-size: 11px; margin-top: 2px; }
+  @keyframes cheertoast { 0% { opacity: 0; transform: translateX(-50%) translateY(-8px) scale(.9); } 12% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1.03); } 18% { transform: translateX(-50%) scale(1); } 80% { opacity: 1; } 100% { opacity: 0; transform: translateX(-50%) translateY(-6px); } }
   .cheer { margin-top: 8px; background: #fdecf1; border: 1px solid #f7c6d3; color: #c2405a; border-radius: 12px; padding: 7px 12px; font-size: 12px; font-weight: 800; display: flex; align-items: center; gap: 6px; }
   .cheer small { margin-left: auto; font-weight: 600; color: #d98a9a; }
   .night { margin-top: 8px; width: 100%; text-align: left; border: none; background: linear-gradient(135deg, #2c3e6b, #1c2a4d); color: #fff; border-radius: 14px; padding: 10px 13px; font: inherit; font-size: 12.5px; font-weight: 800; display: flex; align-items: center; gap: 8px; box-shadow: 0 8px 20px rgba(28, 42, 77, .28); cursor: pointer; }
@@ -745,10 +754,11 @@
   var DURS = [30, 60, 90, 120];
   var SKEY = 'famsession';
   var CAMERA_ON = false; // 📷 인증샷 — 2026-07-19 사용자 결정으로 OFF (코드 보존, 켜려면 true)
-  var CHEER_ON = false;  // ❤️ 응원 — 2026-08-16 사용자 결정으로 일단 숨김(홈 배너·부모 도크 버튼). 서버·시트는 그대로, 켜려면 true
+  var CHEER_ON = true;   // ❤️ 응원 — 부모 도크 버튼 + CY 홈 하트 애니메이션(앱 다시 열 때 안 본 응원만 1회). 상시 배너는 CHEER_BANNER
+  var CHEER_BANNER = false; // 구 상시 배너 '…가 응원해요' — 2026-08-16 숨김(애니메이션으로 대체)
   var ADMIN_CODE = 'dad'; // 이름(기기 사용자) 바꾸기는 아빠만
 
-  var BOOT = null, view = 'home';
+  var BOOT = null, view = 'home', lastInitAt = 0;
   var cur = null, curDur = 60, customEnd = false, sending = false, othersOpen = false;
   // 타이머
   var sess = null, tick = null, overlayOpen = false, wakeLock = null;
@@ -807,7 +817,7 @@
     fetch(API + '?api=init&u=' + encodeURIComponent(code))
       .then(function (r) { return r.json(); })
       .then(function (data) {
-        BOOT = data;
+        BOOT = data; lastInitAt = Date.now();
         saveBoot(data);
         flushEvents(); // 밀린 전환 이벤트(오프라인 인증샷 등) 재전송
         if (!cached) view = defaultView(data);
@@ -863,8 +873,8 @@
     var sent = !!BOOT.cheeredToday;
     var who = (BOOT.viewTarget && BOOT.viewTarget.name) || '채영';
     return '<div class="fd-main">' + (sent
-      ? '<button class="dk-big sent" disabled><span class="dk-st">❤️ 오늘 응원했어요</span><span class="dk-act neutral" style="background:rgba(194,64,90,.12);color:#c2405a">홈에 하트가 떠 있어요</span></button>'
-      : '<button class="dk-big pink" id="fdCheer"><span class="dk-st">❤️ 응원해요</span><span class="dk-act neutral">홈에 하트가 떠요</span></button>') + '</div>';
+      ? '<button class="dk-big sent" disabled><span class="dk-st">❤️ 오늘 응원했어요</span><span class="dk-act neutral" style="background:rgba(194,64,90,.12);color:#c2405a">앱 열면 하트가 뿅 떠요</span></button>'
+      : '<button class="dk-big pink" id="fdCheer"><span class="dk-st">❤️ 응원해요</span><span class="dk-act neutral">앱 열면 하트가 뿅 떠요</span></button>') + '</div>';
   }
   function sendCheer() {
     var b = $('fdCheer'); if (b) { b.disabled = true; }
@@ -1076,7 +1086,7 @@
     // ❤️ 응원 · 🌙 돌아보기 배너 · 이번 주 레슨 (오늘만)
     if (isToday) {
       var ch = BOOT.cheers || [];
-      if (CHEER_ON && ch.length) h += '<div class="cheer">❤️ ' + esc(ch.map(function (c) { return c.name; }).join(' · ')) + '가 응원해요<small>' + esc(ch[ch.length - 1].at) + '</small></div>';
+      if (CHEER_BANNER && ch.length) h += '<div class="cheer">❤️ ' + esc(ch.map(function (c) { return c.name; }).join(' · ')) + '가 응원해요<small>' + esc(ch[ch.length - 1].at) + '</small></div>';
       if (m.practice && !sess && new Date().getHours() >= 21) h += '<button class="night" id="fdNight">🌙 오늘 요약 보기<small>' + (BOOT.note ? '한마디 남김 ✓' : '자기 전에 1분 →') + '</small></button>';
       if (BOOT.note && vt) h += '<div class="cheer" style="background:#eef2fb;border-color:#cdd8f2;color:#2c3e6b">🌙 ' + esc(who.name) + '의 한마디 — "' + esc(BOOT.note) + '"</div>';
       h += lessonLineHtml();
@@ -1133,6 +1143,34 @@
     bindRings(isToday && !vt);
     if (sess) acquireWake();
     startTick();
+    if (m.practice && CHEER_ON) maybeCheerFx();
+  }
+
+  // ── ❤️ 응원 하트 애니메이션 — 안 본 응원만 1회(본 시각 localStorage), 시안 docs/mockups/2026-08-16-응원-하트-애니메이션.html ──
+  var CHEER_SEEN = 'cheerseen', cheerFxOn = false;
+  function maybeCheerFx() {
+    var ch = BOOT.cheers || []; if (!ch.length || cheerFxOn) return;
+    var seen = null; try { seen = JSON.parse(read(CHEER_SEEN) || 'null'); } catch (e) {}
+    var today = todayStr(), lastAt = (seen && seen.date === today) ? seen.at : '';
+    var fresh = ch.filter(function (c) { return String(c.at || '') > lastAt; });
+    if (!fresh.length) return;
+    var maxAt = fresh.reduce(function (a, c) { return c.at > a ? c.at : a; }, lastAt);
+    store(CHEER_SEEN, JSON.stringify({ date: today, at: maxAt }));
+    playCheerFx(fresh);
+  }
+  function playCheerFx(list) {
+    cheerFxOn = true;
+    var old = $('cheerFx'); if (old) old.parentNode.removeChild(old);
+    var w = document.createElement('div'); w.className = 'cheerfx'; w.id = 'cheerFx';
+    var em = ['❤️', '🧡', '❤️', '💛', '❤️', '🧡', '❤️'], h = '';
+    for (var i = 0; i < 26; i++) h += '<span class="h" style="left:' + (4 + Math.random() * 86).toFixed(1) + '%;font-size:' + (18 + Math.random() * 20).toFixed(0) + 'px;animation-delay:' + (Math.random() * 1.6).toFixed(2) + 's">' + em[i % em.length] + '</span>';
+    var bigEm = ['❤️', '🧡', '💛', '💚', '💙', '💜', '🩷'], bs = Math.round(150 * (2 + Math.random() * 0.5));
+    h += '<span class="h big" style="font-size:' + bs + 'px;margin-left:' + (-bs / 2) + 'px">' + bigEm[Math.floor(Math.random() * bigEm.length)] + '</span>';
+    var names = [], ats = [];
+    list.forEach(function (c) { if (names.indexOf(c.name) < 0) names.push(c.name); ats.push(c.at); });
+    h += '<div class="ctoast">❤️ ' + esc(names.join(' · ')) + '가 응원했어요<small>' + esc(ats.join(' · ')) + '</small></div>';
+    w.innerHTML = h; document.body.appendChild(w);
+    setTimeout(function () { if (w.parentNode) w.parentNode.removeChild(w); cheerFxOn = false; }, 4800);
   }
 
   /** 링 카드 — 큰 링(베이스, 사진 배경) + 2×2 작은 링 + ☁️휴식 칩. 오늘·본인일 때만 조작 */
@@ -2224,9 +2262,10 @@
       .catch(function () { sending = false; btn.disabled = false; btn.textContent = '캘린더에 등록'; showToast('등록에 실패했어요. 인터넷 연결을 확인하고 다시 시도해주세요.', true); });
   });
 
-  // 뷰어: 앱 복귀 시 채영 피드·라이브 상태 재조회 (폴링 없음 — GAS 부하 최소)
+  // 앱 복귀 시 재조회 (폴링 없음 — GAS 부하 최소): 뷰어=채영 피드·라이브 상태 / CY=응원 하트 등 (마지막 조회 60초 이후만)
   document.addEventListener('visibilitychange', function () {
-    if (!document.hidden && isViewer() && view === 'feed') init();
+    if (document.hidden || view !== 'feed' || !BOOT || !BOOT.member) return;
+    if (isViewer() || (BOOT.member.practice && Date.now() - lastInitAt > 60000)) init();
   });
 
   if ('serviceWorker' in navigator) { try { navigator.serviceWorker.register('sw.js'); } catch (e) {} }
