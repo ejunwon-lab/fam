@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>가족 일정</title>
-<meta name="theme-color" content="#fff9f0">
+<meta name="theme-color" content="#e9f3fb">
 <link rel="preconnect" href="https://script.google.com">
 <link rel="preconnect" href="https://script.googleusercontent.com">
 <link rel="manifest" href="manifest.webmanifest">
@@ -15,9 +15,9 @@
      var 이름은 유지(수정 최소화): --indigo=주황(주 강조), --teal=청록, --amber=호박 */
   :root {
     color-scheme: light;
-    --bg: #fff9f0; --ink: #33302a; --sub: #98917f;
-    --card: #ffffff; --line: #f0e4d0;
-    --etc-bg: #f6efe2; --etc-ink: #8a8272;
+    --bg: #e9f3fb; --ink: #24303b; --sub: #7d8fa0;
+    --card: #ffffff; --line: #d6e6f3;
+    --etc-bg: #eef3f8; --etc-ink: #5b6b7a;
     --indigo: #f4652f; --indigo-soft: #ffe9d8;
     --teal: #1f9080; --teal-soft: #ddf2ee;
     --amber: #c98a2e; --amber-soft: #fdf0da;
@@ -36,14 +36,14 @@
   .tabbar {
     position: fixed; left: 50%; transform: translateX(-50%); bottom: 0;
     width: 100%; max-width: 480px; z-index: 4;
-    background: #fff; border-top: 1px solid #f3eada;
+    background: #fff; border-top: 1px solid #d6e6f3;
     padding: 10px 16px calc(12px + env(safe-area-inset-bottom));
   }
   .menu-row { display: flex; gap: 8px; }
   .menu-row .mn {
-    flex: 1; font: inherit; text-align: center; background: #fff; border: 1px solid #ede5d4;
-    border-radius: 16px; padding: 12px 2px; font-size: 12.5px; font-weight: 700; color: #33302a;
-    cursor: pointer; box-shadow: 0 2px 8px rgba(120, 90, 40, .06); white-space: nowrap;
+    flex: 1; font: inherit; text-align: center; background: #fff; border: 1px solid #d6e6f3;
+    border-radius: 16px; padding: 12px 2px; font-size: 12.5px; font-weight: 700; color: #24303b;
+    cursor: pointer; box-shadow: 0 2px 8px rgba(60, 100, 140, .06); white-space: nowrap;
   }
   .menu-row .mn.on { background: #ffe9d8; border-color: #ffcfa8; color: #c2481a; }
 
@@ -79,7 +79,7 @@
     display: flex; align-items: center; gap: 14px; width: 100%; text-align: left;
     background: var(--card); border: 1px solid var(--line); border-radius: 18px;
     padding: 16px; font: inherit; color: inherit; cursor: pointer; transition: transform .08s ease;
-    box-shadow: 0 3px 14px rgba(120, 90, 40, .07);
+    box-shadow: 0 3px 14px rgba(60, 100, 140, .07);
   }
   .preset:active { transform: scale(.98); }
   .preset:focus-visible, .chip:focus-visible, .cta:focus-visible, .etc:focus-visible, .pick:focus-visible, .tbtn:focus-visible {
@@ -202,7 +202,7 @@
   .yp-pills { display: flex; gap: 7px; margin: 4px 0 14px; overflow-x: auto; }
   .yp-pill { font: inherit; font-size: 13.5px; font-weight: 700; border: 1px solid var(--line); background: none; color: var(--sub); border-radius: 99px; padding: 8px 16px; cursor: pointer; white-space: nowrap; }
   .yp-pill.on { background: var(--indigo); border-color: var(--indigo); color: #fff; }
-  .yp-scard { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px 16px; margin-bottom: 12px; box-shadow: 0 3px 14px rgba(120, 90, 40, .07); }
+  .yp-scard { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px 16px; margin-bottom: 12px; box-shadow: 0 3px 14px rgba(60, 100, 140, .07); }
   .cal-nav { display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 12px; }
   .cal-nav .mo { font-size: 16px; font-weight: 800; }
   .cal-nav button { background: none; border: none; color: var(--sub); font-size: 17px; cursor: pointer; padding: 2px 8px; }
@@ -244,7 +244,7 @@
   .tg.on { background: var(--teal); }
   .tg::after { content: ''; position: absolute; top: 3px; left: 3px; width: 21px; height: 21px; border-radius: 50%; background: #fff; transition: transform .18s; }
   .tg.on::after { transform: translateX(19px); }
-  .tsheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; max-width: 480px; margin: 0 auto; background: var(--card); border-radius: 26px 26px 0 0; padding: 10px 20px calc(26px + env(safe-area-inset-bottom)); transform: translateY(108%); transition: transform .24s ease; box-shadow: 0 -8px 30px rgba(120,90,40,.16); }
+  .tsheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; max-width: 480px; margin: 0 auto; background: var(--card); border-radius: 26px 26px 0 0; padding: 10px 20px calc(26px + env(safe-area-inset-bottom)); transform: translateY(108%); transition: transform .24s ease; box-shadow: 0 -8px 30px rgba(60,100,140,.16); }
   body.todo-open .tsheet { transform: translateY(0); }
   body.todo-open .backdrop { opacity: 1; pointer-events: auto; }
   .tsheet h2 { margin: 0 0 4px; font-size: 19px; }
@@ -362,7 +362,7 @@
   .subj-card .sm .lesson { color: var(--indigo); font-weight: 700; }
   .subj-card .sm .prac { color: var(--teal); font-weight: 700; }
   .subj-card .sm .sep { color: var(--faint); margin: 0 5px; }
-  :root { --faint: #b8ae99; }
+  :root { --faint: #a9b9c8; }
   /* 도넛 */
   .donut-wrap { display: flex; align-items: center; gap: 20px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 18px; margin-bottom: 10px; }
   .donut { width: 112px; height: 112px; border-radius: 50%; flex: none; display: grid; place-items: center; }
@@ -453,34 +453,34 @@
   .tabbar .fd-main { margin-bottom: 10px; }
   .fd-top { display: flex; justify-content: space-between; align-items: center; padding: 6px 2px 0; }
   .fd-top .r { display: flex; gap: 8px; align-items: center; }
-  .fd-ic { width: 32px; height: 32px; border-radius: 11px; padding: 0; background: #fff; border: 1px solid #f0e4d0; font-size: 15px; cursor: pointer; display: grid; place-items: center; }
-  .fd-who { font-size: 13px; font-weight: 700; color: #33302a; background: #fff; border: 1px solid #f0e4d0; border-radius: 99px; padding: 6px 12px; cursor: pointer; font-family: inherit; }
-  .fd-hd { display: flex; justify-content: space-between; align-items: baseline; padding: 12px 2px 6px; color: #33302a; }
+  .fd-ic { width: 32px; height: 32px; border-radius: 11px; padding: 0; background: #fff; border: 1px solid #d6e6f3; font-size: 15px; cursor: pointer; display: grid; place-items: center; }
+  .fd-who { font-size: 13px; font-weight: 700; color: #24303b; background: #fff; border: 1px solid #d6e6f3; border-radius: 99px; padding: 6px 12px; cursor: pointer; font-family: inherit; }
+  .fd-hd { display: flex; justify-content: space-between; align-items: baseline; padding: 12px 2px 6px; color: #24303b; }
   .fd-hd .d { font-size: 17px; font-weight: 800; }
-  .fd-hd .d small { color: #98917f; font-weight: 600; font-size: 13px; margin-left: 7px; }
-  .fd-hd .tot { font-size: 13px; color: #98917f; }
+  .fd-hd .d small { color: #7d8fa0; font-weight: 600; font-size: 13px; margin-left: 7px; }
+  .fd-hd .tot { font-size: 13px; color: #7d8fa0; }
   .fd-hd .tot b { color: #f4652f; font-size: 16px; font-variant-numeric: tabular-nums; }
-  .fd-dday { display: inline-block; background: #fff; border: 1px solid #f0e4d0; color: #a06b33; font-size: 11.5px; font-weight: 700; border-radius: 99px; padding: 3px 10px; }
+  .fd-dday { display: inline-block; background: #fff; border: 1px solid #d6e6f3; color: #3d6f9e; font-size: 11.5px; font-weight: 700; border-radius: 99px; padding: 3px 10px; }
   .fd-nav { display: flex; align-items: center; gap: 5px; padding: 0 2px 6px; }
-  .fd-nav .arr { width: 32px; height: 32px; border-radius: 11px; border: 1px solid #f0e4d0; background: #fff; color: #8a8272; font-size: 16px; cursor: pointer; padding: 0; }
+  .fd-nav .arr { width: 32px; height: 32px; border-radius: 11px; border: 1px solid #d6e6f3; background: #fff; color: #5b6b7a; font-size: 16px; cursor: pointer; padding: 0; }
   .fd-nav .arr:disabled { opacity: .4; cursor: default; }
-  .fd-nav .dt { position: relative; font-size: 13.5px; font-weight: 800; color: #33302a; padding: 7px 12px; background: #fff; border: 1px solid #f0e4d0; border-radius: 11px; }
+  .fd-nav .dt { position: relative; font-size: 13.5px; font-weight: 800; color: #24303b; padding: 7px 12px; background: #fff; border: 1px solid #d6e6f3; border-radius: 11px; }
   .fd-nav .dt input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; border: 0; padding: 0; }
   .fd-nav .today-btn { margin-left: auto; font-size: 12px; font-weight: 800; color: #c2481a; background: #ffe9d8; border: none; border-radius: 99px; padding: 7px 13px; cursor: pointer; font-family: inherit; }
   .fd-feed { position: relative; padding: 4px 0 8px; }
-  .fd-feed::before { content: ""; position: absolute; left: 9px; top: 14px; bottom: 12px; width: 2px; background: #f0e4d0; }
+  .fd-feed::before { content: ""; position: absolute; left: 9px; top: 14px; bottom: 12px; width: 2px; background: #d6e6f3; }
   .fd-ev { display: flex; gap: 13px; padding: 8px 0; position: relative; }
-  .fd-ev .dot { width: 20px; height: 20px; border-radius: 50%; background: #f0e4d0; border: 3px solid #fff9f0; flex: none; z-index: 1; }
+  .fd-ev .dot { width: 20px; height: 20px; border-radius: 50%; background: #d6e6f3; border: 3px solid #e9f3fb; flex: none; z-index: 1; }
   .fd-ev.p .dot { background: #ff8a3d; }
-  .fd-ev.b .dot { background: #5fb4ec; }
-  .fd-ev .bx { flex: 1; min-width: 0; background: #fff; border-radius: 14px; padding: 11px 13px; font-size: 13px; box-shadow: 0 3px 14px rgba(120, 90, 40, .08); color: #33302a; }
+  .fd-ev.b .dot { background: #8fa3b8; }
+  .fd-ev .bx { flex: 1; min-width: 0; background: #fff; border-radius: 14px; padding: 11px 13px; font-size: 13px; box-shadow: 0 3px 14px rgba(60, 100, 140, .08); color: #24303b; }
   .fd-ev .r1 { display: flex; justify-content: space-between; gap: 8px; font-weight: 700; }
   .fd-ev .r1 .dur { color: #f4652f; font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .fd-ev small { color: #98917f; font-weight: 500; font-variant-numeric: tabular-nums; }
-  .fd-ev.b .bx { background: #eaf4fd; box-shadow: none; color: #3e7fb4; }
-  .fd-ev.b .r1 .dur { color: #3e7fb4; }
-  .fd-ev.b small { color: #7fa5c4; }
-  .fd-shot { margin-top: 8px; height: 64px; border-radius: 10px; overflow: hidden; background: linear-gradient(135deg, #ffe3c2, #ffd1a6); display: flex; align-items: center; justify-content: center; font-size: 11px; color: #a06b33; font-weight: 600; }
+  .fd-ev small { color: #7d8fa0; font-weight: 500; font-variant-numeric: tabular-nums; }
+  .fd-ev.b .bx { background: #eef2f6; box-shadow: none; color: #5b6b7a; }
+  .fd-ev.b .r1 .dur { color: #5b6b7a; }
+  .fd-ev.b small { color: #8fa3b8; }
+  .fd-shot { margin-top: 8px; height: 64px; border-radius: 10px; overflow: hidden; background: linear-gradient(135deg, #ffe3c2, #ffd1a6); display: flex; align-items: center; justify-content: center; font-size: 11px; color: #3d6f9e; font-weight: 600; }
   .fd-shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .fd-live .dot { background: #ff8a3d; box-shadow: 0 0 0 4px rgba(255, 138, 61, .25); }
   .fd-live .bx { background: linear-gradient(135deg, #ff9548, #ff6b35); color: #fff6ec; box-shadow: 0 10px 26px rgba(255, 107, 53, .32); cursor: pointer; }
@@ -489,7 +489,87 @@
   .fd-live.brk .dot { background: #5fb4ec; box-shadow: 0 0 0 4px rgba(95, 180, 236, .25); }
   .fd-live.brk .bx { background: linear-gradient(135deg, #5fb4ec, #3e8fd8); box-shadow: 0 10px 26px rgba(80, 150, 210, .3); }
   .fd-live.brk .bx small { color: #d8ecfb; }
-  .fd-empty { text-align: center; color: #b8ae99; font-size: 13.5px; padding: 30px 0 22px; }
+  .fd-empty { text-align: center; color: #a9b9c8; font-size: 13.5px; padding: 30px 0 22px; }
+  .fd-ev.ap .dot { background: #d6e6f3; }
+  .fd-ev.ap .bx { background: transparent; border: 1px dashed #c3d4e3; color: #7d8fa0; box-shadow: none; }
+  .fd-ev.ap .r1 .dur { color: #7d8fa0; font-weight: 600; }
+  .fd-ev .memo { display: block; font-size: 12px; color: #5b6b7a; font-weight: 500; margin-top: 3px; }
+  .fd-live.rt .dot { background: var(--rc, #34a86b); box-shadow: 0 0 0 4px rgba(52, 168, 107, .25); }
+  .fd-live.rt .bx { background: linear-gradient(135deg, var(--rc1, #3fbf7f), var(--rc, #2a9660)); box-shadow: 0 10px 26px rgba(0, 0, 0, .15); }
+  .fd-live.rt .bx small { color: rgba(255, 255, 255, .8); }
+  .fd-moon { width: 32px; height: 32px; border-radius: 11px; padding: 0; background: #fff; border: 1px solid #d6e6f3; font-size: 15px; cursor: pointer; display: grid; place-items: center; }
+
+  /* ── 루틴 링 카드 ── */
+  .rc { background: #fff; border-radius: 18px; padding: 12px 12px 10px; box-shadow: 0 4px 16px rgba(60, 100, 140, .10); margin-top: 8px; -webkit-touch-callout: none; user-select: none; }
+  .rc .top { display: flex; gap: 12px; align-items: center; }
+  .bigr { width: 128px; height: 128px; border-radius: 50%; flex: none; background: conic-gradient(#ff7a3d calc(var(--p) * 1%), #ffe9d8 0); display: grid; place-items: center; position: relative; cursor: pointer; }
+  .bigr.full { background: #ff7a3d; box-shadow: 0 0 0 4px rgba(255, 122, 61, .25); }
+  .bigr i { width: 100px; height: 100px; border-radius: 50%; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; font-style: normal; }
+  .bigr .v { font-size: 22px; font-weight: 800; color: #f4652f; line-height: 1; font-variant-numeric: tabular-nums; }
+  .bigr .g { font-size: 10px; color: #7d8fa0; font-weight: 700; margin-top: 3px; }
+  .bigr .e { font-size: 15px; margin-bottom: 2px; }
+  .bigr .tag { position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); background: #eef5fb; color: #3d6f9e; border: 1px solid #cfe0ef; border-radius: 99px; font-size: 9.5px; font-weight: 800; padding: 2px 8px; white-space: nowrap; }
+  .smalls { flex: 1; min-width: 0; overflow: hidden; display: flex; flex-direction: column; gap: 7px; }
+  .sr { display: flex; align-items: center; gap: 8px; cursor: pointer; border-radius: 12px; padding: 2px; }
+  .sr:active { background: #f3f8fc; }
+  .sr .r { width: 40px; height: 40px; border-radius: 50%; flex: none; background: conic-gradient(var(--c) calc(var(--p) * 1%), #e3edf5 0); display: grid; place-items: center; }
+  .sr .r i { width: 30px; height: 30px; border-radius: 50%; background: #fff; display: grid; place-items: center; font-style: normal; font-size: 13px; }
+  .sr.done .r { background: var(--c); } .sr.done .r i { background: transparent; color: #fff; font-size: 12px; font-weight: 800; }
+  .sr.run .r i { font-size: 9.5px; font-weight: 800; color: var(--c); font-variant-numeric: tabular-nums; }
+  .sr .n { flex: 1; min-width: 0; overflow: hidden; font-size: 12px; font-weight: 800; line-height: 1.15; }
+  .sr .n small { display: block; font-size: 10px; color: #7d8fa0; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rc .foot { margin-top: 10px; padding-top: 8px; border-top: 1px solid #edf3f8; display: flex; justify-content: space-between; font-size: 10.5px; color: #7d8fa0; font-weight: 700; }
+  .rc .foot b { color: #f4652f; }
+  .cheer { margin-top: 8px; background: #fdecf1; border: 1px solid #f7c6d3; color: #c2405a; border-radius: 12px; padding: 7px 12px; font-size: 12px; font-weight: 800; display: flex; align-items: center; gap: 6px; }
+  .cheer small { margin-left: auto; font-weight: 600; color: #d98a9a; }
+  .night { margin-top: 8px; width: 100%; text-align: left; border: none; background: linear-gradient(135deg, #2c3e6b, #1c2a4d); color: #fff; border-radius: 14px; padding: 10px 13px; font: inherit; font-size: 12.5px; font-weight: 800; display: flex; align-items: center; gap: 8px; box-shadow: 0 8px 20px rgba(28, 42, 77, .28); cursor: pointer; }
+  .night small { margin-left: auto; font-weight: 700; color: #c9d4f0; }
+  .lbl-sm { font-size: 11px; font-weight: 800; letter-spacing: .06em; color: #a9b9c8; margin: 12px 2px 0; }
+  .fd-lesson { margin-top: 6px; font-size: 11px; color: #7d8fa0; overflow-wrap: anywhere; }
+  .fd-lesson b { color: #24303b; }
+  .dk-big.pink { background: linear-gradient(135deg, #ff7a9c, #e8496f); box-shadow: 0 8px 22px rgba(232, 73, 111, .28); }
+  .dk-big.sent { background: #fdecf1; color: #c2405a; box-shadow: none; }
+
+  /* ── 루틴 기록 시트 ── */
+  .rsheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; max-width: 480px; margin: 0 auto; background: #fff; border-radius: 26px 26px 0 0; padding: 10px 20px calc(26px + env(safe-area-inset-bottom)); transform: translateY(108%); transition: transform .24s ease; box-shadow: 0 -8px 30px rgba(60,100,140,.2); max-height: 92vh; overflow-y: auto; }
+  body.rt-open .rsheet { transform: translateY(0); }
+  body.rt-open .backdrop { opacity: 1; pointer-events: auto; }
+  .rsheet h2 { margin: 0 0 2px; font-size: 19px; }
+  .rsheet .sub { font-size: 12.5px; color: var(--sub); margin: 0 0 6px; }
+  .rsheet input[type="text"] { width: 100%; font: inherit; font-size: 15px; font-weight: 600; background: #f3f8fc; color: inherit; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+  .rsheet .hint { font-size: 11px; color: var(--sub); font-weight: 600; }
+  .rsheet .endrow { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; font-size: 12.5px; color: var(--sub); }
+  .rsheet .endrow b { color: var(--ink); }
+  .rsheet .endrow input[type="time"] { font: inherit; font-size: 13px; font-weight: 700; border: 1px solid var(--line); border-radius: 10px; padding: 6px 8px; background: #f3f8fc; color: inherit; }
+  .rsheet .cta { background: var(--rt-c, #34a86b); color: #fff; }
+  .rsheet .alt { width: 100%; margin-top: 8px; background: none; border: none; font: inherit; font-size: 13px; font-weight: 700; color: var(--sub); cursor: pointer; padding: 8px; }
+  .chip.rt-on { background: var(--rt-c, #34a86b); border-color: var(--rt-c, #34a86b); color: #fff; }
+
+  /* ── 🌙 오늘 돌아보기 ── */
+  .review { position: fixed; inset: 0; z-index: 8; background: linear-gradient(180deg, #1c2a4d 0%, #2c3e6b 55%, #3b527f 100%); color: #fff; max-width: 480px; margin: 0 auto; padding: 24px 22px calc(22px + env(safe-area-inset-bottom)); display: none; flex-direction: column; overflow-y: auto; }
+  body.review-on .review { display: flex; }
+  .review .rt { font-size: 11px; letter-spacing: .12em; font-weight: 800; color: #aebbe0; }
+  .review h2 { margin: 4px 0 0; font-size: 22px; font-weight: 800; }
+  .review .sub { font-size: 12.5px; color: #c9d4f0; margin-top: 2px; }
+  .review .rings { display: flex; justify-content: space-between; gap: 6px; margin-top: 16px; }
+  .review .rg { flex: 1; text-align: center; }
+  .review .rg .r { width: 54px; height: 54px; border-radius: 50%; margin: 0 auto; background: conic-gradient(var(--c) calc(var(--p) * 1%), rgba(255, 255, 255, .14) 0); display: grid; place-items: center; }
+  .review .rg .r i { width: 42px; height: 42px; border-radius: 50%; background: #243560; display: grid; place-items: center; font-style: normal; font-size: 15px; }
+  .review .rg.done .r { background: var(--c); } .review .rg.done .r i { background: transparent; font-weight: 800; }
+  .review .rg .n { font-size: 10.5px; font-weight: 800; margin-top: 5px; }
+  .review .rg .v { font-size: 10px; color: #c9d4f0; font-variant-numeric: tabular-nums; }
+  .review .card { background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .14); border-radius: 14px; padding: 10px 12px; margin-top: 10px; font-size: 12.5px; }
+  .review .card .k { font-size: 10.5px; color: #aebbe0; font-weight: 800; margin-bottom: 3px; }
+  .review .stat { display: flex; gap: 8px; margin-top: 10px; }
+  .review .stat span { flex: 1; background: rgba(255, 255, 255, .08); border-radius: 12px; padding: 8px; text-align: center; font-size: 11px; font-weight: 700; color: #c9d4f0; }
+  .review .stat b { display: block; color: #fff; font-size: 15px; }
+  .review .ask { margin-top: auto; padding-top: 16px; }
+  .review .ask .q { font-size: 13px; font-weight: 800; margin-bottom: 6px; }
+  .review textarea { width: 100%; font: inherit; font-size: 14px; background: rgba(255, 255, 255, .12); border: 1px solid rgba(255, 255, 255, .2); border-radius: 12px; padding: 10px 12px; color: #fff; resize: none; height: 68px; }
+  .review textarea::placeholder { color: #aebbe0; }
+  .review .go { width: 100%; margin-top: 10px; background: #fff; color: #2c3e6b; border: none; border-radius: 14px; padding: 13px; font: inherit; font-size: 15px; font-weight: 800; cursor: pointer; }
+  .review .go:disabled { opacity: .6; }
+  .review .skip { width: 100%; background: none; border: none; font: inherit; font-size: 12px; color: #aebbe0; margin-top: 6px; font-weight: 700; cursor: pointer; padding: 6px; }
   /* 도크 확정안 A — 큰 버튼=현재 상태(중앙)+행동 칩(전환될 상태 색), 종료=축소 고정폭 */
   .fd-main { display: flex; gap: 10px; align-items: stretch; }
   .dk-big { flex: 1; border: none; font: inherit; cursor: pointer; border-radius: 18px; padding: 11px 12px; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-align: center; }
@@ -502,15 +582,15 @@
   .dk-act.to-brk { background: #3e8fd8; box-shadow: 0 3px 10px rgba(62, 143, 216, .4); }
   .dk-act.to-prac { background: #f4652f; box-shadow: 0 3px 10px rgba(244, 101, 47, .4); }
   .dk-act.neutral { background: rgba(255, 255, 255, .2); }
-  .dk-end { flex: none; width: 86px; border: none; font: inherit; cursor: pointer; border-radius: 14px; background: #f4f1ea; color: #8a8272; font-size: 11.5px; font-weight: 800; line-height: 1.35; padding: 8px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-align: center; }
+  .dk-end { flex: none; width: 86px; border: none; font: inherit; cursor: pointer; border-radius: 14px; background: #eef2f6; color: #5b6b7a; font-size: 11.5px; font-weight: 800; line-height: 1.35; padding: 8px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-align: center; }
   .dk-end .ic { font-size: 14px; }
   .dk-end:disabled { opacity: .55; cursor: default; }
 
   /* 과목 선택 (연습 시작 전) */
   .fd-pick { position: fixed; inset: 0; z-index: 9; background: rgba(30, 20, 10, .45); display: flex; align-items: flex-end; justify-content: center; }
   .fd-pick .pk { background: #fff; border-radius: 22px 22px 0 0; width: 100%; max-width: 480px; padding: 20px 18px calc(24px + env(safe-area-inset-bottom)); }
-  .fd-pick h3 { margin: 0 0 14px; font-size: 16px; color: #33302a; }
-  .fd-pick .k { width: 100%; display: flex; align-items: center; gap: 10px; margin-bottom: 8px; background: #fff9f0; border: 1px solid #f0e4d0; border-radius: 16px; padding: 15px 16px; font: inherit; font-size: 16px; font-weight: 700; color: #33302a; cursor: pointer; }
+  .fd-pick h3 { margin: 0 0 14px; font-size: 16px; color: #24303b; }
+  .fd-pick .k { width: 100%; display: flex; align-items: center; gap: 10px; margin-bottom: 8px; background: #e9f3fb; border: 1px solid #d6e6f3; border-radius: 16px; padding: 15px 16px; font: inherit; font-size: 16px; font-weight: 700; color: #24303b; cursor: pointer; }
   .fd-pick .k .kd { width: 12px; height: 12px; border-radius: 50%; flex: none; }
   .fd-pick .k.main { background: linear-gradient(135deg, #ff9548, #ff6b35); border: none; color: #fff; font-size: 17px; font-weight: 800; padding: 17px 16px; box-shadow: 0 8px 22px rgba(255, 107, 53, .3); }
   .fd-pick .done-b { margin-left: auto; font-size: 11px; font-weight: 800; color: #2f9e63; background: #e2f4ea; border-radius: 99px; padding: 2px 9px; flex: none; }
@@ -557,6 +637,9 @@
 
   <div class="summary" id="summary"></div>
 
+  <div class="rsheet" id="rsheet"></div>
+  <div class="review" id="review"></div>
+
   <div class="cam" id="cam"></div>
   <input type="file" id="camFile" accept="image/*" capture="user" style="display:none">
 
@@ -565,6 +648,7 @@
   var HUES = ['indigo', 'teal', 'amber'];
   var DURS = [30, 60, 90, 120];
   var SKEY = 'famsession';
+  var CAMERA_ON = false; // 📷 인증샷 — 2026-07-19 사용자 결정으로 OFF (코드 보존, 켜려면 true)
 
   var BOOT = null, view = 'home';
   var cur = null, curDur = 60, customEnd = false, sending = false, othersOpen = false;
@@ -577,7 +661,7 @@
   var COLOR_PALETTE = ['#4fc0af', '#8b96f2', '#e3a94f', '#e07070', '#5fb0e0', '#c78bf2', '#7cc36a', '#e8a13c'];
   // 통계
   var statsOff = 0, statsData = null, statsLoading = false, statsTarget = '', statsSelDay = 0, statsMode = '일간';
-  var CAL_COLS = ['#f6efe2', '#ffe3c2', '#ffbe85', '#ff9548', '#f4652f']; // 잔디 히트맵 — 크림→오렌지
+  var CAL_COLS = ['#eef3f8', '#ffe3c2', '#ffbe85', '#ff9548', '#f4652f']; // 잔디 히트맵 — 크림→오렌지
 
   function $(id) { return document.getElementById(id); }
   function esc(s) {
@@ -650,35 +734,72 @@
     var bar = $('tabbar');
     if (!BOOT || BOOT.error || !BOOT.member) { bar.style.display = 'none'; document.body.classList.remove('dock-big'); return; }
     var prac = !!BOOT.member.practice || !!sess;
-    document.body.classList.toggle('dock-big', prac);
+    var viewer = isViewer();
+    document.body.classList.toggle('dock-big', prac || viewer);
     bar.style.display = 'block';
-    bar.innerHTML = (prac ? dockHtml() : '') + menuHtml();
+    bar.innerHTML = (prac ? dockHtml() : (viewer ? cheerDockHtml() : '')) + menuHtml();
     bindMenu(bar);
     if ($('fdStart')) $('fdStart').addEventListener('click', function () {
-      chooseKind(function (k) { openCam(k, !!sess); }); // 세션 있으면 재개(과목 전환 가능) → 📷
+      if (sess && isRoutineKind(sess.kind)) return; // 루틴 타이머 중엔 연습 시작 불가(한 번에 하나)
+      chooseKind(function (k) { startOrResume(k); });
     });
     if ($('fdRest')) $('fdRest').addEventListener('click', doBreak);
     if ($('fdEnd')) $('fdEnd').addEventListener('click', tFinish);
+    if ($('fdCheer')) $('fdCheer').addEventListener('click', sendCheer);
     startTick();
   }
 
-  /** 큰 버튼이 곧 상태 표시기: 없음=오늘 누적 / 연습 중=구간 시간 / 휴식 중=휴식 경과 */
+  /** 시작/재개 공통 — 카메라 플래그에 따라 📷 경유 또는 즉시 */
+  function startOrResume(kind) {
+    if (CAMERA_ON) openCam(kind, !!sess);
+    else if (sess) doResume(kind, null, null); else doStart(kind, null, null);
+  }
+  function isRoutineKind(k) { var s = subjByName(k); return !!(s && s.mode !== 'timer'); }
+  function subjByName(k) { return ((BOOT && BOOT.subjects) || []).find(function (s) { return s.name === k; }) || null; }
+  function bassGoalMin() { return (BOOT && BOOT.rings && BOOT.rings.rings.find(function (r) { return r.main; }) || {}).goalMin || (BOOT.member && BOOT.member.goalMin) || 0; }
+
+  /** 큰 버튼이 곧 상태 표시기: 없음=오늘 누적/목표 · 연습 중=구간 시간 · 휴식 중=휴식 경과 · 루틴 타이머 중=루틴명+경과 */
   function dockHtml() {
     var h = '<div class="fd-main">';
+    var goal = bassGoalMin();
+    var todayTxt = '오늘 ' + clockHM(Math.floor(todaySec('베이스') / 60)) + (goal ? ' / ' + clockHM(goal) : '');
     if (!sess) {
       h += '<button class="dk-big prac" id="fdStart"><span class="dk-st">▶ 연습 시작</span>' +
-        '<span class="dk-act neutral">오늘 ' + clockHM(Math.floor(todaySec(null) / 60)) + ' · 📷 인증샷 찍고 출발!</span></button>' +
+        '<span class="dk-act neutral">' + todayTxt + '</span></button>' +
         '<button class="dk-end" disabled>☁️ 휴식</button>';
+    } else if (isRoutineKind(sess.kind)) {
+      var rs = subjByName(sess.kind);
+      h += '<button class="dk-big" id="fdEnd" style="background:linear-gradient(135deg,' + esc(rs.color) + 'dd,' + esc(rs.color) + ')"><span class="dk-st">' + esc(rs.emoji) + ' ' + esc(sess.kind) + ' 중 <b id="dkTime">' + fmt(Date.now() - sess.segStart) + '</b></span>' +
+        '<span class="dk-act neutral">누르면 ✓ 끝내고 저장</span></button>' +
+        '<button class="dk-end" disabled>▶ 연습</button>';
     } else if (sess.state === 'practice') {
       h += '<button class="dk-big prac" id="fdRest"><span class="dk-st">🎸 ' + esc(sess.kind) + ' 연습 중 <b id="dkTime">' + fmt(Date.now() - sess.segStart) + '</b></span>' +
         '<span class="dk-act to-brk">누르면 ☁️ 휴식</span></button>' +
         '<button class="dk-end" id="fdEnd"><span class="ic">⏹</span>오늘 연습<br>종료</button>';
     } else {
       h += '<button class="dk-big brk" id="fdStart"><span class="dk-st">☁️ 휴식 중 <b id="dkTime">' + fmt(Date.now() - sess.segStart) + '</b></span>' +
-        '<span class="dk-act to-prac">누르면 ▶ 연습 시작 📷</span></button>' +
+        '<span class="dk-act to-prac">누르면 ▶ 연습 시작</span></button>' +
         '<button class="dk-end" id="fdEnd"><span class="ic">⏹</span>오늘 연습<br>종료</button>';
     }
     return h + '</div>';
+  }
+  /** 부모 도크 — ❤️ 응원해요 (하루 1번/사람) */
+  function cheerDockHtml() {
+    var sent = !!BOOT.cheeredToday;
+    var who = (BOOT.viewTarget && BOOT.viewTarget.name) || '채영';
+    return '<div class="fd-main">' + (sent
+      ? '<button class="dk-big sent" disabled><span class="dk-st">❤️ 오늘 응원했어요</span><span class="dk-act neutral" style="background:rgba(194,64,90,.12);color:#c2405a">' + esc(who) + ' 홈에 하트가 떠 있어요</span></button>'
+      : '<button class="dk-big pink" id="fdCheer"><span class="dk-st">❤️ 응원해요</span><span class="dk-act neutral">' + esc(who) + ' 홈에 하트가 떠요</span></button>') + '</div>';
+  }
+  function sendCheer() {
+    var b = $('fdCheer'); if (b) { b.disabled = true; }
+    fetch(API, { method: 'POST', body: JSON.stringify({ action: 'cheer', u: BOOT.member.code }) })
+      .then(function (r) { return r.json(); })
+      .then(function (res) {
+        if (res && res.error) { showToast(res.error, true); if (b) b.disabled = false; return; }
+        BOOT = res; saveBoot(res); render(); showToast('❤️ 응원을 보냈어요');
+      })
+      .catch(function () { showToast('전송 실패 — 인터넷 확인', true); if (b) b.disabled = false; });
   }
 
   /** 공통 하단 메뉴 — 피드 도크와 다른 화면(#tabbar) 모두 같은 항목·같은 카드 스타일 */
@@ -883,21 +1004,21 @@
     var shots = (vt || !isToday) ? {} : loadShots();
     // 피드 항목: 오늘=서버 today + 로컬(진행 중 세션) / 과거=api=day
     var evs = [];
+    function pushSeg(sg) {
+      evs.push({ brk: sg.k === '휴식', appt: !!sg.appt, k: sg.k, s: sg.s, e: sg.e, min: Math.max(0, toMin_(sg.e) - toMin_(sg.s)), memo: sg.memo || '' });
+    }
     if (isToday) {
-      ((BOOT.today && BOOT.today.segs) || []).forEach(function (sg) {
-        evs.push({ brk: sg.k === '휴식', k: sg.k, s: sg.s, e: sg.e, min: Math.max(0, toMin_(sg.e) - toMin_(sg.s)) });
-      });
+      ((BOOT.today && BOOT.today.segs) || []).forEach(pushSeg);
       if (sess) sess.segments.forEach(function (s) {
         evs.push({ brk: s.type === 'break', k: s.type === 'break' ? '휴식' : (s.kind || sess.kind), s: hmOf(s.start), e: hmOf(s.end), min: Math.round((s.end - s.start) / 60000) });
       });
     } else if (dayData) {
-      (dayData.segs || []).forEach(function (sg) {
-        evs.push({ brk: sg.k === '휴식', k: sg.k, s: sg.s, e: sg.e, min: Math.max(0, toMin_(sg.e) - toMin_(sg.s)) });
-      });
+      (dayData.segs || []).forEach(pushSeg);
     }
 
     var h = '<div class="fd-top"><span>' + ddayFd(who) + '</span><div class="r">' +
       '<button class="fd-ic" id="fdCal" title="가족 캘린더 열기" aria-label="가족 캘린더 열기">📅</button>' +
+      (m.practice ? '<button class="fd-moon" id="fdMoon" title="오늘 돌아보기" aria-label="오늘 돌아보기">🌙</button>' : '') +
       '<button class="fd-who" id="fdWho" title="이름 바꾸기">' + esc(m.name) + '</button></div></div>';
     h += '<div class="fd-hd"><span class="d">' + esc(who.name) + (vt ? ' 👀' : '') + '</span>' +
       '<span class="tot">' + (isToday ? '오늘' : '합계') + ' <b id="fdTotal">' + (isToday ? fmtHMS(feedTotalSec()) : fmtHMS((dayData ? dayData.totalMin : 0) * 60)) + '</b></span></div>';
@@ -909,32 +1030,52 @@
       '<button class="arr" id="fdNext"' + (isToday ? ' disabled' : '') + ' aria-label="다음날">›</button>' +
       (isToday ? '' : '<button class="today-btn" id="fdToday">오늘로 →</button>') + '</div>';
 
+    // 루틴 링 카드 (오늘=BOOT.rings 실시간 / 과거=dayData.rings)
+    var rg = isToday ? BOOT.rings : (dayData && dayData.rings);
+    if (rg && rg.rings && rg.rings.length) h += ringsHtml(rg, isToday, !!vt);
+    // ❤️ 응원 · 🌙 돌아보기 배너 · 이번 주 레슨 (오늘만)
+    if (isToday) {
+      var ch = BOOT.cheers || [];
+      if (ch.length) h += '<div class="cheer">❤️ ' + esc(ch.map(function (c) { return c.name; }).join(' · ')) + '가 응원해요<small>' + esc(ch[ch.length - 1].at) + '</small></div>';
+      if (m.practice && new Date().getHours() >= 21) h += '<button class="night" id="fdNight">🌙 오늘 돌아보기<small>' + (BOOT.note ? '한마디 남김 ✓' : '자기 전에 1분 →') + '</small></button>';
+      if (BOOT.note && vt) h += '<div class="cheer" style="background:#eef2fb;border-color:#cdd8f2;color:#2c3e6b">🌙 ' + esc(who.name) + '의 한마디 — "' + esc(BOOT.note) + '"</div>';
+      h += lessonLineHtml();
+    }
+
     var liveShown = !!(isToday && vt && BOOT.live);
-    h += '<div class="fd-feed">';
+    h += '<div class="lbl-sm">타임라인</div><div class="fd-feed">';
     if (!evs.length && !(isToday && sess) && !liveShown) {
       h += '<div class="fd-empty">' + (isToday
-        ? (vt ? '오늘 아직 기록이 없어요' : '아직 기록이 없어요.<br>아래 버튼으로 오늘 연습을 시작해보세요!')
+        ? (vt ? '오늘 아직 기록이 없어요' : '아직 기록이 없어요.<br>링을 탭해 기록하거나 아래 버튼으로 연습을 시작해요!')
         : (dayData ? '이날은 기록이 없어요' : '불러오는 중…')) + '</div>';
     }
     evs.forEach(function (ev) {
       var shot = !ev.brk && shots[ev.s];
-      h += '<div class="fd-ev ' + (ev.brk ? 'b' : 'p') + '"><span class="dot"></span><div class="bx">' +
-        '<div class="r1"><span>' + (ev.brk ? '☁️ 휴식' : '🎸 ' + esc(ev.k)) + '</span><span class="dur">' + durLabel(Math.max(1, ev.min)) + '</span></div>' +
+      var sj = subjByName(ev.k);
+      var em = ev.brk ? '☁️' : (sj ? sj.emoji : '🎸');
+      var col = ev.brk ? '' : (sj ? sj.color : '#ff8a3d');
+      if (ev.appt) {
+        h += '<div class="fd-ev ap"><span class="dot"></span><div class="bx"><div class="r1"><span>📅 ' + esc(ev.k) + '</span><span class="dur">' + ev.s + '–' + ev.e + '</span></div></div></div>';
+        return;
+      }
+      h += '<div class="fd-ev ' + (ev.brk ? 'b' : 'p') + '"><span class="dot"' + (col ? ' style="background:' + col + '"' : '') + '></span><div class="bx">' +
+        '<div class="r1"><span>' + em + ' ' + (ev.brk ? '휴식' : esc(ev.k)) + '</span><span class="dur"' + (col ? ' style="color:' + col + '"' : '') + '>' + durLabel(Math.max(1, ev.min)) + '</span></div>' +
         (ev.brk ? '' : '<small>' + ev.s + ' – ' + ev.e + '</small>') +
+        (ev.memo ? '<span class="memo">' + esc(ev.memo) + '</span>' : '') +
         (shot ? '<div class="fd-shot"><img src="' + shot + '" alt="인증샷"></div>' : '') +
         '</div></div>';
     });
     if (isToday && sess) {
-      var isBrk = sess.state === 'break';
-      h += '<div class="fd-ev fd-live' + (isBrk ? ' brk' : '') + '" id="fdLive"><span class="dot"></span><div class="bx">' +
-        '<div class="r1"><span>' + (isBrk ? '☁️ 휴식 중' : '🎸 ' + esc(sess.kind) + ' 연습 중') + '</span><small>' + hmOf(sess.segStart) + ' 시작</small></div>' +
+      var isBrk = sess.state === 'break', rk = isRoutineKind(sess.kind), rsj = rk ? subjByName(sess.kind) : null;
+      h += '<div class="fd-ev fd-live' + (isBrk ? ' brk' : '') + (rk ? ' rt' : '') + '" id="fdLive"' + (rk ? ' style="--rc:' + esc(rsj.color) + ';--rc1:' + esc(rsj.color) + 'cc"' : '') + '><span class="dot"></span><div class="bx">' +
+        '<div class="r1"><span>' + (isBrk ? '☁️ 휴식 중' : (rk ? esc(rsj.emoji) + ' ' + esc(sess.kind) + ' 중' : '🎸 ' + esc(sess.kind) + ' 연습 중')) + '</span><small>' + hmOf(sess.segStart) + ' 시작</small></div>' +
         '<div class="t" id="fdLiveT">' + fmt(Date.now() - sess.segStart) + '</div>' +
-        '<small>탭하면 집중 화면 (할 일 체크)</small></div></div>';
+        '<small>' + (rk ? '탭하면 끝내고 저장' : '탭하면 집중 화면 (할 일 체크)') + '</small></div></div>';
     } else if (liveShown) {
       // 뷰어 라이브 카드 — practice_event 기반 실시간 상태 (보기 전용)
-      var lv = BOOT.live, lvBrk = lv.state === 'break';
-      h += '<div class="fd-ev fd-live' + (lvBrk ? ' brk' : '') + '"><span class="dot"></span><div class="bx" style="cursor:default">' +
-        '<div class="r1"><span>' + (lvBrk ? '☁️ 휴식 중' : '🎸 ' + esc(lv.kind || '연습') + ' 연습 중') + '</span><small>' + hmOf(lv.at) + ' 시작</small></div>' +
+      var lv = BOOT.live, lvBrk = lv.state === 'break', lvR = isRoutineKind(lv.kind), lvS = lvR ? subjByName(lv.kind) : null;
+      h += '<div class="fd-ev fd-live' + (lvBrk ? ' brk' : '') + (lvR ? ' rt' : '') + '"' + (lvR ? ' style="--rc:' + esc(lvS.color) + ';--rc1:' + esc(lvS.color) + 'cc"' : '') + '><span class="dot"></span><div class="bx" style="cursor:default">' +
+        '<div class="r1"><span>' + (lvBrk ? '☁️ 휴식 중' : (lvR ? esc(lvS.emoji) + ' ' + esc(lv.kind) + ' 중' : '🎸 ' + esc(lv.kind || '연습') + ' 연습 중')) + '</span><small>' + hmOf(lv.at) + ' 시작</small></div>' +
         '<div class="t" id="fdLiveT">' + fmt(Date.now() - lv.at) + '</div>' +
         '<small>👀 실시간 — ' + esc(who.name) + ' 폰 기준</small></div></div>';
     }
@@ -944,19 +1085,199 @@
     $('app').innerHTML = h;
     $('fdCal').addEventListener('click', openCalendar);
     $('fdWho').addEventListener('click', function () { if (confirm('이름을 다시 고를까요?')) { store('famcode', null); init(); } });
-    if ($('fdLive')) $('fdLive').addEventListener('click', function () { overlayOpen = true; view = 'timer'; render(); });
+    if ($('fdMoon')) $('fdMoon').addEventListener('click', openReview);
+    if ($('fdNight')) $('fdNight').addEventListener('click', openReview);
+    if ($('fdLive')) $('fdLive').addEventListener('click', function () {
+      if (isRoutineKind(sess.kind)) tFinish(); else { overlayOpen = true; view = 'timer'; render(); }
+    });
     $('fdPrev').addEventListener('click', function () { shiftFeedDay(-1); });
     $('fdNext').addEventListener('click', function () { shiftFeedDay(1); });
     if ($('fdToday')) $('fdToday').addEventListener('click', function () { feedDate = null; renderFeed(); });
     $('fdDateIn').addEventListener('change', function () { if (this.value) setFeedDate(this.value); });
+    bindRings(isToday && !vt);
     if (sess) acquireWake();
     startTick();
   }
 
+  /** 링 카드 HTML — 큰 링(베이스) + 작은 링(나머지). live=오늘 채영(탭/길게 활성) */
+  function ringsHtml(rg, isToday, readonly) {
+    var main = rg.rings.find(function (r) { return r.main; }) || rg.rings[0];
+    var others = rg.rings.filter(function (r) { return r !== main; });
+    var mainDone = main.doneMin * 60 + (isToday ? localPracticeSec(main.name) : 0)
+      + ((isToday && !sess && isViewer() && BOOT.live && BOOT.live.state === 'practice' && BOOT.live.kind === main.name) ? Math.floor((Date.now() - BOOT.live.at) / 1000) : 0);
+    var mainPct = main.goalMin ? Math.min(100, mainDone / 60 / main.goalMin * 100) : 0;
+    var h = '<div class="rc"><div class="top">';
+    h += '<div class="bigr' + (mainPct >= 100 ? ' full' : '') + '" id="ringMain" style="--p:' + mainPct.toFixed(1) + '"><i><span class="e">' + esc(main.emoji) + '</span><span class="v" id="ringMainV">' + clockHM(Math.floor(mainDone / 60)) + '</span><span class="g">' + (main.goalMin ? '목표 ' + clockHM(main.goalMin) : '최대한 많이') + '</span></i>' +
+      (rg.academy ? '<span class="tag">🏫 학원 날</span>' : '') + '</div>';
+    h += '<div class="smalls">';
+    // 라이브 판정: 채영 본인=로컬 세션 / 뷰어=서버 live 상태
+    var lvOn = isToday && !sess && isViewer() && BOOT.live && BOOT.live.state === 'practice';
+    var liveStart = sess ? sess.segStart : (lvOn ? BOOT.live.at : 0);
+    var liveKind = sess ? sess.kind : (lvOn ? BOOT.live.kind : '');
+    others.forEach(function (r) {
+      var running = isToday && liveKind === r.name;
+      var done = r.doneMin + (running ? Math.floor((Date.now() - liveStart) / 60000) : 0);
+      var pct = r.goalMin ? Math.min(100, done / r.goalMin * 100) : 0;
+      var isDone = r.goalMin > 0 && done >= r.goalMin;
+      var sub = running ? gl(done) + ' 진행 중 · 목표 ' + gl(r.goalMin)
+        : (isDone ? gl(done) + ' 완료' : (done ? gl(done) + ' / ' + gl(r.goalMin) : '0 / ' + gl(r.goalMin) + (readonly || !isToday ? '' : ' · 탭해서 기록')));
+      h += '<div class="sr' + (isDone ? ' done' : '') + (running ? ' run' : '') + '" data-rt="' + esc(r.name) + '" style="--c:' + esc(r.color) + ';--p:' + pct.toFixed(1) + '">' +
+        '<span class="r"><i' + (running ? ' class="ringRunT"' : '') + '>' + (isDone ? '✓' : (running ? fmt(Date.now() - liveStart) : esc(r.emoji))) + '</i></span>' +
+        '<span class="n">' + esc(r.emoji) + ' ' + esc(r.name) + '<small>' + esc(sub) + '</small></span></div>';
+    });
+    h += '</div></div>';
+    var st = BOOT.streak || { streak: 0, perfectDays: 0 };
+    h += '<div class="foot"><span>🔥 <b>' + st.streak + '일</b> 연속 연습</span><span>이달 완벽한 날 <b>' + st.perfectDays + '</b></span></div></div>';
+    return h;
+  }
+  /** 작은 링: 탭=기록 시트, 길게(500ms)=타이머 시작. 큰 링 탭=연습 시작 */
+  function bindRings(active) {
+    if (!active) return;
+    var mainR = $('ringMain');
+    if (mainR) mainR.addEventListener('click', function () { if (!sess) chooseKind(function (k) { startOrResume(k); }); });
+    document.querySelectorAll('.sr[data-rt]').forEach(function (el) {
+      var name = el.getAttribute('data-rt'), timer = null, longed = false;
+      var start = function () { longed = false; timer = setTimeout(function () { longed = true; startRoutineTimer(name); }, 500); };
+      var cancel = function () { if (timer) { clearTimeout(timer); timer = null; } };
+      el.addEventListener('pointerdown', start);
+      el.addEventListener('pointerup', cancel); el.addEventListener('pointerleave', cancel); el.addEventListener('pointercancel', cancel);
+      el.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+      el.addEventListener('click', function () { if (longed) return; if (sess && sess.kind === name) { tFinish(); return; } openRoutineSheet(name); });
+    });
+  }
+  function lessonLineHtml() {
+    // 이번 주 레슨: [과목].lesson 프리셋 이름이 이번 주 최근기록에 있으면 ✓ (recent는 5건뿐이라 근사 — 정확값은 통계)
+    var subs = (BOOT.subjects || []).filter(function (s) { return s.lesson; });
+    if (!subs.length) return '';
+    var wk = weekKeys_();
+    var rec = (BOOT.recent || []);
+    return '<div class="fd-lesson">이번 주 레슨 · ' + subs.map(function (s) {
+      var done = rec.some(function (r) { return r.t.indexOf(s.lesson) === 0 && wk.some(function (k) { return r.d.indexOf(k) >= 0; }); });
+      return (done ? '<b>' + esc(s.lesson) + ' ✓</b>' : esc(s.lesson) + ' ○');
+    }).join(' · ') + '</div>';
+  }
+  function weekKeys_() {
+    var d = new Date(), dow = d.getDay(), keys = [];
+    for (var i = 0; i < 7; i++) { var x = new Date(d.getFullYear(), d.getMonth(), d.getDate() - dow + i); keys.push((x.getMonth() + 1) + '/' + x.getDate()); }
+    return keys;
+  }
+
+  // ── 루틴 기록 시트 (독서·이론·뉴스): 시간 칩 → (책) → 한 줄 → 저장 / 타이머로 시작 ──
+  var rtName = '', rtMin = 0, rtEnd = '';
+  var RT_CHIPS = [15, 30, 45, 60, 90, 120];
+  function openRoutineSheet(name) {
+    var s = subjByName(name); if (!s) return;
+    if (sess) { showToast((isRoutineKind(sess.kind) ? sess.kind : '연습') + ' 타이머가 돌고 있어요 — 먼저 끝내주세요', true); return; }
+    rtName = name; rtMin = s.goalMin && s.goalMin <= 120 ? s.goalMin : 60; rtEnd = nowHM_();
+    renderRoutineSheet();
+    document.body.classList.add('rt-open');
+  }
+  function nowHM_() { var d = new Date(); return pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+  function renderRoutineSheet() {
+    var s = subjByName(rtName); if (!s) return;
+    var r = (BOOT.rings && BOOT.rings.rings.find(function (x) { return x.name === rtName; })) || { doneMin: 0, goalMin: s.goalMin };
+    var left = Math.max(0, (r.goalMin || 0) - r.doneMin);
+    var isBook = rtName === '독서';
+    var lb = BOOT.lastBook;
+    var startHM = addMin(rtEnd || nowHM_(), -rtMin);
+    var chips = RT_CHIPS.map(function (m) { return '<button class="chip' + (m === rtMin ? ' rt-on' : '') + '" data-m="' + m + '">' + durLabel(m) + '</button>'; }).join('') +
+      '<button class="chip' + (RT_CHIPS.indexOf(rtMin) < 0 ? ' rt-on' : '') + '" data-m="custom">직접…</button>';
+    $('rsheet').style.setProperty('--rt-c', s.color);
+    $('rsheet').innerHTML = '<div class="grip"></div><h2>' + esc(s.emoji) + ' ' + esc(s.name) + ' 기록</h2>' +
+      '<p class="sub">오늘 ' + (r.doneMin ? clockHM(r.doneMin) + ' 했어' : '아직 안 했어') + (left ? ' · ' + durLabel(left) + ' 더 하면 목표 달성' : (r.goalMin ? ' · 목표 달성 ✓' : '')) + '</p>' +
+      '<div class="f-label">얼마나 했어?</div><div class="chips" id="rtChips">' + chips + '</div>' +
+      (RT_CHIPS.indexOf(rtMin) < 0 ? '<input type="number" id="rtCustom" inputmode="numeric" placeholder="분" value="' + rtMin + '" style="margin-top:8px;width:120px;font:inherit;font-size:15px;font-weight:700;border:1px solid var(--line);border-radius:12px;padding:9px 12px;background:#f3f8fc">' : '') +
+      (isBook ? '<div class="f-label">무슨 책? <span class="hint">' + (lb ? '(지난번 책이 채워져 있어요)' : '(선택)') + '</span></div><input type="text" id="rtBook" placeholder="책 제목" value="' + esc(lb ? lb.title : '') + '">' +
+        (lb ? '<div class="hint" style="margin-top:4px">《' + esc(lb.title) + '》 ' + lb.days + '일째</div>' : '') : '') +
+      '<div class="f-label">' + (isBook ? '기억에 남는 한 줄' : (rtName === '뉴스' ? '어떤 뉴스?' : '뭘 배웠어?')) + ' <span class="hint">(선택)</span></div><input type="text" id="rtMemo" placeholder="' + (isBook ? '예: 새는 알을 깨고 나온다…' : '한 줄로') + '">' +
+      '<div class="endrow"><span>끝난 시간 <b>' + esc(rtEnd) + '</b> · 시작 ' + startHM + '</span><input type="time" id="rtEndIn" value="' + esc(rtEnd) + '"></div>' +
+      '<button class="cta" id="rtSave">기록 저장</button>' +
+      (s.mode === 'both' ? '<button class="alt" id="rtTimer">▶ 대신 타이머로 시작</button>' : '');
+    $('rsheet').querySelectorAll('#rtChips .chip').forEach(function (c) {
+      c.addEventListener('click', function () {
+        var mm = c.getAttribute('data-m');
+        rtMin = mm === 'custom' ? 25 : +mm; renderRoutineSheet();
+        if (mm === 'custom') setTimeout(function () { if ($('rtCustom')) $('rtCustom').focus(); }, 50);
+      });
+    });
+    if ($('rtCustom')) $('rtCustom').addEventListener('input', function () { rtMin = Math.max(1, Math.min(600, +this.value || 0)); });
+    $('rtEndIn').addEventListener('change', function () { rtEnd = this.value || nowHM_(); renderRoutineSheet(); });
+    $('rtSave').addEventListener('click', saveRoutineLog);
+    if ($('rtTimer')) $('rtTimer').addEventListener('click', function () { closeRoutineSheet(); startRoutineTimer(rtName); });
+  }
+  function closeRoutineSheet() { document.body.classList.remove('rt-open'); }
+  function saveRoutineLog() {
+    var min = Math.max(1, Math.min(600, Math.round(rtMin || ($('rtCustom') ? +$('rtCustom').value : 0) || 0)));
+    if (!min) { showToast('시간을 골라주세요', true); return; }
+    var hm = (rtEnd || nowHM_()).split(':'), end = new Date(); end.setHours(+hm[0], +hm[1], 0, 0);
+    if (end.getTime() > Date.now() + 60000) end = new Date();
+    var book = $('rtBook') ? $('rtBook').value.trim() : '', memo = $('rtMemo') ? $('rtMemo').value.trim() : '';
+    var btn = $('rtSave'); btn.disabled = true; btn.textContent = '저장 중…';
+    fetch(API, { method: 'POST', body: JSON.stringify({ action: 'routine_log', u: BOOT.member.code, kind: rtName, min: min, endAt: end.getTime(), book: book, memo: memo, logId: Date.now() }) })
+      .then(function (r) { return r.json(); })
+      .then(function (res) {
+        if (res && res.error) { showToast(res.error, true); btn.disabled = false; btn.textContent = '기록 저장'; return; }
+        BOOT = res; saveBoot(res); closeRoutineSheet(); render();
+        var rr = res.rings && res.rings.rings.find(function (x) { return x.name === rtName; });
+        showToast((rr && rr.done) ? '✓ ' + rtName + ' 목표 달성! 오늘 ' + clockHM(rr.doneMin) : rtName + ' ' + durLabel(min) + ' 기록했어요');
+      })
+      .catch(function () { showToast('저장 실패 — 인터넷 확인', true); btn.disabled = false; btn.textContent = '기록 저장'; });
+  }
+  /** 루틴 타이머 = 연습 세션 구조 재사용(kind=루틴명, 휴식 없음, 📷 없음). 종료 시 registerSession으로 저장 */
+  function startRoutineTimer(name) {
+    if (sess) { showToast('이미 타이머가 돌고 있어요', true); return; }
+    var s = subjByName(name); if (!s) return;
+    sess = { kind: name, sessionStart: Date.now(), state: 'practice', segStart: Date.now(), segments: [], routine: true };
+    saveSess();
+    sendEvent('start', 0, null);
+    render();
+    showToast(s.emoji + ' ' + name + ' 타이머 시작 — 끝나면 링이나 아래 버튼을 탭');
+  }
+
+  // ── 🌙 오늘 돌아보기 ──
+  function openReview() {
+    var rg = BOOT.rings, st = BOOT.streak || {}, ch = BOOT.cheers || [];
+    if (!rg) return;
+    var d = new Date();
+    var dow = ['일', '월', '화', '수', '목', '금', '토'][d.getDay()];
+    var doneN = rg.rings.filter(function (r) { return r.done; }).length;
+    var total = rg.rings.reduce(function (a, r) { return a + r.doneMin; }, 0);
+    var h = '<div class="rt">' + (d.getMonth() + 1) + '월 ' + d.getDate() + '일 ' + dow + '요일 · ' + nowHM_() + '</div>' +
+      '<h2>오늘도 수고했어, ' + esc(BOOT.member.name) + ' 🌙</h2>' +
+      '<div class="sub">루틴 ' + doneN + ' / ' + rg.rings.length + ' · 총 ' + durLabel(total) + ' 움직였어' + (rg.academy ? ' · 🏫 학원 날' : '') + '</div>';
+    h += '<div class="rings">' + rg.rings.map(function (r) {
+      return '<div class="rg' + (r.done ? ' done' : '') + '" style="--c:' + esc(r.color) + ';--p:' + r.pct + '"><div class="r"><i>' + (r.done ? '✓' : esc(r.emoji)) + '</i></div><div class="n">' + esc(r.name) + '</div><div class="v">' +
+        (r.mode === 'timer' ? clockHM(r.doneMin) + (r.goalMin ? ' / ' + clockHM(r.goalMin) : '') : (r.doneMin ? clockHM(r.doneMin) : '안 함')) + '</div></div>';
+    }).join('') + '</div>';
+    // 오늘 메모(독서·이론·뉴스) — today.segs의 memo
+    ((BOOT.today && BOOT.today.segs) || []).filter(function (s) { return s.memo; }).forEach(function (s) {
+      var sj = subjByName(s.k);
+      h += '<div class="card"><div class="k">' + (sj ? esc(sj.emoji) + ' ' : '') + esc(s.k) + '</div><div>' + esc(s.memo) + '</div></div>';
+    });
+    h += '<div class="stat"><span>🔥 연속 연습<b>' + (st.streak || 0) + '일</b></span><span>이달 완벽한 날<b>' + (st.perfectDays || 0) + '</b></span><span>❤️ 오늘 응원<b>' + ch.length + '</b></span></div>';
+    h += '<div class="ask"><div class="q">오늘 하루, 한마디로?</div><textarea id="rvText" placeholder="예: 슬랩 연습이 드디어 감이 왔다 🎸">' + esc(BOOT.note || '') + '</textarea>' +
+      '<button class="go" id="rvSave">' + (BOOT.note ? '고쳐 저장하고 잘 자기 🌙' : '저장하고 잘 자기 🌙') + '</button><button class="skip" id="rvSkip">오늘은 그냥 넘어가기</button></div>';
+    $('review').innerHTML = h;
+    document.body.classList.add('review-on');
+    $('rvSkip').addEventListener('click', closeReview);
+    $('rvSave').addEventListener('click', function () {
+      var text = $('rvText').value.trim();
+      var b = $('rvSave'); b.disabled = true; b.textContent = '저장 중…';
+      fetch(API, { method: 'POST', body: JSON.stringify({ action: 'day_note', u: BOOT.member.code, text: text }) })
+        .then(function (r) { return r.json(); })
+        .then(function (res) {
+          if (res && res.error) { showToast(res.error, true); b.disabled = false; b.textContent = '저장하고 잘 자기 🌙'; return; }
+          BOOT = res; saveBoot(res); closeReview(); render(); showToast(text ? '🌙 한마디 저장했어요. 잘 자!' : '🌙 잘 자!');
+        })
+        .catch(function () { showToast('저장 실패 — 인터넷 확인', true); b.disabled = false; b.textContent = '저장하고 잘 자기 🌙'; });
+    });
+  }
+  function closeReview() { document.body.classList.remove('review-on'); }
+
   /** 주과목 = 주1회가 아닌 첫 과목(베이스). 디폴트: 직전 과목, 단 주1회 과목(휴식=그 과목 종료 개념)이면 주과목 복귀 */
   function primaryKind() {
     var subs = BOOT.subjects || [];
-    for (var i = 0; i < subs.length; i++) if (!subs[i].weekly) return subs[i].name;
+    for (var i = 0; i < subs.length; i++) if (!subs[i].weekly && (subs[i].mode === 'timer' || !subs[i].mode)) return subs[i].name;
     return subs.length ? subs[0].name : '베이스';
   }
   function defaultKind() {
@@ -965,7 +1286,8 @@
     return (cur && cur.weekly) ? primaryKind() : sess.kind;
   }
   function chooseKind(cb) {
-    var subs = BOOT.subjects || [];
+    // 연습 시작 피커 = 타이머 전용 과목만(베이스). 독서·이론은 각자 링에서 타이머 시작
+    var subs = (BOOT.subjects || []).filter(function (s) { return s.mode === 'timer' || !s.mode; });
     if (subs.length <= 1) return cb(subs.length ? subs[0].name : '베이스');
     var dflt = defaultKind();
     var sorted = subs.filter(function (s) { return s.name === dflt; })
@@ -1136,7 +1458,7 @@
 
   /** 연습 탭 = 열품타 메인: 날짜+총시간, 좌 과목·할일, 우 타임테이블 */
   function renderTimer() {
-    if (sess && overlayOpen) { renderMeasure(); startTick(); return; }
+    if (sess && overlayOpen && !isRoutineKind(sess.kind)) { renderMeasure(); startTick(); return; }
     closeMeasure();
     var m = BOOT.member;
     var goal = m.goalMin || 0;
@@ -1173,7 +1495,7 @@
       if (e <= s) e = s + 1 / 60;
       if (e <= TT_H0 || s >= TT_H1) return;
       s = Math.max(s, TT_H0); e = Math.min(e, TT_H1);
-      var c = sg.k === '휴식' ? '#c9dced' : subjColor(sg.k);
+      var c = sg.k === "휴식" ? "#c3cfdb" : subjColor(sg.k);
       blocks += '<div class="mtt-blk" style="top:' + ((s - TT_H0) * TT_RH) + 'px;height:' + Math.max(2, (e - s) * TT_RH - 1) + 'px;background:' + c + '"></div>';
     });
     h += '<div class="yp-body"><div class="yp-left">' + left + '</div>' +
@@ -1185,7 +1507,7 @@
     var subs = $('app').querySelectorAll('.yp-sh');
     for (var i = 0; i < subs.length; i++) (function (b) {
       b.addEventListener('click', function () {
-        if (sess) { overlayOpen = true; render(); return; }
+        if (sess) { if (isRoutineKind(sess.kind)) { tFinish(); return; } overlayOpen = true; render(); return; }
         startSession(b.getAttribute('data-start'));
       });
     })(subs[i]);
@@ -1357,6 +1679,18 @@
       if (view === 'feed') {
         if (feedDate) return; // 과거 날짜 조회 중엔 고정 표시
         var ft = $('fdTotal'); if (ft) ft.textContent = fmtHMS(feedTotalSec());
+        var rr = document.querySelector('.ringRunT');
+        if (rr && sess) rr.textContent = fmt(Date.now() - sess.segStart);
+        else if (rr && isViewer() && BOOT.live) rr.textContent = fmt(Date.now() - BOOT.live.at);
+        var mv = $('ringMainV'), mr = $('ringMain');
+        if (mv && sess && !isRoutineKind(sess.kind)) {
+          var mainR = BOOT.rings && BOOT.rings.rings.find(function (x) { return x.main; });
+          if (mainR) {
+            var sec = mainR.doneMin * 60 + localPracticeSec(mainR.name);
+            mv.textContent = clockHM(Math.floor(sec / 60));
+            if (mainR.goalMin && mr) mr.style.setProperty('--p', Math.min(100, sec / 60 / mainR.goalMin * 100).toFixed(1));
+          }
+        }
         var lt = $('fdLiveT');
         if (lt && sess) lt.textContent = fmt(Date.now() - sess.segStart);
         else if (lt && isViewer() && BOOT.live) lt.textContent = fmt(Date.now() - BOOT.live.at);
@@ -1377,7 +1711,10 @@
   function stopTick() { if (tick) { clearInterval(tick); tick = null; } }
 
   /** 연습 시작(연습 탭 진입점) — 인증샷 카메라를 거쳐 doStart로 */
-  function startSession(kind) { openCam(kind, false); }
+  function startSession(kind) {
+    if (isRoutineKind(kind)) { startRoutineTimer(kind); return; }
+    if (CAMERA_ON) openCam(kind, false); else doStart(kind, null, null);
+  }
   function doStart(kind, photo, thumb) {
     sess = { kind: kind, sessionStart: Date.now(), state: 'practice', segStart: Date.now(), segments: [] };
     saveSess();
@@ -1405,20 +1742,50 @@
   }
   function tFinish() {
     if (!sess) return;
+    // 루틴 타이머(독서 등) 종료 → 책·한 줄 메모를 물어보고 저장 (연습은 바로 저장)
+    if (isRoutineKind(sess.kind) && !finishMemoAsked) { openFinishMemo(); return; }
+    finishMemoAsked = false;
     var btn = $('bStop') || $('fdEnd'), orig = btn ? btn.textContent : '';
     if (btn) { btn.disabled = true; btn.textContent = '저장 중…'; }
     sess.segments.push({ type: sess.state, kind: sess.state === 'practice' ? sess.kind : '', start: sess.segStart, end: Date.now() });
-    var payload = { action: 'session', u: BOOT.member.code, kind: sess.kind, segments: sess.segments };
+    var payload = { action: 'session', u: BOOT.member.code, kind: sess.kind, segments: sess.segments, memo: finishMemo || '' };
+    var wasRoutine = isRoutineKind(sess.kind);
     fetch(API, { method: 'POST', body: JSON.stringify(payload) })
       .then(function (r) { return r.json(); })
       .then(function (res) {
         if (res && res.error) { showToast(res.error, true); sess.segments.pop(); if (btn) { btn.disabled = false; btn.textContent = orig; } return; }
         BOOT = res; saveBoot(res); store(SKEY, null);
-        sess = null; overlayOpen = false;
+        var kindDone = sess.kind;
+        sess = null; overlayOpen = false; finishMemo = '';
         closeMeasure();
-        showSummary(res.sessionSummary || {});
+        if (wasRoutine) {
+          render();
+          var rr = res.rings && res.rings.rings.find(function (x) { return x.name === kindDone; });
+          showToast((rr && rr.done) ? '✓ ' + kindDone + ' 목표 달성! 오늘 ' + clockHM(rr.doneMin) : kindDone + ' 저장했어요' + (rr ? ' — 오늘 ' + clockHM(rr.doneMin) : ''));
+        } else showSummary(res.sessionSummary || {});
       })
       .catch(function () { showToast('저장 실패 — 인터넷 확인 후 다시 눌러주세요.', true); sess.segments.pop(); if (btn) { btn.disabled = false; btn.textContent = orig; } });
+  }
+  var finishMemoAsked = false, finishMemo = '';
+  /** 루틴 타이머 끝내기 전 — 《책》/한 줄 입력 시트(선택). 저장 → tFinish 재호출 */
+  function openFinishMemo() {
+    var s = subjByName(sess.kind); if (!s) { finishMemoAsked = true; tFinish(); return; }
+    var isBook = sess.kind === '독서', lb = BOOT.lastBook;
+    var min = Math.round((Date.now() - sess.segStart) / 60000);
+    $('rsheet').style.setProperty('--rt-c', s.color);
+    $('rsheet').innerHTML = '<div class="grip"></div><h2>' + esc(s.emoji) + ' ' + esc(s.kind || sess.kind) + ' 끝!</h2>' +
+      '<p class="sub">' + durLabel(Math.max(1, min)) + ' 했어요 · 저장하기 전에 한 줄만</p>' +
+      (isBook ? '<div class="f-label">무슨 책?</div><input type="text" id="rtBook" placeholder="책 제목" value="' + esc(lb ? lb.title : '') + '">' : '') +
+      '<div class="f-label">' + (isBook ? '기억에 남는 한 줄' : (sess.kind === '뉴스' ? '어떤 뉴스?' : '뭘 배웠어?')) + ' <span class="hint">(선택)</span></div><input type="text" id="rtMemo" placeholder="한 줄로">' +
+      '<button class="cta" id="rtSave">저장</button><button class="alt" id="rtSkip">메모 없이 저장</button>';
+    document.body.classList.add('rt-open');
+    var go = function (withMemo) {
+      var book = withMemo && $('rtBook') ? $('rtBook').value.trim() : '', memo = withMemo && $('rtMemo') ? $('rtMemo').value.trim() : '';
+      finishMemo = (book ? '《' + book + '》' : '') + (book && memo ? ' ｜ ' : '') + memo;
+      finishMemoAsked = true; closeRoutineSheet(); tFinish();
+    };
+    $('rtSave').addEventListener('click', function () { go(true); });
+    $('rtSkip').addEventListener('click', function () { go(false); });
   }
 
   function showSummary(sm) {
@@ -1427,13 +1794,19 @@
     var title = (sm.kinds && sm.kinds.length)
       ? sm.kinds.map(function (k) { return esc(k.kind) + ' ' + human(k.min * 60000); }).join(' + ')
       : esc(kind) + ' 연습 · ' + human(pMin * 60000);
+    var goal = bassGoalMin();
+    var todayMin = (BOOT.today && BOOT.today.byKind && BOOT.today.byKind['베이스']) || 0;
+    var late = new Date().getHours() >= 21;
     $('summary').innerHTML =
       '<div class="done-ic">🎉</div><h2>오늘 연습 끝!</h2><p class="ssub">실연습 ' + human(pMin * 60000) + ' · 잘했어요</p>' +
       '<div class="evt-card"><div class="cal-row">🎸 연습 기록 저장됐어요</div><div class="etitle">' + title + '</div>' +
-      '<div class="edesc">' + sets + '세트 · 통계 탭에서 오늘 잔디와 시간을 볼 수 있어요</div></div>' +
-      '<button class="close" id="sClose">확인</button>';
+      '<div class="edesc">' + sets + '세트 · 오늘 누적 ' + clockHM(todayMin) + (goal ? ' / ' + clockHM(goal) + (todayMin >= goal ? ' 🎯 목표 달성!' : '') : '') + '</div></div>' +
+      (late ? '<button class="close" id="sReview" style="margin-top:auto;background:linear-gradient(135deg,#2c3e6b,#1c2a4d);color:#fff">🌙 오늘 돌아보기</button><button class="close" id="sClose" style="margin-top:10px;background:var(--etc-bg);color:var(--etc-ink)">확인</button>'
+            : '<button class="close" id="sClose">확인</button>');
     document.body.classList.add('summary-on');
-    $('sClose').addEventListener('click', function () { document.body.classList.remove('summary-on'); view = BOOT.member.practice ? 'feed' : 'home'; render(); });
+    var back = function () { document.body.classList.remove('summary-on'); view = BOOT.member.practice ? 'feed' : 'home'; render(); };
+    $('sClose').addEventListener('click', back);
+    if ($('sReview')) $('sReview').addEventListener('click', function () { back(); openReview(); });
   }
 
   // ── 통계 ──
@@ -1449,6 +1822,7 @@
       .catch(function () { statsLoading = false; statsData = { error: '통계를 불러오지 못했어요.' }; renderStats(); });
   }
   function clockHM(min) { min = Math.max(0, Math.round(min)); return Math.floor(min / 60) + ':' + pad(min % 60); }
+  function gl(min) { min = Math.max(0, Math.round(min)); return min < 60 ? min + '분' : clockHM(min); } // 링 라벨: 60분 미만은 분 단위
   function toMin_(hm) { var p = String(hm).split(':'); return (+p[0]) * 60 + (+p[1]); }
   function calLvl(min) { return min <= 0 ? 0 : min < 30 ? 1 : min < 60 ? 2 : min < 120 ? 3 : 4; }
 
@@ -1489,7 +1863,7 @@
     for (var e = 0; e < firstDow; e++) cells += '<div class="cal-cell empty"></div>';
     (d.grass || []).forEach(function (min, idx) {
       var day = idx + 1, lv = calLvl(min), bg = CAL_COLS[lv];
-      var ink = lv >= 3 ? '#ffffff' : (lv >= 1 ? '#8a5a2a' : '#b8ae99');
+      var ink = lv >= 3 ? '#ffffff' : (lv >= 1 ? '#8a5a2a' : '#a9b9c8');
       cells += '<div class="cal-cell' + (statsSelDay === day ? ' sel' : '') + '" data-d="' + day + '" style="background:' + bg + ';color:' + ink + '"><span class="cd">' + day + '</span>' + (min > 0 ? '<span class="ct">' + clockHM(min) + '</span>' : '') + '</div>';
     });
     var leg = CAL_COLS.map(function (c) { return '<span class="lc" style="background:' + c + '"></span>'; }).join('');
@@ -1650,7 +2024,7 @@
 
   $('shTime').addEventListener('input', updateEnd);
   $('shEnd').addEventListener('input', updateEnd);
-  $('backdrop').addEventListener('click', function () { closeSheet(); closeTodoSheet(); });
+  $('backdrop').addEventListener('click', function () { closeSheet(); closeTodoSheet(); if (!finishMemoAsked && !(sess && isRoutineKind(sess.kind) && document.body.classList.contains('rt-open'))) closeRoutineSheet(); });
   $('ctaBtn').addEventListener('click', function () {
     if (sending) return;
     var title = cur ? cur.name : $('shCustom').value.trim();
