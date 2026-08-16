@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>가족 일정</title>
-<!-- v29 홈 작은 링·발자국 일 뷰 글자 확대 — 2026-08-16 -->
+<!-- v30 📝 기록 모아보기(책장·완독·회상 카드·월 셀 점) — 2026-08-16 -->
 <meta name="theme-color" content="#e9f3fb">
 <link rel="preconnect" href="https://script.google.com">
 <link rel="preconnect" href="https://script.googleusercontent.com">
@@ -542,6 +542,44 @@
   .clday .memo.nt { background: #eef2fb; }
   .clempty { font-size: 14px; color: #a9b9c8; margin-top: 8px; }
   .clsum { text-align: right; font-size: 13px; color: var(--sub); margin-top: 8px; font-variant-numeric: tabular-nums; }
+  /* 📝 기록 모아보기 */
+  .clchips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 8px; scrollbar-width: none; }
+  .clchips::-webkit-scrollbar { display: none; }
+  .clchips .chip { flex: none; font-size: 12.5px; padding: 6px 11px; background: #fff; }
+  .clchips .chip.on { background: var(--indigo); border-color: var(--indigo); color: #fff; }
+  .clday-h { font-size: 12.5px; font-weight: 800; color: #7d8fa0; margin: 8px 2px 5px; }
+  .mrow { display: flex; gap: 8px; align-items: flex-start; padding: 7px 0; border-top: 1px solid #eef3f8; font-size: 13.5px; cursor: pointer; }
+  .mrow:first-child { border-top: 0; }
+  .mrow .ic { flex: none; width: 20px; text-align: center; }
+  .mrow .dd { flex: none; width: 38px; color: #7d8fa0; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .mrow .tm { flex: none; color: #3a4a5a; font-weight: 700; font-size: 12px; margin-top: 1px; white-space: nowrap; }
+  .mrow .m { flex: 1; min-width: 0; word-break: break-all; line-height: 1.4; }
+  .mrow .m.dim { color: #c3cfdb; }
+  .mrow .dn { color: #2f9e63; font-weight: 800; font-size: 11.5px; }
+  .mrow.nt { background: #eef2fb; border-radius: 9px; padding: 7px 9px; margin-top: 4px; border-top: 0; color: #2c3e6b; }
+  .mrow .ed { flex: none; background: none; border: none; font: inherit; font-size: 13px; padding: 0 2px; cursor: pointer; opacity: .7; }
+  .clcard.mcard { padding: 6px 14px; }
+  .clcard.bookc { padding: 12px 14px; }
+  .clcard.bookc.fold { padding: 10px 14px; opacity: .8; }
+  .clcard .bkt { cursor: pointer; margin-bottom: 4px; }
+  .clcard.fold .bkt { margin-bottom: 0; }
+  .badge { font-size: 10.5px; font-weight: 800; border-radius: 99px; padding: 2px 8px; background: #e6f6ec; color: #2f9e63; margin-left: 6px; }
+  .badge.now { background: #ffe9d8; color: #c2481a; }
+  .shelf { display: flex; gap: 4px; align-items: flex-end; min-height: 26px; flex-wrap: wrap; }
+  .spine { display: inline-block; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #fff; font-size: 11px; font-weight: 800; border-radius: 4px 4px 2px 2px; padding: 12px 8px 4px; cursor: pointer; box-shadow: inset 0 -3px 0 rgba(0,0,0,.18); }
+  .shelfbar { height: 5px; border-radius: 3px; background: #d9c3a5; margin-top: 2px; box-shadow: 0 2px 4px rgba(0,0,0,.08); }
+  .clmore { display: block; width: 100%; font: inherit; font-size: 13px; font-weight: 800; color: #7d8fa0; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 11px; cursor: pointer; margin-top: 4px; }
+  .clmore:disabled { opacity: .5; }
+  .clcal .c .dt { position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background: currentColor; opacity: .7; }
+  .clcal .c.pf .dt { bottom: 4px; }
+  .lnk.asmemos { display: block; margin: 12px auto 0; font-size: 13px; color: #3d6f9e; }
+  .cheerfx.book .h { filter: drop-shadow(0 4px 8px rgba(52, 168, 107, .35)); }
+  .cheerfx.book .ctoast { border-color: #bfe6cf; color: #2f9e63; box-shadow: 0 8px 24px rgba(52, 168, 107, .18); }
+  .cheerfx.book .ctoast small { color: #7cc59a; }
+  /* 🔁 그때의 오늘 회상 카드 */
+  .recall { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; width: 100%; text-align: left; font: inherit; background: #fff; border: 1px solid #d6e6f3; border-radius: 14px; padding: 9px 12px; margin-top: 8px; cursor: pointer; color: #24303b; }
+  .recall .rl { font-size: 11px; font-weight: 800; color: #3d6f9e; letter-spacing: .02em; }
+  .recall .rm { font-size: 13px; font-weight: 600; line-height: 1.35; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
   /* 홈 헤더 날짜 → 캘린더 일 뷰 */
   .fd-date { display: inline-flex; align-items: center; gap: 5px; font: inherit; font-size: 13px; font-weight: 800; color: #24303b; padding: 6px 12px; background: #fff; border: 1px solid #d6e6f3; border-radius: 11px; cursor: pointer; margin: 0 2px 6px; }
   .fd-date small { color: #7d8fa0; font-weight: 700; }
@@ -1104,6 +1142,8 @@
       if (m.practice && !sess && new Date().getHours() >= 21) h += '<button class="night" id="fdNight">🌙 오늘 요약 보기<small>' + (BOOT.note ? '한마디 남김 ✓' : '자기 전에 1분 →') + '</small></button>';
       if (BOOT.note && vt) h += '<div class="cheer" style="background:#eef2fb;border-color:#cdd8f2;color:#2c3e6b">🌙 ' + esc(who.name) + '의 한마디 — "' + esc(BOOT.note) + '"</div>';
       h += lessonLineHtml();
+      if (BOOT.recall && BOOT.recall.memo) { var rc = BOOT.recall, rsj = subjByName(rc.k), rpb = rc.k === '독서' ? parseBookF_(rc.memo) : null;
+        h += '<button class="recall" id="fdRecall"><span class="rl">🔁 ' + rc.daysAgo + '일 전 오늘</span><span class="rm">' + subjIcon(rsj) + ' ' + (rpb ? (rpb.title ? '《' + esc(rpb.title) + '》 ' : '') + esc(rpb.line) : esc(rc.memo)) + '</span></button>'; }
     }
 
     var liveShown = !!(isToday && vt && BOOT.live);
@@ -1155,6 +1195,7 @@
     if ($('fdNight')) $('fdNight').addEventListener('click', openReview);
     if ($('fdLive')) $('fdLive').addEventListener('click', function () { openActivitySheet(sess.kind); });
     $('fdDate').addEventListener('click', function () { openCal('day', todayStr(), true); });
+    if ($('fdRecall')) $('fdRecall').addEventListener('click', function () { openCal('day', BOOT.recall.date, true); });
     bindRings(isToday && !vt);
     if (sess) acquireWake();
     startTick();
@@ -1173,17 +1214,25 @@
     store(CHEER_SEEN, JSON.stringify({ date: today, at: maxAt }));
     playCheerFx(fresh);
   }
+  /** 📕 완독 축하 — 하트 애니메이션 골격 재사용 */
+  function playBookFx(bd) {
+    var em = ['📕', '📗', '📘', '📙', '📖', '✨', '📚'];
+    playFx_(em, ['📕', '📗', '📘', '📙'], '📕 《' + esc(bd.title) + '》 완독!<small>올해 ' + bd.yearCount + '번째 책' + (bd.goal ? ' · 목표 ' + bd.goal + '권' : '') + '</small>', 'book');
+  }
   function playCheerFx(list) {
-    cheerFxOn = true;
-    var old = $('cheerFx'); if (old) old.parentNode.removeChild(old);
-    var w = document.createElement('div'); w.className = 'cheerfx'; w.id = 'cheerFx';
-    var em = ['❤️', '🧡', '❤️', '💛', '❤️', '🧡', '❤️'], h = '';
-    for (var i = 0; i < 26; i++) h += '<span class="h" style="left:' + (4 + Math.random() * 86).toFixed(1) + '%;font-size:' + (18 + Math.random() * 20).toFixed(0) + 'px;animation-delay:' + (Math.random() * 1.6).toFixed(2) + 's">' + em[i % em.length] + '</span>';
-    var bigEm = ['❤️', '🧡', '💛', '💚', '💙', '💜', '🩷'], bs = Math.round(150 * (2 + Math.random() * 0.5));
-    h += '<span class="h big" style="font-size:' + bs + 'px;margin-left:' + (-bs / 2) + 'px">' + bigEm[Math.floor(Math.random() * bigEm.length)] + '</span>';
     var names = [], ats = [];
     list.forEach(function (c) { if (names.indexOf(c.name) < 0) names.push(c.name); ats.push(c.at); });
-    h += '<div class="ctoast">❤️ ' + esc(names.join(' · ')) + '가 응원했어요<small>' + esc(ats.join(' · ')) + '</small></div>';
+    playFx_(['❤️', '🧡', '❤️', '💛', '❤️', '🧡', '❤️'], ['❤️', '🧡', '💛', '💚', '💙', '💜', '🩷'], '❤️ ' + esc(names.join(' · ')) + '가 응원했어요<small>' + esc(ats.join(' · ')) + '</small>', '');
+  }
+  function playFx_(em, bigEm, toastHtml, cls) {
+    cheerFxOn = true;
+    var old = $('cheerFx'); if (old) old.parentNode.removeChild(old);
+    var w = document.createElement('div'); w.className = 'cheerfx' + (cls ? ' ' + cls : ''); w.id = 'cheerFx';
+    var h = '';
+    for (var i = 0; i < 26; i++) h += '<span class="h" style="left:' + (4 + Math.random() * 86).toFixed(1) + '%;font-size:' + (18 + Math.random() * 20).toFixed(0) + 'px;animation-delay:' + (Math.random() * 1.6).toFixed(2) + 's">' + em[i % em.length] + '</span>';
+    var bs = Math.round(150 * (2 + Math.random() * 0.5));
+    h += '<span class="h big" style="font-size:' + bs + 'px;margin-left:' + (-bs / 2) + 'px">' + bigEm[Math.floor(Math.random() * bigEm.length)] + '</span>';
+    h += '<div class="ctoast">' + toastHtml + '</div>';
     w.innerHTML = h; document.body.appendChild(w);
     setTimeout(function () { if (w.parentNode) w.parentNode.removeChild(w); cheerFxOn = false; }, 4800);
   }
@@ -1265,6 +1314,7 @@
       if (isBook && lb) h += '<div class="hint" style="margin-top:8px">📖 《' + esc(lb.title) + '》 ' + lb.days + '일째 · 다음엔 링을 <b>길게</b> 누르면 바로 시작</div>';
       else if (s.mode !== 'log') h += '<div class="hint" style="margin-top:8px">다음엔 링을 <b>길게</b> 누르면 바로 시작</div>';
     }
+    h += '<button class="lnk asmemos" id="asMemos">📝 지난 기록 보기' + (isBook ? ' → 책별 모아보기' : '') + '</button>';
     // 할 일 (베이스·이론 등 — todos에 그 과목이 있으면)
     var tds = (BOOT.todos || []).filter(function (t) { return t.kind === name; });
     if (tds.length || (s.mode !== 'log' && !isBook)) {
@@ -1281,28 +1331,33 @@
     if ($('asRest')) $('asRest').addEventListener('click', function () { closeRoutineSheet(); goBreak(); });
     if ($('asEnd')) $('asEnd').addEventListener('click', function () { closeRoutineSheet(); endActivity(); });
     if ($('asAdd')) $('asAdd').addEventListener('click', function () { closeRoutineSheet(); todoKind = name; openTodoSheet(); todoKind = name; renderTodoSheet(false); });
+    if ($('asMemos')) $('asMemos').addEventListener('click', function () { closeRoutineSheet(); memoKind = name; openCal('memos', null, true); });
     $('rsheet').querySelectorAll('[data-astd]').forEach(function (b) { b.addEventListener('click', function () { toggleTodo(b.getAttribute('data-astd')); setTimeout(function () { if (document.body.classList.contains('rt-open')) openActivitySheet(name); }, 60); }); });
     $('rsheet').querySelectorAll('[data-ased]').forEach(function (b) { b.addEventListener('click', function (ev) { ev.stopPropagation(); closeRoutineSheet(); openTodoSheet(b.getAttribute('data-ased')); }); });
   }
   /** 타임라인 카드 ✏️ — 메모(독서는 《책》 ｜ 한줄) 편집 */
   function openMemoEdit(sid, kind, memo) {
     var s = subjByName(kind), isBook = kind === '독서';
+    var wasDone = (memo || '').indexOf('✔완독') >= 0; memo = (memo || '').replace('✔완독', '').trim().replace(/\s*｜\s*$/, '');
     var m = /^《(.+?)》\s*(?:｜\s*)?(.*)$/.exec(memo || '');
     var book = m ? m[1] : (isBook && BOOT.lastBook ? BOOT.lastBook.title : ''), line = m ? m[2] : (memo || '');
+    var meDone = wasDone;
     $('rsheet').style.setProperty('--rt-c', s ? s.color : '#34a86b');
     $('rsheet').innerHTML = '<div class="grip"></div><h2>' + (s ? subjIcon(s) + ' ' : '') + esc(kind) + ' 한 줄</h2><p class="sub">이 기록에 메모를 남겨요 (선택)</p>' +
       (isBook ? '<div class="f-label">무슨 책?</div><input type="text" id="meBook" placeholder="책 제목" value="' + esc(book) + '">' : '') +
       '<div class="f-label">' + (isBook ? '기억에 남는 한 줄' : (kind === '뉴스' ? '어떤 뉴스?' : '한 줄')) + '</div><input type="text" id="meLine" placeholder="한 줄로" value="' + esc(line) + '">' +
+      (isBook ? '<div class="rep-toggle" style="margin-top:10px"><span>📕 이 책 다 읽었어요</span><span class="tg' + (meDone ? ' on' : '') + '" id="meDoneTg"></span></div>' : '') +
       '<button class="cta" id="meSave" style="margin-top:14px">저장</button>';
     document.body.classList.add('rt-open');
     setTimeout(function () { if ($('meLine')) $('meLine').focus(); }, 200);
+    if ($('meDoneTg')) $('meDoneTg').addEventListener('click', function () { meDone = !meDone; $('meDoneTg').classList.toggle('on', meDone); });
     $('meSave').addEventListener('click', function () {
       var b = $('meBook') ? $('meBook').value.trim() : '', l = $('meLine').value.trim();
       var text = (b ? '《' + b + '》' : '') + (b && l ? ' ｜ ' : '') + l;
       var btn = $('meSave'); btn.disabled = true; btn.textContent = '저장 중…';
-      fetch(API, { method: 'POST', body: JSON.stringify({ action: 'memo_edit', u: BOOT.member.code, sessionId: sid, memo: text }) })
+      fetch(API, { method: 'POST', body: JSON.stringify({ action: 'memo_edit', u: BOOT.member.code, sessionId: sid, memo: text, done: isBook && meDone && !!b }) })
         .then(function (r) { return r.json(); })
-        .then(function (res) { if (res && res.error) { showToast(res.error, true); btn.disabled = false; btn.textContent = '저장'; return; } BOOT = res; saveBoot(res); closeRoutineSheet(); render(); showToast('✏️ 저장했어요'); })
+        .then(function (res) { if (res && res.error) { showToast(res.error, true); btn.disabled = false; btn.textContent = '저장'; return; } BOOT = res; saveBoot(res); closeRoutineSheet(); memoInvalidate_(); render(); if (res.bookDone) playBookFx(res.bookDone); else showToast('✏️ 저장했어요'); })
         .catch(function () { showToast('저장 실패 — 인터넷 확인', true); btn.disabled = false; btn.textContent = '저장'; });
     });
   }
@@ -1324,9 +1379,10 @@
   }
 
   // ── 루틴 기록 시트 (독서·이론·뉴스): 시간 칩 → (책) → 한 줄 → 저장 / 타이머로 시작 ──
-  var rtName = '', rtMin = 0, rtEnd = '';
+  var rtName = '', rtMin = 0, rtEnd = '', rtDone = false;
   var RT_CHIPS = [15, 30, 45, 60, 90, 120];
   function openRoutineSheet(name) {
+    rtDone = false;
     var s = subjByName(name); if (!s) return;
     rtName = name; rtMin = s.goalMin && s.goalMin <= 120 ? s.goalMin : 60; rtEnd = nowHM_();
     renderRoutineSheet();
@@ -1351,6 +1407,7 @@
         (lb ? '<div class="hint" style="margin-top:4px">《' + esc(lb.title) + '》 ' + lb.days + '일째</div>' : '') : '') +
       '<div class="f-label">' + (isBook ? '기억에 남는 한 줄' : (rtName === '뉴스' ? '어떤 뉴스?' : '뭘 배웠어?')) + ' <span class="hint">(선택)</span></div><input type="text" id="rtMemo" placeholder="' + (isBook ? '예: 새는 알을 깨고 나온다…' : '한 줄로') + '">' +
       '<div class="endrow"><span>끝난 시간 <b>' + esc(rtEnd) + '</b> · 시작 ' + startHM + '</span><input type="time" id="rtEndIn" value="' + esc(rtEnd) + '"></div>' +
+      (isBook ? '<div class="rep-toggle" style="margin-top:10px"><span>📕 이 책 다 읽었어요</span><span class="tg' + (rtDone ? ' on' : '') + '" id="rtDoneTg"></span></div>' : '') +
       '<button class="cta" id="rtSave">기록 저장</button>' +
       (s.mode !== 'log' ? '<button class="alt" id="rtTimer">▶ 대신 타이머로 시작</button>' : '');
     $('rsheet').querySelectorAll('#rtChips .chip').forEach(function (c) {
@@ -1362,6 +1419,7 @@
     });
     if ($('rtCustom')) $('rtCustom').addEventListener('input', function () { rtMin = Math.max(1, Math.min(600, +this.value || 0)); });
     $('rtEndIn').addEventListener('change', function () { rtEnd = this.value || nowHM_(); renderRoutineSheet(); });
+    if ($('rtDoneTg')) $('rtDoneTg').addEventListener('click', function () { rtDone = !rtDone; $('rtDoneTg').classList.toggle('on', rtDone); });
     $('rtSave').addEventListener('click', saveRoutineLog);
     if ($('rtTimer')) $('rtTimer').addEventListener('click', function () { closeRoutineSheet(); startActivity(rtName); });
   }
@@ -1373,11 +1431,12 @@
     if (end.getTime() > Date.now() + 60000) end = new Date();
     var book = $('rtBook') ? $('rtBook').value.trim() : '', memo = $('rtMemo') ? $('rtMemo').value.trim() : '';
     var btn = $('rtSave'); btn.disabled = true; btn.textContent = '저장 중…';
-    fetch(API, { method: 'POST', body: JSON.stringify({ action: 'routine_log', u: BOOT.member.code, kind: rtName, min: min, endAt: end.getTime(), book: book, memo: memo, logId: Date.now() }) })
+    fetch(API, { method: 'POST', body: JSON.stringify({ action: 'routine_log', u: BOOT.member.code, kind: rtName, min: min, endAt: end.getTime(), book: book, memo: memo, done: rtName === '독서' && rtDone && !!book, logId: Date.now() }) })
       .then(function (r) { return r.json(); })
       .then(function (res) {
         if (res && res.error) { showToast(res.error, true); btn.disabled = false; btn.textContent = '기록 저장'; return; }
-        BOOT = res; saveBoot(res); closeRoutineSheet(); render();
+        rtDone = false; BOOT = res; saveBoot(res); closeRoutineSheet(); memoInvalidate_(); render();
+        if (res.bookDone) { playBookFx(res.bookDone); return; }
         var rr = res.rings && res.rings.rings.find(function (x) { return x.name === rtName; });
         showToast((rr && rr.done) ? '✓ ' + rtName + ' 목표 달성! 오늘 ' + clockHM(rr.doneMin) : rtName + ' ' + durLabel(min) + ' 기록했어요');
       })
@@ -2022,9 +2081,10 @@
       h += '<div class="clcard">' + calNav_(md.label, monthOff_(calDate) < 0) + '<div class="stat-hero" style="margin:0"><div class="sh-l">🗓 ' + esc(md.target.name) + ' · 일정</div><div class="sh-big">' + md.monthCount + '건</div><div class="sh-sub">이 달에 기록된 일정</div></div></div>' + eventsHtml_(md);
       $('app').innerHTML = h; bindCal_(); return;
     }
-    h += '<div class="clseg">' + [['month', '월'], ['week', '주'], ['day', '일']].map(function (s) { return '<button class="' + (calMode === s[0] ? 'on' : '') + '" data-m="' + s[0] + '">' + s[1] + '</button>'; }).join('') + '</div>';
+    h += '<div class="clseg">' + [['month', '월'], ['week', '주'], ['day', '일'], ['memos', '📝 기록']].map(function (s) { return '<button class="' + (calMode === s[0] ? 'on' : '') + '" data-m="' + s[0] + '">' + s[1] + '</button>'; }).join('') + '</div>';
     if (calMode === 'month') h += (md && !md.loading) ? monthHtml_(md) : calLoading_();
     else if (calMode === 'week') { var wd = calWeek_(); h += (wd && !wd.loading) ? (wd.error ? calErrHtml_(wd.error) : weekHtml_(wd)) : calLoading_(); }
+    else if (calMode === 'memos') { var xd = calMemos_(); h += memoChips_() + ((xd && !xd.loading) ? (xd.error ? calErrHtml_(xd.error) : memosHtml_(xd)) : calLoading_()); }
     else { var dd = calDay_(); h += (dd && !dd.loading) ? (dd.error ? calErrHtml_(dd.error) : dayHtml_(dd)) : calLoading_(); }
     $('app').innerHTML = h; bindCal_();
   }
@@ -2032,6 +2092,7 @@
   function calErrHtml_(e) { return '<div class="guide"><p>' + esc(e) + '</p><button class="retry" id="calRetry">다시 시도</button></div>'; }
   function calNav_(label, canNext) { return '<div class="clnav"><button class="a" id="clPrev" aria-label="이전">‹</button><span>' + esc(label) + '</span><button class="a" id="clNext"' + (canNext ? '' : ' disabled') + ' aria-label="다음">›</button></div>'; }
   function calShift_(n) {
+    if (calMode === 'memos') return;
     var t = todayStr();
     if (calMode === 'month') { var d = parseD_(calDate); var last = new Date(d.getFullYear(), d.getMonth() + n + 1, 0).getDate(); calDate = fmtD_(new Date(d.getFullYear(), d.getMonth() + n, Math.min(d.getDate(), last))); }
     else if (calMode === 'week') calDate = shiftD_(calDate, 7 * n);
@@ -2039,13 +2100,84 @@
     if (calDate > t) calDate = t;
     renderCal();
   }
+
+  // ── 📝 기록 모아보기 — 발자국 4번째 세그먼트. 칩=전체·과목·🌙 / 독서=책장+책별 묶음 / 나머지=날짜 그룹. 시안 docs/mockups/2026-08-16-기록-모아보기-시안.html ──
+  var memoKind = 'all', openBooks = {};
+  function memoKey_() { return calKey_('x', memoKind); }
+  function calMemos_() { var k = memoKey_(); calFetch_(k, '?api=memos&k=' + encodeURIComponent(memoKind) + '&n=30'); return calCache[k]; }
+  function memoMore_() {
+    var k = memoKey_(), cur = calCache[k]; if (!cur || cur.loading || !cur.more || cur.loadingMore) return;
+    cur.loadingMore = true; renderCal();
+    fetch(API + '?api=memos&k=' + encodeURIComponent(memoKind) + '&n=30&before=' + cur.next + '&u=' + encodeURIComponent(BOOT.member.code) + '&t=' + encodeURIComponent(statsTarget))
+      .then(function (r) { return r.json(); })
+      .then(function (d) { cur.loadingMore = false; if (d && !d.error) { cur.items = cur.items.concat(d.items || []); cur.more = d.more; cur.next = d.next; } if (view === 'stats') renderCal(); })
+      .catch(function () { cur.loadingMore = false; showToast('더 불러오지 못했어요 — 인터넷 확인', true); if (view === 'stats') renderCal(); });
+  }
+  function memoInvalidate_() { Object.keys(calCache).forEach(function (k) { if (k.indexOf('x:') === 0 || k.indexOf('m:') === 0 || k.indexOf('d:') === 0) delete calCache[k]; }); }
+  function memoChips_() {
+    var chips = [{ k: 'all', l: '전체' }].concat((BOOT.subjects || []).map(function (sb) { return { k: sb.name, l: subjIcon(sb) + ' ' + esc(sb.name) }; })).concat([{ k: 'note', l: '🌙 한마디' }]);
+    return '<div class="clchips">' + chips.map(function (c) { return '<button class="chip' + (c.k === memoKind ? ' on' : '') + '" data-mk="' + esc(c.k) + '">' + c.l + '</button>'; }).join('') + '</div>';
+  }
+  function parseBookF_(memo) {
+    memo = String(memo || '').trim(); var done = memo.indexOf('✔완독') >= 0; memo = memo.replace('✔완독', '').trim().replace(/\s*｜\s*$/, '');
+    var m = /^《(.+?)》\s*(?:｜\s*(.*))?$/.exec(memo); return { title: m ? m[1].trim() : '', line: m ? (m[2] || '').trim() : memo, done: done };
+  }
+  function dLabel_(ds) { var d = parseD_(ds); return (d.getMonth() + 1) + '/' + d.getDate(); }
+  function dLabelFull_(ds) { var d = parseD_(ds), t = todayStr(); return (d.getMonth() + 1) + '/' + d.getDate() + ' (' + DOW_KO[d.getDay()] + ')' + (ds === t ? ' · 오늘' : (ds === shiftD_(t, -1) ? ' · 어제' : '')); }
+  function memoRowsHtml_(items, showKind, own) {
+    return items.map(function (it) {
+      if (it.k === 'note') return '<div class="mrow nt" data-day="' + esc(it.date) + '"><span class="ic">🌙</span><span class="m">"' + esc(it.memo) + '"</span></div>';
+      var sj = subjByName(it.k), pb = it.k === '독서' ? parseBookF_(it.memo) : null;
+      var text = pb ? ((pb.title ? '<b>《' + esc(pb.title) + '》</b> ' : '') + esc(pb.line) + (pb.done ? ' <span class="dn">✔ 완독</span>' : '')) : esc(it.memo);
+      return '<div class="mrow" data-day="' + esc(it.date) + '"><span class="ic">' + (showKind ? subjIcon(sj) : '') + '</span><span class="tm">' + durLabel(it.min || 0) + '</span><span class="m">' + text + '</span>' +
+        (own && it.id ? '<button class="ed" data-med="' + esc(it.id) + '" data-k="' + esc(it.k) + '" data-memo="' + esc(it.memo) + '" aria-label="메모 수정">✏️</button>' : '') + '</div>';
+    }).join('');
+  }
+  function memosHtml_(x) {
+    var own = !!(BOOT.member.practice && x.target && x.target.code === BOOT.member.code);
+    var h = '';
+    if (memoKind === '독서' && x.book) {
+      var bk = x.book, goal = bk.goal || 0;
+      h += '<div class="cltiles" style="margin-bottom:10px"><span><b>' + bk.yearDone + (goal ? ' <small>/ ' + goal + '</small>' : '') + '권</b>올해 완독</span><span><b>' + bk.monthDone + '권</b>이달 완독</span><span><b>' + durLabel(bk.monthMin || 0) + '</b>이달 독서</span></div>';
+      var doneBooks = bk.books.filter(function (b) { return b.done; });
+      h += '<div class="clcard"><div class="clt">📚 책장 <small>' + (goal ? '올해 목표 ' + goal + '권' : '') + '</small></div>';
+      if (goal) h += '<div class="clbar" style="margin:0 0 8px;background:#eef3f8"><span style="flex:' + Math.min(bk.yearDone, goal) + ';background:#34a86b"></span><span style="flex:' + Math.max(0, goal - bk.yearDone) + ';background:transparent"></span></div>';
+      h += '<div class="shelf">' + (doneBooks.length ? doneBooks.map(function (b, i) { var cs = ['#34a86b', '#8b6cf2', '#1f9080', '#d9932e', '#ff7a3d', '#3d6f9e', '#c2405a']; return '<span class="spine" style="background:' + cs[i % cs.length] + '" data-book="' + esc(b.title) + '">' + esc(b.title) + '</span>'; }).join('') : '<span class="hint">첫 완독을 기다리는 중 — 다 읽으면 "끝나고 기록"에서 📕 토글!</span>') + '</div><div class="shelfbar"></div></div>';
+      var byTitle = {}; (x.items || []).forEach(function (it) { var pb = parseBookF_(it.memo); var t = pb.title || '(책 제목 없음)'; (byTitle[t] = byTitle[t] || []).push(it); });
+      bk.books.forEach(function (b) {
+        var rows = byTitle[b.title] || []; var open = !b.done || openBooks[b.title];
+        h += '<div class="clcard bookc' + (open ? '' : ' fold') + '" data-bk="' + esc(b.title) + '"><div class="clt bkt">《' + esc(b.title) + '》' + (b.done ? '<span class="badge">✔ 완독</span>' : '<span class="badge now">읽는 중</span>') +
+          '<small style="margin-left:auto">' + b.days + '일' + (b.done ? '' : '째') + ' · ' + durLabel(b.min) + ' · ' + dLabel_(b.first) + '~' + (b.done ? dLabel_(b.last) : '') + '</small></div>';
+        if (open) {
+          h += rows.length ? rows.map(function (it) { var pb = parseBookF_(it.memo); return '<div class="mrow" data-day="' + esc(it.date) + '"><span class="dd">' + dLabel_(it.date) + '</span><span class="tm">' + durLabel(it.min || 0) + '</span><span class="m' + (pb.line ? '' : ' dim') + '">' + (pb.line ? esc(pb.line) : '— (한 줄 없음)') + (pb.done ? ' <span class="dn">✔ 완독</span>' : '') + '</span>' + (own && it.id ? '<button class="ed" data-med="' + esc(it.id) + '" data-k="독서" data-memo="' + esc(it.memo) + '" aria-label="메모 수정">✏️</button>' : '') + '</div>'; }).join('')
+            : '<div class="hint">' + (x.more ? '더 보기를 누르면 이 책의 기록이 나와요' : '기록 없음') + '</div>';
+        }
+        h += '</div>';
+      });
+      if (byTitle['(책 제목 없음)']) h += '<div class="clcard"><div class="clt">책 제목 없는 독서</div>' + memoRowsHtml_(byTitle['(책 제목 없음)'], false, own) + '</div>';
+      if (!bk.books.length && !(x.items || []).length) h += '<div class="clempty" style="text-align:center;padding:20px 0">아직 독서 기록이 없어요</div>';
+    } else {
+      var groups = {}, order = [];
+      (x.items || []).forEach(function (it) { if (!groups[it.date]) { groups[it.date] = []; order.push(it.date); } groups[it.date].push(it); });
+      if (!order.length) h += '<div class="clempty" style="text-align:center;padding:24px 0">' + (memoKind === 'note' ? '🌙 아직 한마디가 없어요' : '아직 한 줄 기록이 없어요<br><small>타임라인 카드의 ✏️로 남길 수 있어요</small>') + '</div>';
+      order.forEach(function (ds) { h += '<div class="clday-h">' + dLabelFull_(ds) + '</div><div class="clcard mcard">' + memoRowsHtml_(groups[ds], memoKind === 'all', own) + '</div>'; });
+    }
+    if (x.more) h += '<button class="clmore" id="memoMore"' + (x.loadingMore ? ' disabled' : '') + '>' + (x.loadingMore ? '불러오는 중…' : '더 보기 (30일씩)') + '</button>';
+    return h;
+  }
+
   function bindCal_() {
     $('app').querySelectorAll('.st-t').forEach(function (c) { c.addEventListener('click', function () { statsTarget = c.getAttribute('data-c'); renderCal(); }); });
     $('app').querySelectorAll('.clseg button').forEach(function (b) { b.addEventListener('click', function () { calMode = b.getAttribute('data-m'); renderCal(); }); });
     var p = $('clPrev'); if (p) p.addEventListener('click', function () { calShift_(-1); });
     var n = $('clNext'); if (n) n.addEventListener('click', function () { if (!n.disabled) calShift_(1); });
     var r = $('calRetry'); if (r) r.addEventListener('click', calRetry_);
-    $('app').querySelectorAll('[data-day]').forEach(function (b) { b.addEventListener('click', function () { var ds = b.getAttribute('data-day'); if (ds > todayStr()) return; calDate = ds; calMode = 'day'; renderCal(); }); });
+    $('app').querySelectorAll('[data-day]').forEach(function (b) { b.addEventListener('click', function (ev) { if (ev.target.closest && ev.target.closest('[data-med]')) return; var ds = b.getAttribute('data-day'); if (ds > todayStr()) return; calDate = ds; calMode = 'day'; renderCal(); }); });
+    $('app').querySelectorAll('[data-mk]').forEach(function (b) { b.addEventListener('click', function () { memoKind = b.getAttribute('data-mk'); renderCal(); }); });
+    var mm = $('memoMore'); if (mm) mm.addEventListener('click', memoMore_);
+    $('app').querySelectorAll('[data-med]').forEach(function (b) { b.addEventListener('click', function (ev) { ev.stopPropagation(); openMemoEdit(b.getAttribute('data-med'), b.getAttribute('data-k'), b.getAttribute('data-memo') || ''); }); });
+    $('app').querySelectorAll('.bookc.fold .bkt, .spine').forEach(function (b) { b.addEventListener('click', function () { var t = b.getAttribute('data-book') || b.parentNode.getAttribute('data-bk'); openBooks[t] = !openBooks[t]; renderCal(); }); });
+    $('app').querySelectorAll('.bookc:not(.fold) .bkt').forEach(function (b) { b.addEventListener('click', function () { var t = b.parentNode.getAttribute('data-bk'); if (openBooks[t]) { openBooks[t] = false; renderCal(); } }); });
   }
   function calLvl(min, goal) { return goal || min >= 360 ? 4 : min <= 0 ? 0 : min < 120 ? 1 : min < 240 ? 2 : 3; }
   function statTiles_(bassMin, perfect, goal) {
@@ -2068,7 +2200,7 @@
     (d.days || []).forEach(function (c, i) {
       var ds = d.ym + '-' + pad(i + 1);
       var cls = 'c' + (c.future ? ' fut' : ' l' + calLvl(c.bass, c.goal)) + (c.perfect ? ' pf' : '') + (ds === today ? ' sel' : '');
-      cells += '<div class="' + cls + '" data-day="' + ds + '">' + (i + 1) + (c.perfect ? '<span class="g">✓</span>' : '') + '</div>';
+      cells += '<div class="' + cls + '" data-day="' + ds + '">' + (i + 1) + (c.perfect ? '<span class="g">✓</span>' : '') + (c.memo ? '<i class="dt"></i>' : '') + '</div>';
     });
     var h = '<div class="clcard">' + calNav_(d.label, monthOff_(calDate) < 0) + '<div class="clcal">' + cells + '</div>' +
       '<div class="cllg"><span><b>색 = 베이스</b></span><span><i style="background:#eef3f8"></i>0</span><span><i style="background:#ffe3c2"></i>~2h</span><span><i style="background:#ffbe85"></i>~4h</span><span><i style="background:#ff9548"></i>~6h</span><span><i style="background:#f4652f"></i>🎯 목표</span><span><b style="color:#2f9e63">✓ 소루틴 완벽</b></span></div></div>';
