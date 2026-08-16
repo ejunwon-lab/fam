@@ -497,29 +497,47 @@
   .fd-live.rt .dot { background: var(--rc, #34a86b); box-shadow: 0 0 0 4px rgba(52, 168, 107, .25); }
   .fd-live.rt .bx { background: linear-gradient(135deg, var(--rc1, #3fbf7f), var(--rc, #2a9660)); box-shadow: 0 10px 26px rgba(0, 0, 0, .15); }
   .fd-live.rt .bx small { color: rgba(255, 255, 255, .8); }
-  .fd-moon { width: 32px; height: 32px; border-radius: 11px; padding: 0; background: #fff; border: 1px solid #d6e6f3; font-size: 15px; cursor: pointer; display: grid; place-items: center; }
+  .fd-moon { height: 30px; border-radius: 10px; padding: 0 10px; background: linear-gradient(135deg, #2c3e6b, #1c2a4d); border: none; color: #fff; font: inherit; font-size: 11.5px; font-weight: 800; cursor: pointer; }
 
   /* ── 루틴 링 카드 ── */
   .rc { background: #fff; border-radius: 18px; padding: 12px 12px 10px; box-shadow: 0 4px 16px rgba(60, 100, 140, .10); margin-top: 8px; -webkit-touch-callout: none; user-select: none; }
   .rc .top { display: flex; gap: 12px; align-items: center; }
-  .bigr { width: 128px; height: 128px; border-radius: 50%; flex: none; background: conic-gradient(#ff7a3d calc(var(--p) * 1%), #ffe9d8 0); display: grid; place-items: center; position: relative; cursor: pointer; }
+  .bigr { width: 140px; height: 140px; border-radius: 50%; flex: none; background: conic-gradient(#ff7a3d calc(var(--p) * 1%), #ffe0cc 0); display: grid; place-items: center; position: relative; cursor: pointer; }
   .bigr.full { background: #ff7a3d; box-shadow: 0 0 0 4px rgba(255, 122, 61, .25); }
-  .bigr i { width: 100px; height: 100px; border-radius: 50%; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; font-style: normal; }
-  .bigr .v { font-size: 22px; font-weight: 800; color: #f4652f; line-height: 1; font-variant-numeric: tabular-nums; }
-  .bigr .g { font-size: 10px; color: #7d8fa0; font-weight: 700; margin-top: 3px; }
-  .bigr .e { font-size: 15px; margin-bottom: 2px; }
+  .bigr .in { width: 118px; height: 118px; border-radius: 50%; overflow: hidden; position: relative; background: #0b0b0e; }
+  .bigr .bassimg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .bigr .ov { position: absolute; inset: 0; background: radial-gradient(circle at 50% 55%, rgba(0,0,0,.62) 0%, rgba(0,0,0,.35) 45%, rgba(0,0,0,.05) 75%); }
+  .bigr .tx { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; text-shadow: 0 1px 6px rgba(0,0,0,.75); }
+  .bigr .v { font-size: 24px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+  .bigr .g { font-size: 10px; color: #e6e6ea; font-weight: 700; margin-top: 3px; }
+  .bigr .e { font-size: 11px; font-weight: 800; color: #ffcf9e; letter-spacing: .06em; margin-bottom: 3px; }
   .bigr .tag { position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); background: #eef5fb; color: #3d6f9e; border: 1px solid #cfe0ef; border-radius: 99px; font-size: 9.5px; font-weight: 800; padding: 2px 8px; white-space: nowrap; }
-  .smalls { flex: 1; min-width: 0; overflow: hidden; display: flex; flex-direction: column; gap: 7px; }
-  .sr { display: flex; align-items: center; gap: 8px; cursor: pointer; border-radius: 12px; padding: 2px; }
+  .g22 { flex: 1; min-width: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 4px; }
+  .sr { display: flex; flex-direction: column; align-items: center; gap: 3px; text-align: center; cursor: pointer; border-radius: 12px; padding: 3px 0; min-width: 0; -webkit-touch-callout: none; user-select: none; }
   .sr:active { background: #f3f8fc; }
-  .sr .r { width: 40px; height: 40px; border-radius: 50%; flex: none; background: conic-gradient(var(--c) calc(var(--p) * 1%), #e3edf5 0); display: grid; place-items: center; }
-  .sr .r i { width: 30px; height: 30px; border-radius: 50%; background: #fff; display: grid; place-items: center; font-style: normal; font-size: 13px; }
+  .sr .r { width: 42px; height: 42px; border-radius: 50%; flex: none; background: conic-gradient(var(--c) calc(var(--p) * 1%), #e3edf5 0); display: grid; place-items: center; }
+  .sr .r i { width: 32px; height: 32px; border-radius: 50%; background: #fff; display: grid; place-items: center; font-style: normal; font-size: 14px; }
   .sr.done .r { background: var(--c); } .sr.done .r i { background: transparent; color: #fff; font-size: 12px; font-weight: 800; }
-  .sr.run .r i { font-size: 9.5px; font-weight: 800; color: var(--c); font-variant-numeric: tabular-nums; }
-  .sr .n { flex: 1; min-width: 0; overflow: hidden; font-size: 12px; font-weight: 800; line-height: 1.15; }
-  .sr .n small { display: block; font-size: 10px; color: #7d8fa0; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .rc .foot { margin-top: 10px; padding-top: 8px; border-top: 1px solid #edf3f8; display: flex; justify-content: space-between; font-size: 10.5px; color: #7d8fa0; font-weight: 700; }
+  .sr.run .r { box-shadow: 0 0 0 3px rgba(0,0,0,.06); } .sr.run .r i { font-size: 9.5px; font-weight: 800; color: var(--c); font-variant-numeric: tabular-nums; }
+  .sr .n { width: 100%; min-width: 0; overflow: hidden; font-size: 10.5px; font-weight: 800; line-height: 1.1; }
+  .sr .n small { display: block; font-size: 9.5px; color: #7d8fa0; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rc .foot { margin-top: 10px; padding-top: 8px; border-top: 1px solid #edf3f8; display: flex; justify-content: space-between; align-items: center; font-size: 10.5px; color: #7d8fa0; font-weight: 700; }
   .rc .foot b { color: #f4652f; }
+  .rest { border: none; font: inherit; border-radius: 99px; background: #eef2f6; color: #5b6b7a; font-size: 11px; font-weight: 800; padding: 5px 11px; cursor: pointer; }
+  .rest:disabled { opacity: .55; cursor: default; }
+  .rest.on { background: #8fa3b8; color: #fff; box-shadow: 0 0 0 3px rgba(143,163,184,.3); } .rest.on b { color: #fff; }
+  .sbar { display: flex; align-items: center; gap: 8px; border-radius: 14px; padding: 8px 10px 8px 14px; color: #fff; font-size: 13px; font-weight: 800; margin-bottom: 8px; }
+  .sbar .sbtx { cursor: pointer; }
+  .sbar .t { margin-left: auto; font-size: 15px; font-variant-numeric: tabular-nums; }
+  .sbar .sbb { background: rgba(255,255,255,.22); border: none; color: #fff; font: inherit; border-radius: 10px; padding: 6px 10px; font-size: 11.5px; font-weight: 800; cursor: pointer; }
+  .sbar .sbb.end { background: rgba(0,0,0,.25); }
+  .memo-edit { display: block; margin-top: 5px; background: none; border: none; font: inherit; font-size: 11px; color: #7d8fa0; font-weight: 700; padding: 0; cursor: pointer; }
+  .lnk { background: none; border: none; font: inherit; font-size: 12px; font-weight: 800; padding: 0; cursor: pointer; }
+  .rsheet .two { display: flex; gap: 8px; }
+  .rsheet .bt { flex: 1; border: none; border-radius: 14px; padding: 14px 8px; text-align: center; font: inherit; font-weight: 800; font-size: 14px; color: #fff; cursor: pointer; }
+  .rsheet .bt small { display: block; font-size: 10px; font-weight: 600; opacity: .85; margin-top: 2px; }
+  .rsheet .bt.ghost { background: #f3f8fc; color: #24303b; border: 1px solid var(--line); }
+  .rsheet .pill { font-size: 10.5px; font-weight: 800; color: var(--sub); background: #eef2f6; border-radius: 99px; padding: 2px 8px; vertical-align: middle; }
   .cheer { margin-top: 8px; background: #fdecf1; border: 1px solid #f7c6d3; color: #c2405a; border-radius: 12px; padding: 7px 12px; font-size: 12px; font-weight: 800; display: flex; align-items: center; gap: 6px; }
   .cheer small { margin-left: auto; font-weight: 600; color: #d98a9a; }
   .night { margin-top: 8px; width: 100%; text-align: left; border: none; background: linear-gradient(135deg, #2c3e6b, #1c2a4d); color: #fff; border-radius: 14px; padding: 10px 13px; font: inherit; font-size: 12.5px; font-weight: 800; display: flex; align-items: center; gap: 8px; box-shadow: 0 8px 20px rgba(28, 42, 77, .28); cursor: pointer; }
@@ -729,67 +747,42 @@
       });
   }
 
-  /** 하단 도크 = 큰 버튼(연습 상태·시간) + 공통 메뉴 — 모든 화면 상시 표시 */
+  /** 하단 도크 = (활동/휴식 중) 상태바 + 공통 메뉴 3개 — 모든 화면 상시 표시 */
   function renderTabs() {
     var bar = $('tabbar');
     if (!BOOT || BOOT.error || !BOOT.member) { bar.style.display = 'none'; document.body.classList.remove('dock-big'); return; }
-    var prac = !!BOOT.member.practice || !!sess;
     var viewer = isViewer();
-    document.body.classList.toggle('dock-big', prac || viewer);
+    document.body.classList.toggle('dock-big', !!sess || viewer);
     bar.style.display = 'block';
-    bar.innerHTML = (prac ? dockHtml() : (viewer ? cheerDockHtml() : '')) + menuHtml();
+    bar.innerHTML = (sess ? statusBarHtml() : (viewer ? cheerDockHtml() : '')) + menuHtml();
     bindMenu(bar);
-    if ($('fdStart')) $('fdStart').addEventListener('click', function () {
-      if (sess && isRoutineKind(sess.kind)) return; // 루틴 타이머 중엔 연습 시작 불가(한 번에 하나)
-      chooseKind(function (k) { startOrResume(k); });
-    });
-    if ($('fdRest')) $('fdRest').addEventListener('click', doBreak);
-    if ($('fdEnd')) $('fdEnd').addEventListener('click', tFinish);
+    if ($('sbRest')) $('sbRest').addEventListener('click', goBreak);
+    if ($('sbResume')) $('sbResume').addEventListener('click', resumeFromBreak);
+    if ($('sbEnd')) $('sbEnd').addEventListener('click', endActivity);
+    if ($('sbMain')) $('sbMain').addEventListener('click', function () { if (sess && !isRoutineKind(sess.kind) && sess.state === 'practice') { overlayOpen = true; view = 'timer'; render(); } });
     if ($('fdCheer')) $('fdCheer').addEventListener('click', sendCheer);
     startTick();
-  }
-
-  /** 시작/재개 공통 — 카메라 플래그에 따라 📷 경유 또는 즉시 */
-  function startOrResume(kind) {
-    if (CAMERA_ON) openCam(kind, !!sess);
-    else if (sess) doResume(kind, null, null); else doStart(kind, null, null);
   }
   function isRoutineKind(k) { var s = subjByName(k); return !!(s && s.mode !== 'timer'); }
   function subjByName(k) { return ((BOOT && BOOT.subjects) || []).find(function (s) { return s.name === k; }) || null; }
   function bassGoalMin() { return (BOOT && BOOT.rings && BOOT.rings.rings.find(function (r) { return r.main; }) || {}).goalMin || (BOOT.member && BOOT.member.goalMin) || 0; }
-
-  /** 큰 버튼이 곧 상태 표시기: 없음=오늘 누적/목표 · 연습 중=구간 시간 · 휴식 중=휴식 경과 · 루틴 타이머 중=루틴명+경과 */
-  function dockHtml() {
-    var h = '<div class="fd-main">';
-    var goal = bassGoalMin();
-    var todayTxt = '오늘 ' + clockHM(Math.floor(todaySec('베이스') / 60)) + (goal ? ' / ' + clockHM(goal) : '');
-    if (!sess) {
-      h += '<button class="dk-big prac" id="fdStart"><span class="dk-st">▶ 연습 시작</span>' +
-        '<span class="dk-act neutral">' + todayTxt + '</span></button>' +
-        '<button class="dk-end" disabled>☁️ 휴식</button>';
-    } else if (isRoutineKind(sess.kind)) {
-      var rs = subjByName(sess.kind);
-      h += '<button class="dk-big" id="fdEnd" style="background:linear-gradient(135deg,' + esc(rs.color) + 'dd,' + esc(rs.color) + ')"><span class="dk-st">' + esc(rs.emoji) + ' ' + esc(sess.kind) + ' 중 <b id="dkTime">' + fmt(Date.now() - sess.segStart) + '</b></span>' +
-        '<span class="dk-act neutral">누르면 ✓ 끝내고 저장</span></button>' +
-        '<button class="dk-end" disabled>▶ 연습</button>';
-    } else if (sess.state === 'practice') {
-      h += '<button class="dk-big prac" id="fdRest"><span class="dk-st">🎸 ' + esc(sess.kind) + ' 연습 중 <b id="dkTime">' + fmt(Date.now() - sess.segStart) + '</b></span>' +
-        '<span class="dk-act to-brk">누르면 ☁️ 휴식</span></button>' +
-        '<button class="dk-end" id="fdEnd"><span class="ic">⏹</span>오늘 연습<br>종료</button>';
-    } else {
-      h += '<button class="dk-big brk" id="fdStart"><span class="dk-st">☁️ 휴식 중 <b id="dkTime">' + fmt(Date.now() - sess.segStart) + '</b></span>' +
-        '<span class="dk-act to-prac">누르면 ▶ 연습 시작</span></button>' +
-        '<button class="dk-end" id="fdEnd"><span class="ic">⏹</span>오늘 연습<br>종료</button>';
+  /** 활동/휴식 상태바 — 활동 중에만 존재 */
+  function statusBarHtml() {
+    var s = subjByName(sess.kind), col = s ? s.color : '#ff7a3d';
+    if (sess.state === 'break') {
+      return '<div class="sbar" style="background:linear-gradient(135deg,#9fb0c2,#7f94aa)"><span class="sbtx">☁️ 휴식 중</span><b class="t" id="dkTime">' + fmt(Date.now() - sess.segStart) + '</b>' +
+        '<button class="sbb" id="sbResume">▶ ' + esc(sess.kind) + '</button><button class="sbb end" id="sbEnd">⏹</button></div>';
     }
-    return h + '</div>';
+    return '<div class="sbar" style="background:linear-gradient(135deg,' + esc(col) + 'dd,' + esc(col) + ')"><span class="sbtx" id="sbMain">' + (s ? esc(s.emoji) : '🎸') + ' ' + esc(sess.kind) + (isRoutineKind(sess.kind) ? ' 중' : ' 연습 중') + '</span><b class="t" id="dkTime">' + fmt(Date.now() - sess.segStart) + '</b>' +
+      '<button class="sbb" id="sbRest">☁️ 휴식</button><button class="sbb end" id="sbEnd">⏹</button></div>';
   }
   /** 부모 도크 — ❤️ 응원해요 (하루 1번/사람) */
   function cheerDockHtml() {
     var sent = !!BOOT.cheeredToday;
     var who = (BOOT.viewTarget && BOOT.viewTarget.name) || '채영';
     return '<div class="fd-main">' + (sent
-      ? '<button class="dk-big sent" disabled><span class="dk-st">❤️ 오늘 응원했어요</span><span class="dk-act neutral" style="background:rgba(194,64,90,.12);color:#c2405a">' + esc(who) + ' 홈에 하트가 떠 있어요</span></button>'
-      : '<button class="dk-big pink" id="fdCheer"><span class="dk-st">❤️ 응원해요</span><span class="dk-act neutral">' + esc(who) + ' 홈에 하트가 떠요</span></button>') + '</div>';
+      ? '<button class="dk-big sent" disabled><span class="dk-st">❤️ 오늘 응원했어요</span><span class="dk-act neutral" style="background:rgba(194,64,90,.12);color:#c2405a">홈에 하트가 떠 있어요</span></button>'
+      : '<button class="dk-big pink" id="fdCheer"><span class="dk-st">❤️ 응원해요</span><span class="dk-act neutral">홈에 하트가 떠요</span></button>') + '</div>';
   }
   function sendCheer() {
     var b = $('fdCheer'); if (b) { b.disabled = true; }
@@ -806,8 +799,7 @@
   function menuTabs() {
     var t = [];
     if (BOOT.member.practice || isViewer()) t.push({ k: 'feed', i: '🏠', l: '홈' });
-    t.push({ k: 'home', i: '📅', l: '일정 등록' });
-    if (BOOT.member.practice) t.push({ k: 'timer', i: '✅', l: '할 일' });
+    t.push({ k: 'home', i: '📅', l: '일정' });
     t.push({ k: 'stats', i: '📊', l: '통계' });
     return t;
   }
@@ -1005,7 +997,7 @@
     // 피드 항목: 오늘=서버 today + 로컬(진행 중 세션) / 과거=api=day
     var evs = [];
     function pushSeg(sg) {
-      evs.push({ brk: sg.k === '휴식', appt: !!sg.appt, k: sg.k, s: sg.s, e: sg.e, min: Math.max(0, toMin_(sg.e) - toMin_(sg.s)), memo: sg.memo || '' });
+      evs.push({ brk: sg.k === '휴식', appt: !!sg.appt, k: sg.k, s: sg.s, e: sg.e, min: Math.max(0, toMin_(sg.e) - toMin_(sg.s)), memo: sg.memo || '', id: sg.id || '' });
     }
     if (isToday) {
       ((BOOT.today && BOOT.today.segs) || []).forEach(pushSeg);
@@ -1017,8 +1009,7 @@
     }
 
     var h = '<div class="fd-top"><span>' + ddayFd(who) + '</span><div class="r">' +
-      '<button class="fd-ic" id="fdCal" title="가족 캘린더 열기" aria-label="가족 캘린더 열기">📅</button>' +
-      (m.practice ? '<button class="fd-moon" id="fdMoon" title="오늘 돌아보기" aria-label="오늘 돌아보기">🌙</button>' : '') +
+      (m.practice ? '<button class="fd-moon" id="fdMoon" title="오늘 요약" aria-label="오늘 요약">🌙 오늘 요약</button>' : '') +
       '<button class="fd-who" id="fdWho" title="이름 바꾸기">' + esc(m.name) + '</button></div></div>';
     h += '<div class="fd-hd"><span class="d">' + esc(who.name) + (vt ? ' 👀' : '') + '</span>' +
       '<span class="tot">' + (isToday ? '오늘' : '합계') + ' <b id="fdTotal">' + (isToday ? fmtHMS(feedTotalSec()) : fmtHMS((dayData ? dayData.totalMin : 0) * 60)) + '</b></span></div>';
@@ -1037,7 +1028,7 @@
     if (isToday) {
       var ch = BOOT.cheers || [];
       if (ch.length) h += '<div class="cheer">❤️ ' + esc(ch.map(function (c) { return c.name; }).join(' · ')) + '가 응원해요<small>' + esc(ch[ch.length - 1].at) + '</small></div>';
-      if (m.practice && new Date().getHours() >= 21) h += '<button class="night" id="fdNight">🌙 오늘 돌아보기<small>' + (BOOT.note ? '한마디 남김 ✓' : '자기 전에 1분 →') + '</small></button>';
+      if (m.practice && !sess && new Date().getHours() >= 21) h += '<button class="night" id="fdNight">🌙 오늘 요약 보기<small>' + (BOOT.note ? '한마디 남김 ✓' : '자기 전에 1분 →') + '</small></button>';
       if (BOOT.note && vt) h += '<div class="cheer" style="background:#eef2fb;border-color:#cdd8f2;color:#2c3e6b">🌙 ' + esc(who.name) + '의 한마디 — "' + esc(BOOT.note) + '"</div>';
       h += lessonLineHtml();
     }
@@ -1046,7 +1037,7 @@
     h += '<div class="lbl-sm">타임라인</div><div class="fd-feed">';
     if (!evs.length && !(isToday && sess) && !liveShown) {
       h += '<div class="fd-empty">' + (isToday
-        ? (vt ? '오늘 아직 기록이 없어요' : '아직 기록이 없어요.<br>링을 탭해 기록하거나 아래 버튼으로 연습을 시작해요!')
+        ? (vt ? '오늘 아직 기록이 없어요' : '아직 기록이 없어요.<br>위의 링을 눌러 시작해요!')
         : (dayData ? '이날은 기록이 없어요' : '불러오는 중…')) + '</div>';
     }
     evs.forEach(function (ev) {
@@ -1062,6 +1053,7 @@
         '<div class="r1"><span>' + em + ' ' + (ev.brk ? '휴식' : esc(ev.k)) + '</span><span class="dur"' + (col ? ' style="color:' + col + '"' : '') + '>' + durLabel(Math.max(1, ev.min)) + '</span></div>' +
         (ev.brk ? '' : '<small>' + ev.s + ' – ' + ev.e + '</small>') +
         (ev.memo ? '<span class="memo">' + esc(ev.memo) + '</span>' : '') +
+        ((!vt && isToday && ev.id && !ev.brk) ? '<button class="memo-edit" data-sid="' + esc(ev.id) + '" data-k="' + esc(ev.k) + '" data-memo="' + esc(ev.memo) + '" aria-label="메모">' + (ev.memo ? '✏️' : '✏️ 한 줄 남기기') + '</button>' : '') +
         (shot ? '<div class="fd-shot"><img src="' + shot + '" alt="인증샷"></div>' : '') +
         '</div></div>';
     });
@@ -1083,13 +1075,11 @@
 
     // 도크(큰 버튼+메뉴)는 공통 #tabbar가 담당 — 피드는 콘텐츠만
     $('app').innerHTML = h;
-    $('fdCal').addEventListener('click', openCalendar);
     $('fdWho').addEventListener('click', function () { if (confirm('이름을 다시 고를까요?')) { store('famcode', null); init(); } });
     if ($('fdMoon')) $('fdMoon').addEventListener('click', openReview);
+    document.querySelectorAll('.memo-edit[data-sid]').forEach(function (b) { b.addEventListener('click', function () { openMemoEdit(b.getAttribute('data-sid'), b.getAttribute('data-k'), b.getAttribute('data-memo') || ''); }); });
     if ($('fdNight')) $('fdNight').addEventListener('click', openReview);
-    if ($('fdLive')) $('fdLive').addEventListener('click', function () {
-      if (isRoutineKind(sess.kind)) tFinish(); else { overlayOpen = true; view = 'timer'; render(); }
-    });
+    if ($('fdLive')) $('fdLive').addEventListener('click', function () { openActivitySheet(sess.kind); });
     $('fdPrev').addEventListener('click', function () { shiftFeedDay(-1); });
     $('fdNext').addEventListener('click', function () { shiftFeedDay(1); });
     if ($('fdToday')) $('fdToday').addEventListener('click', function () { feedDate = null; renderFeed(); });
@@ -1099,50 +1089,122 @@
     startTick();
   }
 
-  /** 링 카드 HTML — 큰 링(베이스) + 작은 링(나머지). live=오늘 채영(탭/길게 활성) */
+  /** 링 카드 — 큰 링(베이스, 사진 배경) + 2×2 작은 링 + ☁️휴식 칩. 오늘·본인일 때만 조작 */
   function ringsHtml(rg, isToday, readonly) {
     var main = rg.rings.find(function (r) { return r.main; }) || rg.rings[0];
     var others = rg.rings.filter(function (r) { return r !== main; });
-    var mainDone = main.doneMin * 60 + (isToday ? localPracticeSec(main.name) : 0)
-      + ((isToday && !sess && isViewer() && BOOT.live && BOOT.live.state === 'practice' && BOOT.live.kind === main.name) ? Math.floor((Date.now() - BOOT.live.at) / 1000) : 0);
-    var mainPct = main.goalMin ? Math.min(100, mainDone / 60 / main.goalMin * 100) : 0;
-    var h = '<div class="rc"><div class="top">';
-    h += '<div class="bigr' + (mainPct >= 100 ? ' full' : '') + '" id="ringMain" style="--p:' + mainPct.toFixed(1) + '"><i><span class="e">' + esc(main.emoji) + '</span><span class="v" id="ringMainV">' + clockHM(Math.floor(mainDone / 60)) + '</span><span class="g">' + (main.goalMin ? '목표 ' + clockHM(main.goalMin) : '최대한 많이') + '</span></i>' +
-      (rg.academy ? '<span class="tag">🏫 학원 날</span>' : '') + '</div>';
-    h += '<div class="smalls">';
-    // 라이브 판정: 채영 본인=로컬 세션 / 뷰어=서버 live 상태
     var lvOn = isToday && !sess && isViewer() && BOOT.live && BOOT.live.state === 'practice';
     var liveStart = sess ? sess.segStart : (lvOn ? BOOT.live.at : 0);
-    var liveKind = sess ? sess.kind : (lvOn ? BOOT.live.kind : '');
+    var liveKind = (sess && sess.state === 'practice') ? sess.kind : (lvOn ? BOOT.live.kind : '');
+    var pendMin = function (name) { return isToday ? pendingBlocks.filter(function (b) { return b.type === 'practice' && b.kind === name; }).reduce(function (a, b) { return a + Math.round((b.end - b.start) / 60000); }, 0) : 0; };
+    var mainSec = (main.doneMin + pendMin(main.name)) * 60 + ((isToday && liveKind === main.name) ? Math.floor((Date.now() - liveStart) / 1000) : 0);
+    var mainPct = main.goalMin ? Math.min(100, mainSec / 60 / main.goalMin * 100) : 0;
+    var mainRun = isToday && liveKind === main.name;
+    var h = '<div class="rc"><div class="top">';
+    h += '<div class="bigr' + (mainPct >= 100 ? ' full' : '') + '" id="ringMain" style="--p:' + mainPct.toFixed(1) + '"><div class="in"><img src="bass.jpg" alt="" class="bassimg"><div class="ov"></div><div class="tx">' +
+      (mainRun ? '<span class="e">' + esc(main.emoji) + ' 연습 중</span>' : '<span class="e">' + esc(main.emoji) + '</span>') +
+      '<span class="v" id="ringMainV">' + clockHM(Math.floor(mainSec / 60)) + '</span><span class="g">' + (main.goalMin ? '목표 ' + clockHM(main.goalMin) : '최대한 많이') + '</span></div></div>' +
+      (rg.academy ? '<span class="tag">🏫 학원 날</span>' : '') + '</div>';
+    h += '<div class="g22">';
     others.forEach(function (r) {
       var running = isToday && liveKind === r.name;
-      var done = r.doneMin + (running ? Math.floor((Date.now() - liveStart) / 60000) : 0);
+      var done = r.doneMin + pendMin(r.name) + (running ? Math.floor((Date.now() - liveStart) / 60000) : 0);
       var pct = r.goalMin ? Math.min(100, done / r.goalMin * 100) : 0;
       var isDone = r.goalMin > 0 && done >= r.goalMin;
-      var sub = running ? gl(done) + ' 진행 중 · 목표 ' + gl(r.goalMin)
-        : (isDone ? gl(done) + ' 완료' : (done ? gl(done) + ' / ' + gl(r.goalMin) : '0 / ' + gl(r.goalMin) + (readonly || !isToday ? '' : ' · 탭해서 기록')));
+      var sub = running ? gl(done) + ' 진행 중' : (isDone ? gl(done) + ' 완료' : ((done ? gl(done) : '0') + ' / ' + gl(r.goalMin)));
       h += '<div class="sr' + (isDone ? ' done' : '') + (running ? ' run' : '') + '" data-rt="' + esc(r.name) + '" style="--c:' + esc(r.color) + ';--p:' + pct.toFixed(1) + '">' +
         '<span class="r"><i' + (running ? ' class="ringRunT"' : '') + '>' + (isDone ? '✓' : (running ? fmt(Date.now() - liveStart) : esc(r.emoji))) + '</i></span>' +
-        '<span class="n">' + esc(r.emoji) + ' ' + esc(r.name) + '<small>' + esc(sub) + '</small></span></div>';
+        '<span class="n">' + esc(r.name) + '<small>' + esc(sub) + '</small></span></div>';
     });
     h += '</div></div>';
-    var st = BOOT.streak || { streak: 0, perfectDays: 0 };
-    h += '<div class="foot"><span>🔥 <b>' + st.streak + '일</b> 연속 연습</span><span>이달 완벽한 날 <b>' + st.perfectDays + '</b></span></div></div>';
+    var st = BOOT.streak || { streak: 0, perfectDays: 0, goalDays: 0 };
+    var restOn = isToday && sess && sess.state === 'break';
+    var restLv = isToday && !sess && isViewer() && BOOT.live && BOOT.live.state === 'break';
+    h += '<div class="foot"><span>🔥 <b>' + st.streak + '일</b> 연속</span>' +
+      '<button class="rest' + ((restOn || restLv) ? ' on' : '') + '" id="restChip"' + (readonly || !isToday ? ' disabled' : '') + '>☁️ ' + ((restOn || restLv) ? '휴식 중 <b class="t" id="restT">' + fmt(Date.now() - (restOn ? sess.segStart : BOOT.live.at)) + '</b>' : '휴식') + '</button>' +
+      '<span>완벽 <b>' + st.perfectDays + '</b> · 🎯 <b>' + (st.goalDays || 0) + '</b></span></div></div>';
     return h;
   }
-  /** 작은 링: 탭=기록 시트, 길게(500ms)=타이머 시작. 큰 링 탭=연습 시작 */
+  /** 링 조작: idle 탭=활동 시트 · 활동/휴식 중 탭=즉시 전환/재개(같은 활동이면 시트) · 길게=즉시 시작. 휴식 칩=휴식/재개 */
   function bindRings(active) {
     if (!active) return;
-    var mainR = $('ringMain');
-    if (mainR) mainR.addEventListener('click', function () { if (!sess) chooseKind(function (k) { startOrResume(k); }); });
-    document.querySelectorAll('.sr[data-rt]').forEach(function (el) {
-      var name = el.getAttribute('data-rt'), timer = null, longed = false;
-      var start = function () { longed = false; timer = setTimeout(function () { longed = true; startRoutineTimer(name); }, 500); };
+    var mk = function (el, name) {
+      var timer = null, longed = false;
+      var startP = function () { longed = false; timer = setTimeout(function () { longed = true; if (!sess || sess.kind !== name || sess.state === 'break') startActivity(name); }, 500); };
       var cancel = function () { if (timer) { clearTimeout(timer); timer = null; } };
-      el.addEventListener('pointerdown', start);
+      el.addEventListener('pointerdown', startP);
       el.addEventListener('pointerup', cancel); el.addEventListener('pointerleave', cancel); el.addEventListener('pointercancel', cancel);
       el.addEventListener('contextmenu', function (e) { e.preventDefault(); });
-      el.addEventListener('click', function () { if (longed) return; if (sess && sess.kind === name) { tFinish(); return; } openRoutineSheet(name); });
+      el.addEventListener('click', function () {
+        if (longed) return;
+        if (!sess) { openActivitySheet(name); return; }
+        if (sess.state === 'practice' && sess.kind === name) { openActivitySheet(name); return; } // 활동 중인 링 → 휴식/끝 시트
+        startActivity(name); // 다른 활동 중·휴식 중 → 즉시 전환/재개
+      });
+    };
+    var mainR = $('ringMain'); if (mainR) mk(mainR, ((BOOT.rings && BOOT.rings.rings.find(function (r) { return r.main; })) || { name: '베이스' }).name);
+    document.querySelectorAll('.sr[data-rt]').forEach(function (el) { mk(el, el.getAttribute('data-rt')); });
+    var rc = $('restChip'); if (rc) rc.addEventListener('click', function () { if (!sess) return; if (sess.state === 'practice') goBreak(); else resumeFromBreak(); });
+  }
+
+  /** 활동 시트 — idle: ▶ 시작 / ✓ 끝나고 기록 + 할 일(또는 책) · 활동 중: ☁️ 휴식 / ⏹ 끝 + 할 일 */
+  function openActivitySheet(name) {
+    var s = subjByName(name); if (!s) return;
+    var r = (BOOT.rings && BOOT.rings.rings.find(function (x) { return x.name === name; })) || { doneMin: 0, goalMin: s.goalMin };
+    var active = sess && sess.state === 'practice' && sess.kind === name;
+    var isBook = name === '독서', lb = BOOT.lastBook;
+    var col = s.color;
+    $('rsheet').style.setProperty('--rt-c', col);
+    var h = '<div class="grip"></div><h2>' + esc(s.emoji) + ' ' + esc(name) + ' <span class="pill">오늘 ' + clockHM(r.doneMin) + (r.goalMin ? ' / ' + clockHM(r.goalMin) : '') + '</span></h2>';
+    if (active) {
+      h += '<p class="sub">' + esc(name) + (s.mode === 'timer' ? ' 연습' : '') + ' 중 · <b class="t" id="shT">' + fmt(Date.now() - sess.segStart) + '</b> 경과</p>' +
+        '<div class="two"><button class="bt" id="asRest" style="background:linear-gradient(135deg,#9fb0c2,#7f94aa)">☁️ 휴식<small>이 활동 저장</small></button><button class="bt" id="asEnd" style="background:#24303b">⏹ 끝내기<small>저장하고 쉬기</small></button></div>';
+    } else {
+      h += '<p class="sub">' + (sess ? (sess.state === 'break' ? '휴식 중 — 시작하면 휴식이 끝나요' : actLabel(sess.kind) + ' 중 — 시작하면 그건 저장돼요') : '지금 아무것도 안 하고 있어요') + '</p>' +
+        '<div class="two">' + (s.mode !== 'log' ? '<button class="bt" id="asStart" style="background:linear-gradient(135deg,' + esc(col) + 'dd,' + esc(col) + ')">▶ ' + (s.mode === 'timer' ? '연습 시작' : '시작') + '<small>타이머</small></button>' : '') +
+        '<button class="bt ghost" id="asLog">✓ 끝나고 기록<small>시간만 입력</small></button></div>';
+      if (isBook && lb) h += '<div class="hint" style="margin-top:8px">📖 《' + esc(lb.title) + '》 ' + lb.days + '일째 · 다음엔 링을 <b>길게</b> 누르면 바로 시작</div>';
+      else if (s.mode !== 'log') h += '<div class="hint" style="margin-top:8px">다음엔 링을 <b>길게</b> 누르면 바로 시작</div>';
+    }
+    // 할 일 (베이스·이론 등 — todos에 그 과목이 있으면)
+    var tds = (BOOT.todos || []).filter(function (t) { return t.kind === name; });
+    if (tds.length || (s.mode !== 'log' && !isBook)) {
+      h += '<div class="f-label" style="display:flex;justify-content:space-between;margin-top:14px"><span>' + esc(name) + ' 할 일</span><button class="lnk" id="asAdd" style="color:' + esc(col) + '">+ 추가</button></div>';
+      if (tds.length) tds.forEach(function (t) {
+        h += '<div class="yp-todo' + (t.done ? ' done' : '') + '" data-astd="' + esc(t.id) + '"><span class="yp-ring" style="border-color:' + esc(col) + ';background:' + (t.done ? esc(col) : 'transparent') + '">✓</span><span class="yp-tx">' + esc(t.text) + '</span>' + (t.repeat ? '<span class="yp-rep">매일</span>' : '') + '<button class="yp-edit" data-ased="' + esc(t.id) + '" aria-label="수정">✏️</button></div>';
+      });
+      else h += '<div class="hint">아직 할 일이 없어요</div>';
+    }
+    $('rsheet').innerHTML = h;
+    document.body.classList.add('rt-open');
+    if ($('asStart')) $('asStart').addEventListener('click', function () { closeRoutineSheet(); startActivity(name); });
+    if ($('asLog')) $('asLog').addEventListener('click', function () { openRoutineSheet(name); });
+    if ($('asRest')) $('asRest').addEventListener('click', function () { closeRoutineSheet(); goBreak(); });
+    if ($('asEnd')) $('asEnd').addEventListener('click', function () { closeRoutineSheet(); endActivity(); });
+    if ($('asAdd')) $('asAdd').addEventListener('click', function () { closeRoutineSheet(); todoKind = name; openTodoSheet(); todoKind = name; renderTodoSheet(false); });
+    $('rsheet').querySelectorAll('[data-astd]').forEach(function (b) { b.addEventListener('click', function () { toggleTodo(b.getAttribute('data-astd')); setTimeout(function () { if (document.body.classList.contains('rt-open')) openActivitySheet(name); }, 60); }); });
+    $('rsheet').querySelectorAll('[data-ased]').forEach(function (b) { b.addEventListener('click', function (ev) { ev.stopPropagation(); closeRoutineSheet(); openTodoSheet(b.getAttribute('data-ased')); }); });
+  }
+  /** 타임라인 카드 ✏️ — 메모(독서는 《책》 ｜ 한줄) 편집 */
+  function openMemoEdit(sid, kind, memo) {
+    var s = subjByName(kind), isBook = kind === '독서';
+    var m = /^《(.+?)》\s*(?:｜\s*)?(.*)$/.exec(memo || '');
+    var book = m ? m[1] : (isBook && BOOT.lastBook ? BOOT.lastBook.title : ''), line = m ? m[2] : (memo || '');
+    $('rsheet').style.setProperty('--rt-c', s ? s.color : '#34a86b');
+    $('rsheet').innerHTML = '<div class="grip"></div><h2>' + (s ? esc(s.emoji) + ' ' : '') + esc(kind) + ' 한 줄</h2><p class="sub">이 기록에 메모를 남겨요 (선택)</p>' +
+      (isBook ? '<div class="f-label">무슨 책?</div><input type="text" id="meBook" placeholder="책 제목" value="' + esc(book) + '">' : '') +
+      '<div class="f-label">' + (isBook ? '기억에 남는 한 줄' : (kind === '뉴스' ? '어떤 뉴스?' : '한 줄')) + '</div><input type="text" id="meLine" placeholder="한 줄로" value="' + esc(line) + '">' +
+      '<button class="cta" id="meSave" style="margin-top:14px">저장</button>';
+    document.body.classList.add('rt-open');
+    setTimeout(function () { if ($('meLine')) $('meLine').focus(); }, 200);
+    $('meSave').addEventListener('click', function () {
+      var b = $('meBook') ? $('meBook').value.trim() : '', l = $('meLine').value.trim();
+      var text = (b ? '《' + b + '》' : '') + (b && l ? ' ｜ ' : '') + l;
+      var btn = $('meSave'); btn.disabled = true; btn.textContent = '저장 중…';
+      fetch(API, { method: 'POST', body: JSON.stringify({ action: 'memo_edit', u: BOOT.member.code, sessionId: sid, memo: text }) })
+        .then(function (r) { return r.json(); })
+        .then(function (res) { if (res && res.error) { showToast(res.error, true); btn.disabled = false; btn.textContent = '저장'; return; } BOOT = res; saveBoot(res); closeRoutineSheet(); render(); showToast('✏️ 저장했어요'); })
+        .catch(function () { showToast('저장 실패 — 인터넷 확인', true); btn.disabled = false; btn.textContent = '저장'; });
     });
   }
   function lessonLineHtml() {
@@ -1167,7 +1229,6 @@
   var RT_CHIPS = [15, 30, 45, 60, 90, 120];
   function openRoutineSheet(name) {
     var s = subjByName(name); if (!s) return;
-    if (sess) { showToast((isRoutineKind(sess.kind) ? sess.kind : '연습') + ' 타이머가 돌고 있어요 — 먼저 끝내주세요', true); return; }
     rtName = name; rtMin = s.goalMin && s.goalMin <= 120 ? s.goalMin : 60; rtEnd = nowHM_();
     renderRoutineSheet();
     document.body.classList.add('rt-open');
@@ -1192,7 +1253,7 @@
       '<div class="f-label">' + (isBook ? '기억에 남는 한 줄' : (rtName === '뉴스' ? '어떤 뉴스?' : '뭘 배웠어?')) + ' <span class="hint">(선택)</span></div><input type="text" id="rtMemo" placeholder="' + (isBook ? '예: 새는 알을 깨고 나온다…' : '한 줄로') + '">' +
       '<div class="endrow"><span>끝난 시간 <b>' + esc(rtEnd) + '</b> · 시작 ' + startHM + '</span><input type="time" id="rtEndIn" value="' + esc(rtEnd) + '"></div>' +
       '<button class="cta" id="rtSave">기록 저장</button>' +
-      (s.mode === 'both' ? '<button class="alt" id="rtTimer">▶ 대신 타이머로 시작</button>' : '');
+      (s.mode !== 'log' ? '<button class="alt" id="rtTimer">▶ 대신 타이머로 시작</button>' : '');
     $('rsheet').querySelectorAll('#rtChips .chip').forEach(function (c) {
       c.addEventListener('click', function () {
         var mm = c.getAttribute('data-m');
@@ -1203,7 +1264,7 @@
     if ($('rtCustom')) $('rtCustom').addEventListener('input', function () { rtMin = Math.max(1, Math.min(600, +this.value || 0)); });
     $('rtEndIn').addEventListener('change', function () { rtEnd = this.value || nowHM_(); renderRoutineSheet(); });
     $('rtSave').addEventListener('click', saveRoutineLog);
-    if ($('rtTimer')) $('rtTimer').addEventListener('click', function () { closeRoutineSheet(); startRoutineTimer(rtName); });
+    if ($('rtTimer')) $('rtTimer').addEventListener('click', function () { closeRoutineSheet(); startActivity(rtName); });
   }
   function closeRoutineSheet() { document.body.classList.remove('rt-open'); }
   function saveRoutineLog() {
@@ -1223,16 +1284,6 @@
       })
       .catch(function () { showToast('저장 실패 — 인터넷 확인', true); btn.disabled = false; btn.textContent = '기록 저장'; });
   }
-  /** 루틴 타이머 = 연습 세션 구조 재사용(kind=루틴명, 휴식 없음, 📷 없음). 종료 시 registerSession으로 저장 */
-  function startRoutineTimer(name) {
-    if (sess) { showToast('이미 타이머가 돌고 있어요', true); return; }
-    var s = subjByName(name); if (!s) return;
-    sess = { kind: name, sessionStart: Date.now(), state: 'practice', segStart: Date.now(), segments: [], routine: true };
-    saveSess();
-    sendEvent('start', 0, null);
-    render();
-    showToast(s.emoji + ' ' + name + ' 타이머 시작 — 끝나면 링이나 아래 버튼을 탭');
-  }
 
   // ── 🌙 오늘 돌아보기 ──
   function openReview() {
@@ -1243,8 +1294,8 @@
     var doneN = rg.rings.filter(function (r) { return r.done; }).length;
     var total = rg.rings.reduce(function (a, r) { return a + r.doneMin; }, 0);
     var h = '<div class="rt">' + (d.getMonth() + 1) + '월 ' + d.getDate() + '일 ' + dow + '요일 · ' + nowHM_() + '</div>' +
-      '<h2>오늘도 수고했어, ' + esc(BOOT.member.name) + ' 🌙</h2>' +
-      '<div class="sub">루틴 ' + doneN + ' / ' + rg.rings.length + ' · 총 ' + durLabel(total) + ' 움직였어' + (rg.academy ? ' · 🏫 학원 날' : '') + '</div>';
+      '<h2>오늘도 수고했어 🌙</h2>' +
+      '<div class="sub">소루틴 ' + rg.rings.filter(function (r) { return !r.main && r.done; }).length + ' / ' + rg.rings.filter(function (r) { return !r.main; }).length + (rg.goalHit ? ' · 🎯 연습 목표 달성' : '') + ' · 총 ' + durLabel(total) + (rg.academy ? ' · 🏫 학원 날' : '') + '</div>';
     h += '<div class="rings">' + rg.rings.map(function (r) {
       return '<div class="rg' + (r.done ? ' done' : '') + '" style="--c:' + esc(r.color) + ';--p:' + r.pct + '"><div class="r"><i>' + (r.done ? '✓' : esc(r.emoji)) + '</i></div><div class="n">' + esc(r.name) + '</div><div class="v">' +
         (r.mode === 'timer' ? clockHM(r.doneMin) + (r.goalMin ? ' / ' + clockHM(r.goalMin) : '') : (r.doneMin ? clockHM(r.doneMin) : '안 함')) + '</div></div>';
@@ -1254,7 +1305,7 @@
       var sj = subjByName(s.k);
       h += '<div class="card"><div class="k">' + (sj ? esc(sj.emoji) + ' ' : '') + esc(s.k) + '</div><div>' + esc(s.memo) + '</div></div>';
     });
-    h += '<div class="stat"><span>🔥 연속 연습<b>' + (st.streak || 0) + '일</b></span><span>이달 완벽한 날<b>' + (st.perfectDays || 0) + '</b></span><span>❤️ 오늘 응원<b>' + ch.length + '</b></span></div>';
+    h += '<div class="stat"><span>🔥 연속<b>' + (st.streak || 0) + '일</b></span><span>완벽한 날<b>' + (st.perfectDays || 0) + '</b></span><span>🎯 목표 달성<b>' + (st.goalDays || 0) + '</b></span><span>❤️ 응원<b>' + ch.length + '</b></span></div>';
     h += '<div class="ask"><div class="q">오늘 하루, 한마디로?</div><textarea id="rvText" placeholder="예: 슬랩 연습이 드디어 감이 왔다 🎸">' + esc(BOOT.note || '') + '</textarea>' +
       '<button class="go" id="rvSave">' + (BOOT.note ? '고쳐 저장하고 잘 자기 🌙' : '저장하고 잘 자기 🌙') + '</button><button class="skip" id="rvSkip">오늘은 그냥 넘어가기</button></div>';
     $('review').innerHTML = h;
@@ -1372,7 +1423,8 @@
     document.body.classList.remove('cam-on'); $('cam').innerHTML = '';
     var ctx = camCtx; camCtx = null;
     if (!ctx) return;
-    if (ctx.resume) doResume(ctx.kind, photo, thumb); else doStart(ctx.kind, photo, thumb);
+    if (thumb) saveShot(hmOf(Date.now()), thumb);
+    startActivity(ctx.kind); // (CAMERA_ON일 때만 도달) 사진은 로컬 썸네일만 — v5에서 photo 전송 생략
   }
 
   /** 전환 이벤트 서버 통지 — 실패해도 타이머·기록은 계속. 실패분은 큐에 남겨 인터넷 복귀 시 자동 재전송 */
@@ -1430,12 +1482,9 @@
     return h + ':' + pad(m) + ':' + pad(s);
   }
   function localPracticeSec(kind) {
-    if (!sess) return 0;
-    var t = 0; // 구간별 kind — 한 세션 안 과목 전환 지원
-    sess.segments.forEach(function (s) {
-      if (s.type === 'practice' && (!kind || (s.kind || sess.kind) === kind)) t += s.end - s.start;
-    });
-    if (sess.state === 'practice' && (!kind || sess.kind === kind)) t += Date.now() - sess.segStart;
+    var t = 0;
+    pendingBlocks.forEach(function (b) { if (b.type === 'practice' && (!kind || b.kind === kind)) t += b.end - b.start; }); // 서버 확인 전 블록
+    if (sess && sess.state === 'practice' && (!kind || sess.kind === kind)) t += Date.now() - sess.segStart;
     return Math.floor(t / 1000);
   }
   function todaySec(kind) {
@@ -1507,8 +1556,7 @@
     var subs = $('app').querySelectorAll('.yp-sh');
     for (var i = 0; i < subs.length; i++) (function (b) {
       b.addEventListener('click', function () {
-        if (sess) { if (isRoutineKind(sess.kind)) { tFinish(); return; } overlayOpen = true; render(); return; }
-        startSession(b.getAttribute('data-start'));
+        startActivity(b.getAttribute('data-start'));
       });
     })(subs[i]);
     var tds = $('app').querySelectorAll('.yp-todo');
@@ -1644,12 +1692,12 @@
       (st === 'practice'
         ? '<button class="tbtn rest" id="bRest">☕ 휴식하기</button>'
         : '<button class="tbtn resume" id="bResume">▶ 연습 다시 시작</button>') +
-      '<button class="tbtn stop" id="bStop">⏹ 오늘 연습 종료</button></div>';
+      '<button class="tbtn stop" id="bStop">⏹ 끝내기</button></div>';
     document.body.classList.add('measuring');
-    $('mCollapse').addEventListener('click', function () { overlayOpen = false; closeMeasure(); render(); });
-    if ($('bRest')) $('bRest').addEventListener('click', doBreak);
-    if ($('bResume')) $('bResume').addEventListener('click', function () { openCam(sess.kind, true); });
-    $('bStop').addEventListener('click', tFinish);
+    $('mCollapse').addEventListener('click', function () { overlayOpen = false; closeMeasure(); view = 'feed'; render(); });
+    if ($('bRest')) $('bRest').addEventListener('click', goBreak);
+    if ($('bResume')) $('bResume').addEventListener('click', resumeFromBreak);
+    $('bStop').addEventListener('click', endActivity);
     var mtds = $('measure').querySelectorAll('.yp-todo');
     for (var i = 0; i < mtds.length; i++) (function (b) {
       b.addEventListener('click', function () { toggleTodo(b.getAttribute('data-mtd')); });
@@ -1671,6 +1719,8 @@
     if (tick) return;
     tick = setInterval(function () {
       var dk = $('dkTime'); if (dk && sess) dk.textContent = fmt(Date.now() - sess.segStart); // 도크 상태 시간
+      var rt = $('restT'); if (rt && sess && sess.state === 'break') rt.textContent = fmt(Date.now() - sess.segStart); else if (rt && !sess && isViewer() && BOOT.live) rt.textContent = fmt(Date.now() - BOOT.live.at);
+      var sht = $('shT'); if (sht && sess) sht.textContent = fmt(Date.now() - sess.segStart);
       if (document.body.classList.contains('measuring') && sess) {
         var c = $('mClock'); if (c) c.textContent = fmtHMS(curSegSec());
         var t = $('mToday'); if (t) t.textContent = fmtHMS(todaySec(null));
@@ -1683,10 +1733,10 @@
         if (rr && sess) rr.textContent = fmt(Date.now() - sess.segStart);
         else if (rr && isViewer() && BOOT.live) rr.textContent = fmt(Date.now() - BOOT.live.at);
         var mv = $('ringMainV'), mr = $('ringMain');
-        if (mv && sess && !isRoutineKind(sess.kind)) {
+        if (mv && sess && sess.state === 'practice' && !isRoutineKind(sess.kind)) {
           var mainR = BOOT.rings && BOOT.rings.rings.find(function (x) { return x.main; });
           if (mainR) {
-            var sec = mainR.doneMin * 60 + localPracticeSec(mainR.name);
+            var sec = mainR.doneMin * 60 + localPracticeSec(mainR.name) + pendingBlocks.filter(function (b) { return b.type === 'practice' && b.kind === mainR.name; }).reduce(function (a, b) { return a + Math.round((b.end - b.start) / 1000); }, 0);
             mv.textContent = clockHM(Math.floor(sec / 60));
             if (mainR.goalMin && mr) mr.style.setProperty('--p', Math.min(100, sec / 60 / mainR.goalMin * 100).toFixed(1));
           }
@@ -1711,103 +1761,117 @@
   function stopTick() { if (tick) { clearInterval(tick); tick = null; } }
 
   /** 연습 시작(연습 탭 진입점) — 인증샷 카메라를 거쳐 doStart로 */
-  function startSession(kind) {
-    if (isRoutineKind(kind)) { startRoutineTimer(kind); return; }
-    if (CAMERA_ON) openCam(kind, false); else doStart(kind, null, null);
-  }
-  function doStart(kind, photo, thumb) {
-    sess = { kind: kind, sessionStart: Date.now(), state: 'practice', segStart: Date.now(), segments: [] };
-    saveSess();
-    if (thumb) saveShot(hmOf(sess.segStart), thumb);
-    sendEvent('start', 0, photo);
-    if (view === 'timer') overlayOpen = true; // 연습 탭에서 시작하면 기존처럼 측정 화면
-    render();
-  }
-  function doBreak() {
-    if (!sess || sess.state !== 'practice') return;
-    var segMin = Math.round((Date.now() - sess.segStart) / 60000);
-    sess.segments.push({ type: 'practice', kind: sess.kind, start: sess.segStart, end: Date.now() });
-    sess.state = 'break'; sess.segStart = Date.now(); saveSess();
-    sendEvent('break', segMin, null);
-    if (document.body.classList.contains('measuring')) renderMeasure(); else render();
-  }
-  function doResume(kind, photo, thumb) {
-    if (!sess || sess.state !== 'break') return;
-    var brkMin = Math.round((Date.now() - sess.segStart) / 60000);
-    sess.segments.push({ type: 'break', start: sess.segStart, end: Date.now() });
-    sess.state = 'practice'; sess.kind = kind || sess.kind; sess.segStart = Date.now(); saveSess();
-    if (thumb) saveShot(hmOf(sess.segStart), thumb);
-    sendEvent('resume', brkMin, photo);
-    if (document.body.classList.contains('measuring')) renderMeasure(); else render();
-  }
-  function tFinish() {
-    if (!sess) return;
-    // 루틴 타이머(독서 등) 종료 → 책·한 줄 메모를 물어보고 저장 (연습은 바로 저장)
-    if (isRoutineKind(sess.kind) && !finishMemoAsked) { openFinishMemo(); return; }
-    finishMemoAsked = false;
-    var btn = $('bStop') || $('fdEnd'), orig = btn ? btn.textContent : '';
-    if (btn) { btn.disabled = true; btn.textContent = '저장 중…'; }
-    sess.segments.push({ type: sess.state, kind: sess.state === 'practice' ? sess.kind : '', start: sess.segStart, end: Date.now() });
-    var payload = { action: 'session', u: BOOT.member.code, kind: sess.kind, segments: sess.segments, memo: finishMemo || '' };
-    var wasRoutine = isRoutineKind(sess.kind);
-    fetch(API, { method: 'POST', body: JSON.stringify(payload) })
+  // ══ v5 활동 엔진 — 링이 유일한 입구 · 한 번에 하나 · 블록 즉시 저장 · 되돌리기 (설계 docs/plans/2026-08-16-루틴-링.md v5) ══
+  // sess = { kind, state:'practice'|'break', segStart, segments:[] } (segments는 항상 비어 있음 — 블록마다 즉시 저장)
+  var pendingBlocks = [];   // 서버 확인 전 블록(로컬 합계용)
+  var lastBlock = null;     // 되돌리기 대상 {sessionId, type, kind, start, end, prevSess}
+  var undoTimer = null;
+  var BLKQ = 'famblkq';
+  function bq() { try { return JSON.parse(read(BLKQ) || '[]') || []; } catch (e) { return []; } }
+  function bqSave(q) { try { store(BLKQ, JSON.stringify(q.slice(-50))); } catch (e) {} }
+  var blkFlushing = false;
+  function flushBlocks() {
+    if (blkFlushing || !BOOT || !BOOT.member) return;
+    var q = bq(); if (!q.length) return;
+    blkFlushing = true;
+    var it = q[0];
+    fetch(API, { method: 'POST', body: JSON.stringify(it.payload) })
       .then(function (r) { return r.json(); })
       .then(function (res) {
-        if (res && res.error) { showToast(res.error, true); sess.segments.pop(); if (btn) { btn.disabled = false; btn.textContent = orig; } return; }
-        BOOT = res; saveBoot(res); store(SKEY, null);
-        var kindDone = sess.kind;
-        sess = null; overlayOpen = false; finishMemo = '';
-        closeMeasure();
-        if (wasRoutine) {
-          render();
-          var rr = res.rings && res.rings.rings.find(function (x) { return x.name === kindDone; });
-          showToast((rr && rr.done) ? '✓ ' + kindDone + ' 목표 달성! 오늘 ' + clockHM(rr.doneMin) : kindDone + ' 저장했어요' + (rr ? ' — 오늘 ' + clockHM(rr.doneMin) : ''));
-        } else showSummary(res.sessionSummary || {});
+        blkFlushing = false;
+        var q2 = bq(); q2.shift(); bqSave(q2);
+        pendingBlocks = pendingBlocks.filter(function (b) { return b.sessionId !== it.sessionId; });
+        if (res && !res.error) { BOOT = res; saveBoot(res); if (!document.body.classList.contains('rt-open')) render(); }
+        else if (res && res.error) showToast(res.error, true);
+        flushBlocks();
       })
-      .catch(function () { showToast('저장 실패 — 인터넷 확인 후 다시 눌러주세요.', true); sess.segments.pop(); if (btn) { btn.disabled = false; btn.textContent = orig; } });
+      .catch(function () { blkFlushing = false; showToast('저장 대기 중 — 인터넷이 연결되면 자동으로 보내요', true); });
   }
-  var finishMemoAsked = false, finishMemo = '';
-  /** 루틴 타이머 끝내기 전 — 《책》/한 줄 입력 시트(선택). 저장 → tFinish 재호출 */
-  function openFinishMemo() {
-    var s = subjByName(sess.kind); if (!s) { finishMemoAsked = true; tFinish(); return; }
-    var isBook = sess.kind === '독서', lb = BOOT.lastBook;
-    var min = Math.round((Date.now() - sess.segStart) / 60000);
-    $('rsheet').style.setProperty('--rt-c', s.color);
-    $('rsheet').innerHTML = '<div class="grip"></div><h2>' + esc(s.emoji) + ' ' + esc(s.kind || sess.kind) + ' 끝!</h2>' +
-      '<p class="sub">' + durLabel(Math.max(1, min)) + ' 했어요 · 저장하기 전에 한 줄만</p>' +
-      (isBook ? '<div class="f-label">무슨 책?</div><input type="text" id="rtBook" placeholder="책 제목" value="' + esc(lb ? lb.title : '') + '">' : '') +
-      '<div class="f-label">' + (isBook ? '기억에 남는 한 줄' : (sess.kind === '뉴스' ? '어떤 뉴스?' : '뭘 배웠어?')) + ' <span class="hint">(선택)</span></div><input type="text" id="rtMemo" placeholder="한 줄로">' +
-      '<button class="cta" id="rtSave">저장</button><button class="alt" id="rtSkip">메모 없이 저장</button>';
-    document.body.classList.add('rt-open');
-    var go = function (withMemo) {
-      var book = withMemo && $('rtBook') ? $('rtBook').value.trim() : '', memo = withMemo && $('rtMemo') ? $('rtMemo').value.trim() : '';
-      finishMemo = (book ? '《' + book + '》' : '') + (book && memo ? ' ｜ ' : '') + memo;
-      finishMemoAsked = true; closeRoutineSheet(); tFinish();
-    };
-    $('rtSave').addEventListener('click', function () { go(true); });
-    $('rtSkip').addEventListener('click', function () { go(false); });
-  }
+  window.addEventListener('online', flushBlocks);
 
-  function showSummary(sm) {
-    var pMin = sm.practiceMin || 0, sets = sm.sets || 0, kind = sm.kind || '베이스';
-    // 과목별 분해 (한 세션 안 과목 전환 시 "베이스 52분 + 화성학 48분")
-    var title = (sm.kinds && sm.kinds.length)
-      ? sm.kinds.map(function (k) { return esc(k.kind) + ' ' + human(k.min * 60000); }).join(' + ')
-      : esc(kind) + ' 연습 · ' + human(pMin * 60000);
-    var goal = bassGoalMin();
-    var todayMin = (BOOT.today && BOOT.today.byKind && BOOT.today.byKind['베이스']) || 0;
-    var late = new Date().getHours() >= 21;
-    $('summary').innerHTML =
-      '<div class="done-ic">🎉</div><h2>오늘 연습 끝!</h2><p class="ssub">실연습 ' + human(pMin * 60000) + ' · 잘했어요</p>' +
-      '<div class="evt-card"><div class="cal-row">🎸 연습 기록 저장됐어요</div><div class="etitle">' + title + '</div>' +
-      '<div class="edesc">' + sets + '세트 · 오늘 누적 ' + clockHM(todayMin) + (goal ? ' / ' + clockHM(goal) + (todayMin >= goal ? ' 🎯 목표 달성!' : '') : '') + '</div></div>' +
-      (late ? '<button class="close" id="sReview" style="margin-top:auto;background:linear-gradient(135deg,#2c3e6b,#1c2a4d);color:#fff">🌙 오늘 돌아보기</button><button class="close" id="sClose" style="margin-top:10px;background:var(--etc-bg);color:var(--etc-ink)">확인</button>'
-            : '<button class="close" id="sClose">확인</button>');
-    document.body.classList.add('summary-on');
-    var back = function () { document.body.classList.remove('summary-on'); view = BOOT.member.practice ? 'feed' : 'home'; render(); };
-    $('sClose').addEventListener('click', back);
-    if ($('sReview')) $('sReview').addEventListener('click', function () { back(); openReview(); });
+  /** 블록 1개 저장(큐 경유). 세션ID='S'+start (서버와 동일 규칙 → 멱등·되돌리기 키) */
+  function saveBlock(type, kind, start, end, memo) {
+    if (end - start < 15000) return null; // 15초 미만은 버림(실수 탭)
+    var sessionId = 'S' + start;
+    var payload = { action: 'session', u: BOOT.member.code, kind: kind, segments: [{ type: type, kind: type === 'practice' ? kind : '', start: start, end: end }], memo: memo || '' };
+    var q = bq(); q.push({ sessionId: sessionId, payload: payload }); bqSave(q);
+    pendingBlocks.push({ sessionId: sessionId, type: type, kind: kind, start: start, end: end });
+    flushBlocks();
+    return sessionId;
   }
+  /** 활동 시작/전환/재개 — 어떤 상태에서든 kind로 */
+  function startActivity(kind) {
+    var now = Date.now(), prev = sess ? { kind: sess.kind, state: sess.state, segStart: sess.segStart } : null;
+    var savedId = null, savedLabel = '';
+    if (sess && sess.state === 'practice') {
+      if (sess.kind === kind) return; // 이미 그 활동 중
+      savedId = saveBlock('practice', sess.kind, sess.segStart, now);
+      savedLabel = actLabel(sess.kind) + ' ' + human(now - sess.segStart);
+    } else if (sess && sess.state === 'break') {
+      savedId = saveBlock('break', '휴식', sess.segStart, now);
+      savedLabel = '휴식 ' + human(now - sess.segStart);
+    }
+    var isNew = !sess;
+    sess = { kind: kind, state: 'practice', segStart: now, segments: [] };
+    saveSess();
+    sendEvent(isNew ? 'start' : 'resume', 0, null);
+    var s = subjByName(kind);
+    lastBlock = savedId ? { sessionId: savedId, prevSess: prev } : null;
+    render();
+    if (savedId) showUndoToast(savedLabel + ' 저장 → ' + (s ? s.emoji + ' ' : '') + kind + ' 시작');
+    else showToast((s ? s.emoji + ' ' : '▶ ') + kind + ' 시작!');
+  }
+  function goBreak() {
+    if (!sess || sess.state !== 'practice') return;
+    var now = Date.now(), prev = { kind: sess.kind, state: sess.state, segStart: sess.segStart };
+    var id = saveBlock('practice', sess.kind, sess.segStart, now);
+    var lbl = actLabel(sess.kind) + ' ' + human(now - sess.segStart);
+    sess.state = 'break'; sess.segStart = now; saveSess();
+    sendEvent('break', Math.round((now - prev.segStart) / 60000), null);
+    lastBlock = id ? { sessionId: id, prevSess: prev } : null;
+    if (document.body.classList.contains('measuring')) renderMeasure(); else render();
+    if (id) showUndoToast(lbl + ' 저장 · ☁️ 휴식'); 
+  }
+  function resumeFromBreak() { if (sess && sess.state === 'break') startActivity(sess.kind); }
+  function endActivity() {
+    if (!sess) return;
+    var now = Date.now(), prev = { kind: sess.kind, state: sess.state, segStart: sess.segStart };
+    var id = saveBlock(sess.state === 'break' ? 'break' : 'practice', sess.state === 'break' ? '휴식' : sess.kind, sess.segStart, now);
+    var lbl = (sess.state === 'break' ? '휴식' : actLabel(sess.kind)) + ' ' + human(now - sess.segStart);
+    var k = sess.kind;
+    sess = null; store(SKEY, null);
+    sendEvent('end', 0, null);
+    lastBlock = id ? { sessionId: id, prevSess: prev } : null;
+    closeMeasure(); overlayOpen = false;
+    if (view === 'timer') view = 'feed';
+    render();
+    if (id) showUndoToast(lbl + ' 저장됨'); else showToast('너무 짧아서 저장하지 않았어요');
+  }
+  function actLabel(kind) { var s = subjByName(kind); return (s ? s.emoji + ' ' : '') + kind + (s && s.mode === 'timer' ? ' 연습' : ''); }
+  /** 되돌리기: 방금 저장한 블록 삭제 + 이전 상태 복원 */
+  function undoLast() {
+    if (!lastBlock) return;
+    var lb = lastBlock; lastBlock = null;
+    var q = bq(); var inQ = q.some(function (x) { return x.sessionId === lb.sessionId; });
+    if (inQ) { bqSave(q.filter(function (x) { return x.sessionId !== lb.sessionId; })); pendingBlocks = pendingBlocks.filter(function (b) { return b.sessionId !== lb.sessionId; }); }
+    else fetch(API, { method: 'POST', body: JSON.stringify({ action: 'undo_block', u: BOOT.member.code, sessionId: lb.sessionId }) }).then(function (r) { return r.json(); }).then(function (res) { if (res && !res.error) { BOOT = res; saveBoot(res); render(); } }).catch(function () {});
+    if (lb.prevSess) { sess = { kind: lb.prevSess.kind, state: lb.prevSess.state, segStart: lb.prevSess.segStart, segments: [] }; saveSess(); sendEvent(lb.prevSess.state === 'break' ? 'break' : 'resume', 0, null); }
+    render(); showToast('↩︎ 되돌렸어요');
+  }
+  function showUndoToast(msg) {
+    var toast = $('toast');
+    toast.innerHTML = esc(msg) + ' <button id="undoBtn" style="margin-left:10px;background:rgba(0,0,0,.18);border:none;color:#fff;font:inherit;font-size:12.5px;font-weight:800;border-radius:8px;padding:3px 9px;cursor:pointer;pointer-events:auto">되돌리기</button>';
+    toast.className = 'toast show'; toast.style.pointerEvents = 'auto';
+    var b = $('undoBtn'); if (b) b.addEventListener('click', function () { undoLast(); });
+    if (undoTimer) clearTimeout(undoTimer);
+    undoTimer = setTimeout(function () { toast.className = 'toast'; toast.style.pointerEvents = 'none'; lastBlock = null; }, 5000);
+  }
+  // 하위 호환 별칭 (연습 탭·집중 화면)
+  function doBreak() { goBreak(); }
+  function tFinish() { endActivity(); }
+  function startSession(kind) { startActivity(kind); }
+  function startRoutineTimer(name) { startActivity(name); }
+  function startOrResume(kind) { startActivity(kind); }
 
   // ── 통계 ──
   function loadStats() {
@@ -2024,7 +2088,7 @@
 
   $('shTime').addEventListener('input', updateEnd);
   $('shEnd').addEventListener('input', updateEnd);
-  $('backdrop').addEventListener('click', function () { closeSheet(); closeTodoSheet(); if (!finishMemoAsked && !(sess && isRoutineKind(sess.kind) && document.body.classList.contains('rt-open'))) closeRoutineSheet(); });
+  $('backdrop').addEventListener('click', function () { closeSheet(); closeTodoSheet(); closeRoutineSheet(); });
   $('ctaBtn').addEventListener('click', function () {
     if (sending) return;
     var title = cur ? cur.name : $('shCustom').value.trim();
