@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>가족 일정</title>
-<!-- v20 루틴 캘린더 (월·주·일) — 2026-08-16 -->
+<!-- v21 홈 헤더 정리·이름 바꾸기 아빠만·응원 숨김 — 2026-08-16 -->
 <meta name="theme-color" content="#e9f3fb">
 <link rel="preconnect" href="https://script.google.com">
 <link rel="preconnect" href="https://script.googleusercontent.com">
@@ -745,6 +745,8 @@
   var DURS = [30, 60, 90, 120];
   var SKEY = 'famsession';
   var CAMERA_ON = false; // 📷 인증샷 — 2026-07-19 사용자 결정으로 OFF (코드 보존, 켜려면 true)
+  var CHEER_ON = false;  // ❤️ 응원 — 2026-08-16 사용자 결정으로 일단 숨김(홈 배너·부모 도크 버튼). 서버·시트는 그대로, 켜려면 true
+  var ADMIN_CODE = 'dad'; // 이름(기기 사용자) 바꾸기는 아빠만
 
   var BOOT = null, view = 'home';
   var cur = null, curDur = 60, customEnd = false, sending = false, othersOpen = false;
@@ -828,9 +830,9 @@
     var bar = $('tabbar');
     if (!BOOT || BOOT.error || !BOOT.member) { bar.style.display = 'none'; document.body.classList.remove('dock-big'); return; }
     var viewer = isViewer();
-    document.body.classList.toggle('dock-big', !!sess || viewer);
+    document.body.classList.toggle('dock-big', !!sess || (viewer && CHEER_ON));
     bar.style.display = 'block';
-    bar.innerHTML = (sess ? statusBarHtml() : (viewer ? cheerDockHtml() : '')) + menuHtml();
+    bar.innerHTML = (sess ? statusBarHtml() : (viewer && CHEER_ON ? cheerDockHtml() : '')) + menuHtml();
     bindMenu(bar);
     if ($('sbRest')) $('sbRest').addEventListener('click', goBreak);
     if ($('sbResume')) $('sbResume').addEventListener('click', resumeFromBreak);
@@ -839,6 +841,10 @@
     if ($('fdCheer')) $('fdCheer').addEventListener('click', sendCheer);
     startTick();
   }
+  function canRename() { return !!(BOOT && BOOT.member && BOOT.member.code === ADMIN_CODE); }
+  /** 이름 칩 — 아빠만 탭하면 이름 다시 고르기, 나머지는 표시만 */
+  function whoChip(cls, id, name) { return canRename() ? '<button class="' + cls + '" id="' + id + '" title="이름 바꾸기">' + esc(name) + '</button>' : '<span class="' + cls + '">' + esc(name) + '</span>'; }
+  function bindWho(id) { var b = $(id); if (b && b.tagName === 'BUTTON') b.addEventListener('click', function () { if (confirm('이름을 다시 고를까요?')) { store('famcode', null); init(); } }); }
   function isRoutineKind(k) { var s = subjByName(k); return !!(s && s.mode !== 'timer'); }
   function subjByName(k) { return ((BOOT && BOOT.subjects) || []).find(function (s) { return s.name === k; }) || null; }
   function bassGoalMin() { return (BOOT && BOOT.rings && BOOT.rings.rings.find(function (r) { return r.main; }) || {}).goalMin || (BOOT.member && BOOT.member.goalMin) || 0; }
@@ -931,7 +937,7 @@
     }
     h += '<div class="appbar"><span class="t">일정 기록</span><div class="right">' +
       '<button class="iconbtn" id="calBtn" title="가족 캘린더 열기" aria-label="가족 캘린더 열기">📅</button>' +
-      '<button class="who" id="whoBtn" title="이름 바꾸기">' + esc(BOOT.member.name) + '</button></div></div>';
+      whoChip('who', 'whoBtn', BOOT.member.name) + '</div></div>';
     h += '<div class="sec-label">탭 한 번으로 등록</div><div class="presets">';
     // 이름이 'X (변주)' 꼴인 프리셋은 X로 묶어 버튼 1개 → 시트 안에서 변주(칩) 선택
     var items = [], gmap = {};
@@ -990,7 +996,7 @@
 
     if (isKakao) $('kakaoGo').addEventListener('click', function () { location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(location.origin + location.pathname); });
     if ($('installX')) $('installX').addEventListener('click', function () { store('installHintOff', '1'); $('installHint').style.display = 'none'; });
-    $('whoBtn').addEventListener('click', function () { if (confirm('이름을 다시 고를까요?')) { store('famcode', null); init(); } });
+    bindWho('whoBtn');
     $('calBtn').addEventListener('click', openCalendar);
     var btns = $('app').querySelectorAll('.preset');
     for (var i = 0; i < btns.length; i++) (function (b) {
@@ -1057,8 +1063,8 @@
 
     var h = '<div class="fd-top"><span>' + ddayFd(who) + '</span><div class="r">' +
       (m.practice ? '<button class="fd-moon" id="fdMoon" title="오늘 요약" aria-label="오늘 요약">🌙 오늘 요약</button>' : '') +
-      '<button class="fd-who" id="fdWho" title="이름 바꾸기">' + esc(m.name) + '</button></div></div>';
-    h += '<div class="fd-hd"><span class="d">' + esc(who.name) + (vt ? ' 👀' : '') + '</span>' +
+      whoChip('fd-who', 'fdWho', m.name) + '</div></div>';
+    h += '<div class="fd-hd"><span></span>' + // 좌측 이름 제거(2026-08-16) — 오늘 합계만
       '<span class="tot">' + (isToday ? '오늘' : '합계') + ' <b id="fdTotal">' + (isToday ? fmtHMS(feedTotalSec()) : fmtHMS((dayData ? dayData.totalMin : 0) * 60)) + '</b></span></div>';
 
     // 날짜 → 📆 루틴 캘린더 일 뷰(오늘). 과거 보기는 캘린더로 일원화
@@ -1070,7 +1076,7 @@
     // ❤️ 응원 · 🌙 돌아보기 배너 · 이번 주 레슨 (오늘만)
     if (isToday) {
       var ch = BOOT.cheers || [];
-      if (ch.length) h += '<div class="cheer">❤️ ' + esc(ch.map(function (c) { return c.name; }).join(' · ')) + '가 응원해요<small>' + esc(ch[ch.length - 1].at) + '</small></div>';
+      if (CHEER_ON && ch.length) h += '<div class="cheer">❤️ ' + esc(ch.map(function (c) { return c.name; }).join(' · ')) + '가 응원해요<small>' + esc(ch[ch.length - 1].at) + '</small></div>';
       if (m.practice && !sess && new Date().getHours() >= 21) h += '<button class="night" id="fdNight">🌙 오늘 요약 보기<small>' + (BOOT.note ? '한마디 남김 ✓' : '자기 전에 1분 →') + '</small></button>';
       if (BOOT.note && vt) h += '<div class="cheer" style="background:#eef2fb;border-color:#cdd8f2;color:#2c3e6b">🌙 ' + esc(who.name) + '의 한마디 — "' + esc(BOOT.note) + '"</div>';
       h += lessonLineHtml();
@@ -1118,7 +1124,7 @@
 
     // 도크(큰 버튼+메뉴)는 공통 #tabbar가 담당 — 피드는 콘텐츠만
     $('app').innerHTML = h;
-    $('fdWho').addEventListener('click', function () { if (confirm('이름을 다시 고를까요?')) { store('famcode', null); init(); } });
+    bindWho('fdWho');
     if ($('fdMoon')) $('fdMoon').addEventListener('click', openReview);
     document.querySelectorAll('.memo-edit[data-sid]').forEach(function (b) { b.addEventListener('click', function () { openMemoEdit(b.getAttribute('data-sid'), b.getAttribute('data-k'), b.getAttribute('data-memo') || ''); }); });
     if ($('fdNight')) $('fdNight').addEventListener('click', openReview);
@@ -1558,7 +1564,7 @@
 
     var h = '<div class="appbar" style="padding:2px 2px 6px"><span>' + ddayLabel(m) + '</span><div class="right">' +
       '<button class="iconbtn" id="calBtnT" title="가족 캘린더 열기">📅</button>' +
-      '<button class="who" id="whoBtnT">' + esc(m.name) + '</button></div></div>';
+      whoChip('who', 'whoBtnT', m.name) + '</div></div>';
     h += '<div class="yp-top"><span class="yp-date">' + dateStr + '</span><span class="yp-total" id="heroClock">' + hmShort(todaySec(null)) + '</span></div>';
     if (goal) h += '<div class="yp-goal" id="heroGoal">목표 ' + durLabel(goal) + ' · ' + pct + '%</div>';
 
@@ -1592,7 +1598,7 @@
 
     $('app').innerHTML = h;
     $('calBtnT').addEventListener('click', openCalendar);
-    $('whoBtnT').addEventListener('click', function () { if (confirm('이름을 다시 고를까요?')) { store('famcode', null); init(); } });
+    bindWho('whoBtnT');
     var subs = $('app').querySelectorAll('.yp-sh');
     for (var i = 0; i < subs.length; i++) (function (b) {
       b.addEventListener('click', function () {
