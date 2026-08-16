@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>가족 일정</title>
-<!-- v22 ❤️ 응원 재개 — 부모 도크 버튼 + CY 하트 애니메이션(앱 열 때 1회) — 2026-08-16 -->
+<!-- v23 루틴 캘린더 → 👣 나의 발자국 — 2026-08-16 -->
 <meta name="theme-color" content="#e9f3fb">
 <link rel="preconnect" href="https://script.google.com">
 <link rel="preconnect" href="https://script.googleusercontent.com">
@@ -462,7 +462,7 @@
   .fd-hd .tot { font-size: 13px; color: #7d8fa0; }
   .fd-hd .tot b { color: #f4652f; font-size: 16px; font-variant-numeric: tabular-nums; }
   .fd-dday { display: inline-block; background: #fff; border: 1px solid #d6e6f3; color: #3d6f9e; font-size: 11.5px; font-weight: 700; border-radius: 99px; padding: 3px 10px; }
-  /* ── 📆 루틴 캘린더 (월·주·일) — 홈 링 카드와 같은 흰 카드·하늘색 파스텔 ── */
+  /* ── 👣 나의 발자국 = 루틴 캘린더 (월·주·일) — 홈 링 카드와 같은 흰 카드·하늘색 파스텔 ── */
   .clseg { display: flex; gap: 4px; background: #fff; border: 1px solid var(--line); border-radius: 13px; padding: 3px; margin: 0 0 12px; }
   .clseg button { flex: 1; font: inherit; font-size: 13.5px; font-weight: 800; padding: 8px 0; border-radius: 10px; border: none; background: none; color: var(--sub); cursor: pointer; }
   .clseg button.on { background: #ffe9d8; color: #c2481a; }
@@ -892,7 +892,7 @@
     var t = [];
     if (BOOT.member.practice || isViewer()) t.push({ k: 'feed', i: '🏠', l: '홈' });
     t.push({ k: 'home', i: '📅', l: '일정' });
-    t.push({ k: 'stats', i: '📆', l: '루틴' });
+    t.push({ k: 'stats', i: '👣', l: '발자국' });
     return t;
   }
   function menuHtml() {
@@ -1053,7 +1053,7 @@
     var m = BOOT.member;
     var vt = isViewer() ? BOOT.viewTarget : null; // 뷰어(엄마아빠)는 채영 피드를 보기 전용으로
     var who = vt || m;
-    var isToday = true, dayData = null; // 홈은 오늘만 — 과거는 📆 루틴 캘린더 일 뷰
+    var isToday = true, dayData = null; // 홈은 오늘만 — 과거는 👣 나의 발자국 일 뷰
     var nd = new Date();
     var dateStr = (nd.getMonth() + 1) + '월 ' + nd.getDate() + '일 ' + ['일', '월', '화', '수', '목', '금', '토'][nd.getDay()];
     var shots = (vt || !isToday) ? {} : loadShots();
@@ -1077,8 +1077,8 @@
     h += '<div class="fd-hd"><span></span>' + // 좌측 이름 제거(2026-08-16) — 오늘 합계만
       '<span class="tot">' + (isToday ? '오늘' : '합계') + ' <b id="fdTotal">' + (isToday ? fmtHMS(feedTotalSec()) : fmtHMS((dayData ? dayData.totalMin : 0) * 60)) + '</b></span></div>';
 
-    // 날짜 → 📆 루틴 캘린더 일 뷰(오늘). 과거 보기는 캘린더로 일원화
-    h += '<button class="fd-date" id="fdDate" title="루틴 캘린더에서 보기">📆 ' + dateStr + ' <small>›</small></button>';
+    // 날짜 → 👣 나의 발자국 일 뷰(오늘). 과거 보기는 캘린더로 일원화
+    h += '<button class="fd-date" id="fdDate" title="나의 발자국에서 보기">👣 ' + dateStr + ' <small>›</small></button>';
 
     // 루틴 링 카드 (오늘=BOOT.rings 실시간 / 과거=dayData.rings)
     var rg = isToday ? BOOT.rings : (dayData && dayData.rings);
@@ -1956,7 +1956,7 @@
   function startRoutineTimer(name) { startActivity(name); }
   function startOrResume(kind) { startActivity(kind); }
 
-  // ── 📆 루틴 캘린더 (월·주·일) — 통계 탭 대체. 커서=calDate 하나, 월/주는 거기서 파생. 설계 docs/plans/2026-08-16-루틴-캘린더.md ──
+  // ── 👣 나의 발자국 = 루틴 캘린더 (월·주·일) — 통계 탭 대체. 커서=calDate 하나, 월/주는 거기서 파생. 설계 docs/plans/2026-08-16-루틴-캘린더.md ──
   var calMode = 'month', calDate = '', calCache = {}, calErr = '';
   var DOW_KO = ['일', '월', '화', '수', '목', '금', '토'];
   function clockHM(min) { min = Math.max(0, Math.round(min)); return Math.floor(min / 60) + ':' + pad(min % 60); }
@@ -1993,7 +1993,7 @@
 
   function renderCal() {
     renderTabs();
-    var h = '<div class="appbar"><span class="t">📅 루틴 캘린더</span><div class="right"><span class="who">' + esc(BOOT.member.name) + '</span></div></div>';
+    var h = '<div class="appbar"><span class="t">👣 나의 발자국</span><div class="right"><span class="who">' + esc(BOOT.member.name) + '</span></div></div>';
     var md = calMonth_(); // 대상 칩·연습 여부는 월 데이터에서
     if (md && md.targets && md.targets.length) {
       h += '<div class="chips" style="justify-content:center;margin-bottom:10px">' +
