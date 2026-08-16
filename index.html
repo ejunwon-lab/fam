@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>가족 일정</title>
-<!-- v31 기록 칩 2줄 정렬(잘림 해소) — 2026-08-16 -->
+<!-- v32 기록 칩 글자만 — 2026-08-16 -->
 <meta name="theme-color" content="#e9f3fb">
 <link rel="preconnect" href="https://script.google.com">
 <link rel="preconnect" href="https://script.googleusercontent.com">
@@ -2115,7 +2115,7 @@
   }
   function memoInvalidate_() { Object.keys(calCache).forEach(function (k) { if (k.indexOf('x:') === 0 || k.indexOf('m:') === 0 || k.indexOf('d:') === 0) delete calCache[k]; }); }
   function memoChips_() {
-    var chips = [{ k: 'all', l: '전체' }].concat((BOOT.subjects || []).map(function (sb) { return { k: sb.name, l: subjIcon(sb) + ' ' + esc(sb.name) }; })).concat([{ k: 'note', l: '🌙 한마디' }]);
+    var chips = [{ k: 'all', l: '전체' }].concat((BOOT.subjects || []).map(function (sb) { return { k: sb.name, l: esc(sb.name) }; })).concat([{ k: 'note', l: '한마디' }]); // 글자만 (2026-08-16 주인님)
     return '<div class="clchips">' + chips.map(function (c) { return '<button class="chip' + (c.k === memoKind ? ' on' : '') + '" data-mk="' + esc(c.k) + '">' + c.l + '</button>'; }).join('') + '</div>';
   }
   function parseBookF_(memo) {
