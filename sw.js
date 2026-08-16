@@ -1,5 +1,5 @@
 /* 가족 일정 — 앱 셸 캐시: index.html=네트워크 우선(항상 최신, 오프라인 폴백), 나머지=stale-while-revalidate */
-var CACHE = 'fam-shell-v11';
+var CACHE = 'fam-shell-v12';
 var SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png', './bass.jpg', './tl/bass.jpg', './tl/book.jpg', './tl/news.jpg', './tl/theory.jpg', './tl/gym.jpg'];
 
 self.addEventListener('install', function (e) {

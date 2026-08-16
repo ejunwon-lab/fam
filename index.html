@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>가족 일정</title>
-<!-- v25 타임라인 카드 배경 사진(A안, 베이스 가로) — 2026-08-16 -->
+<!-- v26 운동=🏃‍♀️, 베이스 카드 사진 전체 보이게 — 2026-08-16 -->
 <meta name="theme-color" content="#e9f3fb">
 <link rel="preconnect" href="https://script.google.com">
 <link rel="preconnect" href="https://script.googleusercontent.com">
@@ -863,10 +863,12 @@
   function whoChip(cls, id, name) { return canRename() ? '<button class="' + cls + '" id="' + id + '" title="이름 바꾸기">' + esc(name) + '</button>' : '<span class="' + cls + '">' + esc(name) + '</span>'; }
   function bindWho(id) { var b = $(id); if (b && b.tagName === 'BUTTON') b.addEventListener('click', function () { if (confirm('이름을 다시 고를까요?')) { store('famcode', null); init(); } }); }
   /** 과목 아이콘 — 시트 이모지 기본, 오버라이드(뉴스=네이버 N 배지, 2026-08-16) */
-  var ICON_OVERRIDE = { '뉴스': '<span class="ico-n">N</span>' };
+  var ICON_OVERRIDE = { '뉴스': '<span class="ico-n">N</span>', '운동': '🏃‍♀️' }; // 운동 🏃‍♀️ (2026-08-16 주인님 선택 — 시트 G열은 🏋️ 그대로여도 프론트가 우선)
+  var EMOJI_OVERRIDE = { '운동': '🏃‍♀️' }; // 텍스트(토스트·상태바) 용
   /** 타임라인 카드 배경 사진(A안, 2026-08-16) — 과목명→파일(tl/, 720×300). 베이스=홈 링 사진을 가로로, 나머지=Unsplash 무료 */
   var TL_PHOTO = { '베이스': 'tl/bass.jpg', '독서': 'tl/book.jpg', '뉴스': 'tl/news.jpg', '음악이론': 'tl/theory.jpg', '운동': 'tl/gym.jpg' };
   function subjIcon(s) { if (!s) return '🎵'; return ICON_OVERRIDE[s.name] || esc(s.emoji || '🎵'); }
+  function subjEmoji(s) { return s ? (EMOJI_OVERRIDE[s.name] || s.emoji || '🎵') : '🎵'; }
   function isRoutineKind(k) { var s = subjByName(k); return !!(s && s.mode !== 'timer'); }
   function subjByName(k) { return ((BOOT && BOOT.subjects) || []).find(function (s) { return s.name === k; }) || null; }
   function bassGoalMin() { return (BOOT && BOOT.rings && BOOT.rings.rings.find(function (r) { return r.main; }) || {}).goalMin || (BOOT.member && BOOT.member.goalMin) || 0; }
@@ -877,7 +879,7 @@
       return '<div class="sbar" style="background:linear-gradient(135deg,#9fb0c2,#7f94aa)"><span class="sbtx">☁️ 휴식 중</span><b class="t" id="dkTime">' + fmt(Date.now() - sess.segStart) + '</b>' +
         '<button class="sbb" id="sbResume">▶ ' + esc(sess.kind) + '</button><button class="sbb end" id="sbEnd">⏹</button></div>';
     }
-    return '<div class="sbar" style="background:linear-gradient(135deg,' + esc(col) + 'dd,' + esc(col) + ')"><span class="sbtx" id="sbMain">' + (s ? esc(s.emoji) : '🎸') + ' ' + esc(sess.kind) + (isRoutineKind(sess.kind) ? ' 중' : ' 연습 중') + '</span><b class="t" id="dkTime">' + fmt(Date.now() - sess.segStart) + '</b>' +
+    return '<div class="sbar" style="background:linear-gradient(135deg,' + esc(col) + 'dd,' + esc(col) + ')"><span class="sbtx" id="sbMain">' + (s ? esc(subjEmoji(s)) : '🎸') + ' ' + esc(sess.kind) + (isRoutineKind(sess.kind) ? ' 중' : ' 연습 중') + '</span><b class="t" id="dkTime">' + fmt(Date.now() - sess.segStart) + '</b>' +
       '<button class="sbb" id="sbRest">☁️ 휴식</button><button class="sbb end" id="sbEnd">⏹</button></div>';
   }
   /** 부모 도크 — ❤️ 응원해요 (하루 1번/사람) */
@@ -1914,8 +1916,8 @@
     var s = subjByName(kind);
     lastBlock = savedId ? { sessionId: savedId, prevSess: prev } : null;
     render();
-    if (savedId) showUndoToast(savedLabel + ' 저장 → ' + (s ? s.emoji + ' ' : '') + kind + ' 시작');
-    else showToast((s ? s.emoji + ' ' : '▶ ') + kind + ' 시작!');
+    if (savedId) showUndoToast(savedLabel + ' 저장 → ' + (s ? subjEmoji(s) + ' ' : '') + kind + ' 시작');
+    else showToast((s ? subjEmoji(s) + ' ' : '▶ ') + kind + ' 시작!');
   }
   function goBreak() {
     if (!sess || sess.state !== 'practice') return;
@@ -1943,7 +1945,7 @@
     render();
     if (id) showUndoToast(lbl + ' 저장됨'); else showToast('너무 짧아서 저장하지 않았어요');
   }
-  function actLabel(kind) { var s = subjByName(kind); return (s ? s.emoji + ' ' : '') + kind + (s && s.mode === 'timer' ? ' 연습' : ''); }
+  function actLabel(kind) { var s = subjByName(kind); return (s ? subjEmoji(s) + ' ' : '') + kind + (s && s.mode === 'timer' ? ' 연습' : ''); }
   /** 되돌리기: 방금 저장한 블록 삭제 + 이전 상태 복원 */
   function undoLast() {
     if (!lastBlock) return;
