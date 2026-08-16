@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>가족 일정</title>
-<!-- v30 📝 기록 모아보기(책장·완독·회상 카드·월 셀 점) — 2026-08-16 -->
+<!-- v31 기록 칩 2줄 정렬(잘림 해소) — 2026-08-16 -->
 <meta name="theme-color" content="#e9f3fb">
 <link rel="preconnect" href="https://script.google.com">
 <link rel="preconnect" href="https://script.googleusercontent.com">
@@ -543,7 +543,7 @@
   .clempty { font-size: 14px; color: #a9b9c8; margin-top: 8px; }
   .clsum { text-align: right; font-size: 13px; color: var(--sub); margin-top: 8px; font-variant-numeric: tabular-nums; }
   /* 📝 기록 모아보기 */
-  .clchips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 8px; scrollbar-width: none; }
+  .clchips { display: flex; flex-wrap: wrap; gap: 6px; padding-bottom: 4px; margin-bottom: 8px; }
   .clchips::-webkit-scrollbar { display: none; }
   .clchips .chip { flex: none; font-size: 12.5px; padding: 6px 11px; background: #fff; }
   .clchips .chip.on { background: var(--indigo); border-color: var(--indigo); color: #fff; }
