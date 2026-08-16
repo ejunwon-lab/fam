@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>가족 일정</title>
-<!-- v37 오늘 돌아보기 로고 🌅 — 2026-08-16 -->
+<!-- v38 돌아보기 ✕ 닫기 + 한마디 21시부터 — 2026-08-16 -->
 <meta name="theme-color" content="#e9f3fb">
 <link rel="preconnect" href="https://script.google.com">
 <link rel="preconnect" href="https://script.googleusercontent.com">
@@ -716,6 +716,10 @@
   .review .stat { display: flex; gap: 8px; margin-top: 10px; }
   .review .stat span { flex: 1; background: rgba(255, 255, 255, .08); border-radius: 12px; padding: 8px; text-align: center; font-size: 11px; font-weight: 700; color: #c9d4f0; }
   .review .stat b { display: block; color: #fff; font-size: 15px; }
+  .review .rvx { position: absolute; top: calc(12px + env(safe-area-inset-top)); right: 14px; width: 36px; height: 36px; border-radius: 50%; background: rgba(255, 255, 255, .14); border: 1px solid rgba(255, 255, 255, .25); color: #fff; font: inherit; font-size: 16px; font-weight: 800; cursor: pointer; }
+  .review .lock { background: rgba(255, 255, 255, .08); border: 1px dashed rgba(255, 255, 255, .3); border-radius: 12px; padding: 12px; font-size: 13px; color: #c9d4f0; text-align: center; }
+  .review .lock b { color: #fff; }
+  .review .lock span { display: block; margin-top: 6px; color: #fff; }
   .review .ask { margin-top: auto; padding-top: 16px; }
   .review .ask .q { font-size: 13px; font-weight: 800; margin-bottom: 6px; }
   .review textarea { width: 100%; font: inherit; font-size: 14px; background: rgba(255, 255, 255, .12); border: 1px solid rgba(255, 255, 255, .2); border-radius: 12px; padding: 10px 12px; color: #fff; resize: none; height: 68px; }
@@ -1449,7 +1453,8 @@
     var dow = ['일', '월', '화', '수', '목', '금', '토'][d.getDay()];
     var doneN = rg.rings.filter(function (r) { return r.done; }).length;
     var total = rg.rings.reduce(function (a, r) { return a + r.doneMin; }, 0);
-    var h = '<div class="rt">' + (d.getMonth() + 1) + '월 ' + d.getDate() + '일 ' + dow + '요일 · ' + nowHM_() + '</div>' +
+    var canWrite = d.getHours() >= 21; // 한마디 입력은 밤 9시부터 (2026-08-16 주인님) — 그 전엔 보기만
+    var h = '<button class="rvx" id="rvClose" aria-label="닫기">✕</button><div class="rt">' + (d.getMonth() + 1) + '월 ' + d.getDate() + '일 ' + dow + '요일 · ' + nowHM_() + '</div>' +
       '<h2>오늘도 수고했어 ' + REVIEW_ICON + '</h2>' +
       '<div class="sub">소루틴 ' + rg.rings.filter(function (r) { return !r.main && r.done; }).length + ' / ' + rg.rings.filter(function (r) { return !r.main; }).length + (rg.goalHit ? ' · 🎯 연습 목표 달성' : '') + ' · 총 ' + durLabel(total) + (rg.academy ? ' · 🏫 학원 날' : '') + '</div>';
     h += '<div class="rings">' + rg.rings.map(function (r) {
@@ -1462,12 +1467,14 @@
       h += '<div class="card"><div class="k">' + (sj ? subjIcon(sj) + ' ' : '') + esc(s.k) + '</div><div>' + esc(s.memo) + '</div></div>';
     });
     h += '<div class="stat"><span>🔥 연속<b>' + (st.streak || 0) + '일</b></span><span>완벽한 날<b>' + (st.perfectDays || 0) + '</b></span><span>🎯 목표 달성<b>' + (st.goalDays || 0) + '</b></span><span>❤️ 응원<b>' + ch.length + '</b></span></div>';
-    h += '<div class="ask"><div class="q">오늘 하루, 한마디로?</div><textarea id="rvText" placeholder="예: 슬랩 연습이 드디어 감이 왔다 🎸">' + esc(BOOT.note || '') + '</textarea>' +
+    if (canWrite) h += '<div class="ask"><div class="q">오늘 하루, 한마디로?</div><textarea id="rvText" placeholder="예: 슬랩 연습이 드디어 감이 왔다 🎸">' + esc(BOOT.note || '') + '</textarea>' +
       '<button class="go" id="rvSave">' + (BOOT.note ? '고쳐 저장하고 잘 자기 🌙' : '저장하고 잘 자기 🌙') + '</button><button class="skip" id="rvSkip">오늘은 그냥 넘어가기</button></div>';
+    else h += '<div class="ask"><div class="q">오늘 하루, 한마디로?</div><div class="lock">🌙 한마디는 <b>밤 9시부터</b> 쓸 수 있어요' + (BOOT.note ? '<br><span>오늘 한마디: "' + esc(BOOT.note) + '"</span>' : '') + '</div><button class="skip" id="rvSkip">돌아가기</button></div>';
     $('review').innerHTML = h;
     document.body.classList.add('review-on');
     $('rvSkip').addEventListener('click', closeReview);
-    $('rvSave').addEventListener('click', function () {
+    $('rvClose').addEventListener('click', closeReview);
+    if ($('rvSave')) $('rvSave').addEventListener('click', function () {
       var text = $('rvText').value.trim();
       var b = $('rvSave'); b.disabled = true; b.textContent = '저장 중…';
       fetch(API, { method: 'POST', body: JSON.stringify({ action: 'day_note', u: BOOT.member.code, text: text }) })
