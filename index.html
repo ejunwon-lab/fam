@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>가족 일정</title>
-<!-- v23 루틴 캘린더 → 👣 나의 발자국 — 2026-08-16 -->
+<!-- v24 홈 링: 큰 링 아이콘 제거·작은 링 확대·뉴스=네이버 N — 2026-08-16 -->
 <meta name="theme-color" content="#e9f3fb">
 <link rel="preconnect" href="https://script.google.com">
 <link rel="preconnect" href="https://script.googleusercontent.com">
@@ -590,15 +590,15 @@
   .bigr .g { font-size: 10px; color: #e6e6ea; font-weight: 700; margin-top: 3px; }
   .bigr .e { font-size: 11px; font-weight: 800; color: #ffcf9e; letter-spacing: .06em; margin-bottom: 3px; }
   .bigr .tag { position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); background: #eef5fb; color: #3d6f9e; border: 1px solid #cfe0ef; border-radius: 99px; font-size: 9.5px; font-weight: 800; padding: 2px 8px; white-space: nowrap; }
-  .g22 { flex: 1; min-width: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 4px; }
+  .g22 { flex: 1; min-width: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 4px; }
   .sr { display: flex; flex-direction: column; align-items: center; gap: 3px; text-align: center; cursor: pointer; border-radius: 12px; padding: 3px 0; min-width: 0; -webkit-touch-callout: none; user-select: none; }
   .sr:active { background: #f3f8fc; }
-  .sr .r { width: 42px; height: 42px; border-radius: 50%; flex: none; background: conic-gradient(var(--c) calc(var(--p) * 1%), #e3edf5 0); display: grid; place-items: center; }
-  .sr .r i { width: 32px; height: 32px; border-radius: 50%; background: #fff; display: grid; place-items: center; font-style: normal; font-size: 14px; }
-  .sr.done .r { background: var(--c); } .sr.done .r i { background: transparent; color: #fff; font-size: 12px; font-weight: 800; }
-  .sr.run .r { box-shadow: 0 0 0 3px rgba(0,0,0,.06); } .sr.run .r i { font-size: 9.5px; font-weight: 800; color: var(--c); font-variant-numeric: tabular-nums; }
-  .sr .n { width: 100%; min-width: 0; overflow: hidden; font-size: 10.5px; font-weight: 800; line-height: 1.1; }
-  .sr .n small { display: block; font-size: 9.5px; color: #7d8fa0; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sr .r { width: 54px; height: 54px; border-radius: 50%; flex: none; background: conic-gradient(var(--c) calc(var(--p) * 1%), #e3edf5 0); display: grid; place-items: center; }
+  .sr .r i { width: 42px; height: 42px; border-radius: 50%; background: #fff; display: grid; place-items: center; font-style: normal; font-size: 19px; }
+  .sr.done .r { background: var(--c); } .sr.done .r i { background: transparent; color: #fff; font-size: 15px; font-weight: 800; }
+  .sr.run .r { box-shadow: 0 0 0 3px rgba(0,0,0,.06); } .sr.run .r i { font-size: 11px; font-weight: 800; color: var(--c); font-variant-numeric: tabular-nums; }
+  .sr .n { width: 100%; min-width: 0; overflow: hidden; font-size: 11.5px; font-weight: 800; line-height: 1.1; }
+  .sr .n small { display: block; font-size: 10px; color: #7d8fa0; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .rc .foot { margin-top: 10px; padding-top: 8px; border-top: 1px solid #edf3f8; display: flex; justify-content: space-between; align-items: center; font-size: 10.5px; color: #7d8fa0; font-weight: 700; }
   .rc .foot b { color: #f4652f; }
   .rest { border: none; font: inherit; border-radius: 99px; background: #eef2f6; color: #5b6b7a; font-size: 11px; font-weight: 800; padding: 5px 11px; cursor: pointer; }
@@ -625,6 +625,7 @@
   .cheerfx .ctoast { position: absolute; left: 50%; top: calc(64px + env(safe-area-inset-top)); transform: translateX(-50%); background: #fff; border: 1px solid #f7c6d3; color: #c2405a; border-radius: 16px; padding: 10px 16px; font-size: 13.5px; font-weight: 800; box-shadow: 0 8px 24px rgba(194, 64, 90, .18); white-space: nowrap; opacity: 0; animation: cheertoast 3.6s ease forwards .4s; }
   .cheerfx .ctoast small { display: block; font-weight: 600; color: #d98a9a; font-size: 11px; margin-top: 2px; }
   @keyframes cheertoast { 0% { opacity: 0; transform: translateX(-50%) translateY(-8px) scale(.9); } 12% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1.03); } 18% { transform: translateX(-50%) scale(1); } 80% { opacity: 1; } 100% { opacity: 0; transform: translateX(-50%) translateY(-6px); } }
+  .ico-n { display: inline-grid; place-items: center; width: 1.1em; height: 1.1em; border-radius: 24%; background: #03c75a; color: #fff; font-weight: 900; font-size: .9em; font-family: Arial, Helvetica, sans-serif; line-height: 1; vertical-align: -.12em; }
   .cheer { margin-top: 8px; background: #fdecf1; border: 1px solid #f7c6d3; color: #c2405a; border-radius: 12px; padding: 7px 12px; font-size: 12px; font-weight: 800; display: flex; align-items: center; gap: 6px; }
   .cheer small { margin-left: auto; font-weight: 600; color: #d98a9a; }
   .night { margin-top: 8px; width: 100%; text-align: left; border: none; background: linear-gradient(135deg, #2c3e6b, #1c2a4d); color: #fff; border-radius: 14px; padding: 10px 13px; font: inherit; font-size: 12.5px; font-weight: 800; display: flex; align-items: center; gap: 8px; box-shadow: 0 8px 20px rgba(28, 42, 77, .28); cursor: pointer; }
@@ -855,6 +856,9 @@
   /** 이름 칩 — 아빠만 탭하면 이름 다시 고르기, 나머지는 표시만 */
   function whoChip(cls, id, name) { return canRename() ? '<button class="' + cls + '" id="' + id + '" title="이름 바꾸기">' + esc(name) + '</button>' : '<span class="' + cls + '">' + esc(name) + '</span>'; }
   function bindWho(id) { var b = $(id); if (b && b.tagName === 'BUTTON') b.addEventListener('click', function () { if (confirm('이름을 다시 고를까요?')) { store('famcode', null); init(); } }); }
+  /** 과목 아이콘 — 시트 이모지 기본, 오버라이드(뉴스=네이버 N 배지, 2026-08-16) */
+  var ICON_OVERRIDE = { '뉴스': '<span class="ico-n">N</span>' };
+  function subjIcon(s) { if (!s) return '🎵'; return ICON_OVERRIDE[s.name] || esc(s.emoji || '🎵'); }
   function isRoutineKind(k) { var s = subjByName(k); return !!(s && s.mode !== 'timer'); }
   function subjByName(k) { return ((BOOT && BOOT.subjects) || []).find(function (s) { return s.name === k; }) || null; }
   function bassGoalMin() { return (BOOT && BOOT.rings && BOOT.rings.rings.find(function (r) { return r.main; }) || {}).goalMin || (BOOT.member && BOOT.member.goalMin) || 0; }
@@ -1102,7 +1106,7 @@
     evs.forEach(function (ev) {
       var shot = !ev.brk && shots[ev.s];
       var sj = subjByName(ev.k);
-      var em = ev.brk ? '☁️' : (sj ? sj.emoji : '🎸');
+      var em = ev.brk ? '☁️' : (sj ? subjIcon(sj) : '🎸');
       var col = ev.brk ? '' : (sj ? sj.color : '#ff8a3d');
       if (ev.appt) {
         h += '<div class="fd-ev ap"><span class="dot"></span><div class="bx"><div class="r1"><span>📅 ' + esc(ev.k) + '</span><span class="dur">' + ev.s + '–' + ev.e + '</span></div></div></div>';
@@ -1119,14 +1123,14 @@
     if (isToday && sess) {
       var isBrk = sess.state === 'break', rk = isRoutineKind(sess.kind), rsj = rk ? subjByName(sess.kind) : null;
       h += '<div class="fd-ev fd-live' + (isBrk ? ' brk' : '') + (rk ? ' rt' : '') + '" id="fdLive"' + (rk ? ' style="--rc:' + esc(rsj.color) + ';--rc1:' + esc(rsj.color) + 'cc"' : '') + '><span class="dot"></span><div class="bx">' +
-        '<div class="r1"><span>' + (isBrk ? '☁️ 휴식 중' : (rk ? esc(rsj.emoji) + ' ' + esc(sess.kind) + ' 중' : '🎸 ' + esc(sess.kind) + ' 연습 중')) + '</span><small>' + hmOf(sess.segStart) + ' 시작</small></div>' +
+        '<div class="r1"><span>' + (isBrk ? '☁️ 휴식 중' : (rk ? subjIcon(rsj) + ' ' + esc(sess.kind) + ' 중' : '🎸 ' + esc(sess.kind) + ' 연습 중')) + '</span><small>' + hmOf(sess.segStart) + ' 시작</small></div>' +
         '<div class="t" id="fdLiveT">' + fmt(Date.now() - sess.segStart) + '</div>' +
         '<small>' + (rk ? '탭하면 끝내고 저장' : '탭하면 집중 화면 (할 일 체크)') + '</small></div></div>';
     } else if (liveShown) {
       // 뷰어 라이브 카드 — practice_event 기반 실시간 상태 (보기 전용)
       var lv = BOOT.live, lvBrk = lv.state === 'break', lvR = isRoutineKind(lv.kind), lvS = lvR ? subjByName(lv.kind) : null;
       h += '<div class="fd-ev fd-live' + (lvBrk ? ' brk' : '') + (lvR ? ' rt' : '') + '"' + (lvR ? ' style="--rc:' + esc(lvS.color) + ';--rc1:' + esc(lvS.color) + 'cc"' : '') + '><span class="dot"></span><div class="bx" style="cursor:default">' +
-        '<div class="r1"><span>' + (lvBrk ? '☁️ 휴식 중' : (lvR ? esc(lvS.emoji) + ' ' + esc(lv.kind) + ' 중' : '🎸 ' + esc(lv.kind || '연습') + ' 연습 중')) + '</span><small>' + hmOf(lv.at) + ' 시작</small></div>' +
+        '<div class="r1"><span>' + (lvBrk ? '☁️ 휴식 중' : (lvR ? subjIcon(lvS) + ' ' + esc(lv.kind) + ' 중' : '🎸 ' + esc(lv.kind || '연습') + ' 연습 중')) + '</span><small>' + hmOf(lv.at) + ' 시작</small></div>' +
         '<div class="t" id="fdLiveT">' + fmt(Date.now() - lv.at) + '</div>' +
         '<small>👀 실시간 — ' + esc(who.name) + ' 폰 기준</small></div></div>';
     }
@@ -1186,7 +1190,7 @@
     var mainRun = isToday && liveKind === main.name;
     var h = '<div class="rc"><div class="top">';
     h += '<div class="bigr' + (mainPct >= 100 ? ' full' : '') + '" id="ringMain" style="--p:' + mainPct.toFixed(1) + '"><div class="in"><img src="bass.jpg" alt="" class="bassimg"><div class="ov"></div><div class="tx">' +
-      (mainRun ? '<span class="e">' + esc(main.emoji) + ' 연습 중</span>' : '<span class="e">' + esc(main.emoji) + '</span>') +
+      (mainRun ? '<span class="e">연습 중</span>' : '') + // 아이콘 없이 사진만 (2026-08-16)
       '<span class="v" id="ringMainV">' + clockHM(Math.floor(mainSec / 60)) + '</span><span class="g">' + (main.goalMin ? '목표 ' + clockHM(main.goalMin) : '최대한 많이') + '</span></div></div>' +
       (rg.academy ? '<span class="tag">🏫 학원 날</span>' : '') + '</div>';
     h += '<div class="g22">';
@@ -1197,7 +1201,7 @@
       var isDone = r.goalMin > 0 && done >= r.goalMin;
       var sub = running ? gl(done) + ' 진행 중' : (isDone ? gl(done) + ' 완료' : ((done ? gl(done) : '0') + ' / ' + gl(r.goalMin)));
       h += '<div class="sr' + (isDone ? ' done' : '') + (running ? ' run' : '') + '" data-rt="' + esc(r.name) + '" style="--c:' + esc(r.color) + ';--p:' + pct.toFixed(1) + '">' +
-        '<span class="r"><i' + (running ? ' class="ringRunT"' : '') + '>' + (isDone ? '✓' : (running ? fmt(Date.now() - liveStart) : esc(r.emoji))) + '</i></span>' +
+        '<span class="r"><i' + (running ? ' class="ringRunT"' : '') + '>' + (isDone ? '✓' : (running ? fmt(Date.now() - liveStart) : subjIcon(r))) + '</i></span>' +
         '<span class="n">' + esc(r.name) + '<small>' + esc(sub) + '</small></span></div>';
     });
     h += '</div></div>';
@@ -1239,7 +1243,7 @@
     var isBook = name === '독서', lb = BOOT.lastBook;
     var col = s.color;
     $('rsheet').style.setProperty('--rt-c', col);
-    var h = '<div class="grip"></div><h2>' + esc(s.emoji) + ' ' + esc(name) + ' <span class="pill">오늘 ' + clockHM(r.doneMin) + (r.goalMin ? ' / ' + clockHM(r.goalMin) : '') + '</span></h2>';
+    var h = '<div class="grip"></div><h2>' + subjIcon(s) + ' ' + esc(name) + ' <span class="pill">오늘 ' + clockHM(r.doneMin) + (r.goalMin ? ' / ' + clockHM(r.goalMin) : '') + '</span></h2>';
     if (active) {
       h += '<p class="sub">' + esc(name) + (s.mode === 'timer' ? ' 연습' : '') + ' 중 · <b class="t" id="shT">' + fmt(Date.now() - sess.segStart) + '</b> 경과</p>' +
         '<div class="two"><button class="bt" id="asRest" style="background:linear-gradient(135deg,#9fb0c2,#7f94aa)">☁️ 휴식<small>이 활동 저장</small></button><button class="bt" id="asEnd" style="background:#24303b">⏹ 끝내기<small>저장하고 쉬기</small></button></div>';
@@ -1275,7 +1279,7 @@
     var m = /^《(.+?)》\s*(?:｜\s*)?(.*)$/.exec(memo || '');
     var book = m ? m[1] : (isBook && BOOT.lastBook ? BOOT.lastBook.title : ''), line = m ? m[2] : (memo || '');
     $('rsheet').style.setProperty('--rt-c', s ? s.color : '#34a86b');
-    $('rsheet').innerHTML = '<div class="grip"></div><h2>' + (s ? esc(s.emoji) + ' ' : '') + esc(kind) + ' 한 줄</h2><p class="sub">이 기록에 메모를 남겨요 (선택)</p>' +
+    $('rsheet').innerHTML = '<div class="grip"></div><h2>' + (s ? subjIcon(s) + ' ' : '') + esc(kind) + ' 한 줄</h2><p class="sub">이 기록에 메모를 남겨요 (선택)</p>' +
       (isBook ? '<div class="f-label">무슨 책?</div><input type="text" id="meBook" placeholder="책 제목" value="' + esc(book) + '">' : '') +
       '<div class="f-label">' + (isBook ? '기억에 남는 한 줄' : (kind === '뉴스' ? '어떤 뉴스?' : '한 줄')) + '</div><input type="text" id="meLine" placeholder="한 줄로" value="' + esc(line) + '">' +
       '<button class="cta" id="meSave" style="margin-top:14px">저장</button>';
@@ -1328,7 +1332,7 @@
     var chips = RT_CHIPS.map(function (m) { return '<button class="chip' + (m === rtMin ? ' rt-on' : '') + '" data-m="' + m + '">' + durLabel(m) + '</button>'; }).join('') +
       '<button class="chip' + (RT_CHIPS.indexOf(rtMin) < 0 ? ' rt-on' : '') + '" data-m="custom">직접…</button>';
     $('rsheet').style.setProperty('--rt-c', s.color);
-    $('rsheet').innerHTML = '<div class="grip"></div><h2>' + esc(s.emoji) + ' ' + esc(s.name) + ' 기록</h2>' +
+    $('rsheet').innerHTML = '<div class="grip"></div><h2>' + subjIcon(s) + ' ' + esc(s.name) + ' 기록</h2>' +
       '<p class="sub">오늘 ' + (r.doneMin ? clockHM(r.doneMin) + ' 했어' : '아직 안 했어') + (left ? ' · ' + durLabel(left) + ' 더 하면 목표 달성' : (r.goalMin ? ' · 목표 달성 ✓' : '')) + '</p>' +
       '<div class="f-label">얼마나 했어?</div><div class="chips" id="rtChips">' + chips + '</div>' +
       (RT_CHIPS.indexOf(rtMin) < 0 ? '<input type="number" id="rtCustom" inputmode="numeric" placeholder="분" value="' + rtMin + '" style="margin-top:8px;width:120px;font:inherit;font-size:15px;font-weight:700;border:1px solid var(--line);border-radius:12px;padding:9px 12px;background:#f3f8fc">' : '') +
@@ -1381,13 +1385,13 @@
       '<h2>오늘도 수고했어 🌙</h2>' +
       '<div class="sub">소루틴 ' + rg.rings.filter(function (r) { return !r.main && r.done; }).length + ' / ' + rg.rings.filter(function (r) { return !r.main; }).length + (rg.goalHit ? ' · 🎯 연습 목표 달성' : '') + ' · 총 ' + durLabel(total) + (rg.academy ? ' · 🏫 학원 날' : '') + '</div>';
     h += '<div class="rings">' + rg.rings.map(function (r) {
-      return '<div class="rg' + (r.done ? ' done' : '') + '" style="--c:' + esc(r.color) + ';--p:' + r.pct + '"><div class="r"><i>' + (r.done ? '✓' : esc(r.emoji)) + '</i></div><div class="n">' + esc(r.name) + '</div><div class="v">' +
+      return '<div class="rg' + (r.done ? ' done' : '') + '" style="--c:' + esc(r.color) + ';--p:' + r.pct + '"><div class="r"><i>' + (r.done ? '✓' : subjIcon(r)) + '</i></div><div class="n">' + esc(r.name) + '</div><div class="v">' +
         (r.mode === 'timer' ? clockHM(r.doneMin) + (r.goalMin ? ' / ' + clockHM(r.goalMin) : '') : (r.doneMin ? clockHM(r.doneMin) : '안 함')) + '</div></div>';
     }).join('') + '</div>';
     // 오늘 메모(독서·이론·뉴스) — today.segs의 memo
     ((BOOT.today && BOOT.today.segs) || []).filter(function (s) { return s.memo; }).forEach(function (s) {
       var sj = subjByName(s.k);
-      h += '<div class="card"><div class="k">' + (sj ? esc(sj.emoji) + ' ' : '') + esc(s.k) + '</div><div>' + esc(s.memo) + '</div></div>';
+      h += '<div class="card"><div class="k">' + (sj ? subjIcon(sj) + ' ' : '') + esc(s.k) + '</div><div>' + esc(s.memo) + '</div></div>';
     });
     h += '<div class="stat"><span>🔥 연속<b>' + (st.streak || 0) + '일</b></span><span>완벽한 날<b>' + (st.perfectDays || 0) + '</b></span><span>🎯 목표 달성<b>' + (st.goalDays || 0) + '</b></span><span>❤️ 응원<b>' + ch.length + '</b></span></div>';
     h += '<div class="ask"><div class="q">오늘 하루, 한마디로?</div><textarea id="rvText" placeholder="예: 슬랩 연습이 드디어 감이 왔다 🎸">' + esc(BOOT.note || '') + '</textarea>' +
@@ -2123,17 +2127,17 @@
     var blocks = segs.map(function (sg) {
       var p = blkPos_(sg, ax); if (!p) return '';
       var sj = subjByName(sg.k), small = +p.h < 3.2, big = +p.h >= 6;
-      var lb = sg.k === '휴식' ? '☁️' : ((sj ? sj.emoji : '🎵') + (small ? '' : ' ' + sg.k) + (big ? ' <small>' + sg.s + '</small>' : ''));
+      var lb = sg.k === '휴식' ? '☁️' : (subjIcon(sj) + (small ? '' : ' ' + sg.k) + (big ? ' <small>' + sg.s + '</small>' : ''));
       return '<div class="b" style="top:' + p.top + '%;height:' + p.h + '%;background:' + segColor_(sg.k) + (sg.k === '휴식' ? ';color:#5b6b7a' : '') + '">' + lb + '</div>';
     }).join('');
     var rg = dd.rings && dd.rings.rings || [];
     var rings = rg.map(function (r) {
       var pct = r.goalMin ? Math.min(100, r.doneMin / r.goalMin * 100) : 0;
       var sub = r.mode === 'timer' ? clockHM(r.doneMin) + (r.goalMin ? ' / ' + clockHM(r.goalMin) : '') + (r.done ? ' 🎯' : '') : (r.done ? gl(r.doneMin) + ' ✓' : (r.doneMin ? gl(r.doneMin) : '0') + ' / ' + gl(r.goalMin));
-      return '<div class="rg' + (r.done ? ' done' : '') + '" style="--c:' + esc(r.color) + ';--p:' + pct.toFixed(1) + '"><i><b>' + (r.done ? '✓' : esc(r.emoji)) + '</b></i><span>' + esc(r.name) + '<small>' + sub + '</small></span></div>';
+      return '<div class="rg' + (r.done ? ' done' : '') + '" style="--c:' + esc(r.color) + ';--p:' + pct.toFixed(1) + '"><i><b>' + (r.done ? '✓' : subjIcon(r)) + '</b></i><span>' + esc(r.name) + '<small>' + sub + '</small></span></div>';
     }).join('');
     var memos = segs.filter(function (sg) { return sg.memo; }).map(function (sg) {
-      var sj = subjByName(sg.k), em = sj ? sj.emoji : '🎵', mm = /^《(.+?)》\s*(?:｜\s*(.*))?$/.exec(sg.memo);
+      var sj = subjByName(sg.k), em = subjIcon(sj), mm = /^《(.+?)》\s*(?:｜\s*(.*))?$/.exec(sg.memo);
       return '<div class="memo"><b>' + em + ' ' + (mm ? '《' + esc(mm[1]) + '》' : esc(sg.k)) + '</b>' + (mm ? esc(mm[2] || '') : esc(sg.memo)) + '</div>';
     }).join('');
     if (dd.note) memos += '<div class="memo nt"><b>🌙 한마디</b>' + esc(dd.note) + '</div>';
