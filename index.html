@@ -1296,7 +1296,7 @@
       if (m.practice) { var rvTot = rg && rg.rings ? rg.rings.reduce(function (a, r) { return a + r.doneMin; }, 0) : 0;
         h += '<button class="night" id="fdNight">' + REVIEW_ICON + ' ' + REVIEW_NAME + '<small>' + (BOOT.note ? '한마디 남김 ✓' : (nd.getHours() >= 21 ? '자기 전에 1분 →' : (rvTot ? '지금까지 ' + durLabel(rvTot) + ' →' : '오늘 어땠는지 →'))) + '</small></button>'; } // 항상 표시 (2026-08-16 주인님 — 21시 제한 해제) · 부제는 시간대별(v41)
       if (BOOT.note && vt) h += '<div class="cheer" style="background:#eef2fb;border-color:#cdd8f2;color:#2c3e6b">🌙 ' + esc(who.name) + '의 한마디 — "' + esc(BOOT.note) + '"</div>';
-      if (m.practice && !vt) h += pushBannerHtml_();
+      h += pushBannerHtml_(); // 연습자=목표 알림 · 부모=테스트/앞으로 소식 (v52)
       h += lessonLineHtml();
       if (BOOT.recall && BOOT.recall.memo) { var rc = BOOT.recall, rsj = subjByName(rc.k), rpb = rc.k === '독서' ? parseBookF_(rc.memo) : null;
         h += '<button class="recall" id="fdRecall"><span class="rl">🔁 ' + rc.daysAgo + '일 전 오늘</span><span class="rm">' + subjIcon(rsj) + ' ' + (rpb ? (rpb.title ? '《' + esc(rpb.title) + '》 ' : '') + esc(rpb.line) : esc(rc.memo)) + '</span></button>'; }
@@ -2073,9 +2073,10 @@
     if (isIOS_() && !isStandalone_() && !('Notification' in window)) return '<div class="pushb"><span>🔔 목표 알림은 <b>홈 화면에 추가한 앱</b>에서 켤 수 있어요</span><button class="x" id="pbX">✕</button></div>';
     if (!pushSupported_()) return '';
     var perm = Notification.permission;
-    if (perm === 'granted' && read('pushOn') === '1') return '<div class="pushb on"><span>🔔 목표 알림 켜짐 <small>독서·이론·뉴스 목표 채우면 잠금 화면에 알림</small></span><button class="lk" id="pbTest">테스트</button></div>';
+    var pr = !!(BOOT.member && BOOT.member.practice);
+    if (perm === 'granted' && read('pushOn') === '1') return '<div class="pushb on"><span>🔔 알림 켜짐 <small>' + (pr ? '독서·이론·뉴스 목표 채우면 잠금 화면에 알림' : '이 폰으로 알림을 받아요') + '</small></span><button class="lk" id="pbTest">테스트</button></div>';
     if (perm === 'denied') return '<div class="pushb"><span>🔔 알림이 꺼져 있어요 <small>아이폰 설정 › 알림 › 이 앱에서 허용</small></span><button class="x" id="pbX">✕</button></div>';
-    return '<div class="pushb"><span>🔔 목표 알림 켜기 <small>독서 2시간·이론 30분… 채우면 잠금 화면에 알림</small></span><button class="lk on" id="pbOn">켜기</button><button class="x" id="pbX">✕</button></div>';
+    return '<div class="pushb"><span>🔔 ' + (pr ? '목표 알림 켜기' : '알림 켜기') + ' <small>' + (pr ? '독서 2시간·이론 30분… 채우면 잠금 화면에 알림' : '잠금 화면 알림 · 켠 뒤 테스트 가능') + '</small></span><button class="lk on" id="pbOn">켜기</button><button class="x" id="pbX">✕</button></div>';
   }
   function bindPushBanner_() {
     var on = $('pbOn'), x = $('pbX'), t = $('pbTest');
@@ -2112,7 +2113,7 @@
       return fetch(API, { method: 'POST', body: JSON.stringify({ action: 'push_token', u: BOOT.member.code, token: token, ua: navigator.userAgent }) }).then(function (r) { return r.json(); }).then(function (res) { if (res && res.error) throw new Error(res.error); store('pushTok', token); return token; });
     });
   }
-  function pushBoot_() { if (!pushSupported_() || read('pushOn') !== '1' || Notification.permission !== 'granted' || !BOOT || !BOOT.member || !BOOT.member.practice) return; pushRegister_().catch(function () {}); }
+  function pushBoot_() { if (!pushSupported_() || read('pushOn') !== '1' || Notification.permission !== 'granted' || !BOOT || !BOOT.member) return; pushRegister_().catch(function () {}); }
   /** 포그라운드 비프 — 사용자 제스처(활동 시작) 때 AudioContext 열어둠 */
   function ensureAudio_() { try { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if (audioCtx.state === 'suspended') audioCtx.resume(); } catch (e) {} }
   function beep_() {
@@ -2819,7 +2820,7 @@
     if ((isViewer() && view === 'feed') || Date.now() - lastInitAt > 60000) init();
   });
   // ── 새 버전 자동 반영 (v45): 복귀 때 서버 index.html HEAD ETag가 바뀌었으면 본문 마커(<!-- vNN)를 읽어 APP_VER보다 크면 새로고침. 시트·집중 화면 중엔 미룸(다음 복귀 때) ──
-  var APP_VER = 51, appEtag = null;
+  var APP_VER = 52, appEtag = null;
   function checkUpdate_() {
     fetch('index.html', { method: 'HEAD', cache: 'no-store' }).then(function (r) {
       var et = r.headers.get('ETag') || r.headers.get('Last-Modified') || '';
