@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>가족 일정</title>
 <!-- v40 책 편집 v2: 자동완성·책 허브·⋯ 메뉴·병합·삭제·되돌리기·📚 책 세그먼트 — 2026-08-16 -->
+<!-- v48 📅 가족 일정에 루틴 블록(블록마다 한 줄, GAS @43) + '약속만·활동 포함' 토글 — 2026-08-18 -->
 <!-- v47 독서 목표 주 1권(GAS @41/V25): 📚 타일 이번 주 W/1권·올해·이달, 최근 8주 ✓ 스트립+🔥 주 연속, 목표 시트 주 단위, 완독 축하 문구 — 2026-08-18 -->
 <!-- v46 프리페치 dirty 버그(옛 캐시 유지) 수정 · 집중 화면 복귀 시 재렌더 안 함 — 2026-08-18 -->
 <!-- v45 폰 캐시 대책: 복귀 시 모든 화면 60초 재조회 + 새 버전 자동 새로고침(HEAD ETag 변경 → 서버 APP_VER > 내 APP_VER) — 릴리스마다 APP_VER 올릴 것 — 2026-08-18 -->
@@ -156,6 +157,13 @@
   .bkweeks span { width: 22px; height: 22px; border-radius: 6px; background: #eef3f8; color: #b8c6d4; font-size: 12px; font-weight: 800; display: grid; place-items: center; }
   .bkweeks span.ok { background: #34a86b; color: #fff; } .bkweeks span.cur { box-shadow: 0 0 0 2px #ffb98a; }
   .bkweeks small { margin-left: 6px; font-size: 11.5px; color: var(--sub); font-weight: 700; }
+  .fctog { display: flex; justify-content: center; gap: 6px; margin: -4px 0 8px; }
+  .fctog button { font: inherit; font-size: 12px; font-weight: 700; border: 1px solid var(--line); background: #fff; color: var(--sub); border-radius: 999px; padding: 4px 11px; cursor: pointer; }
+  .fctog button.on { background: #ffe3c2; border-color: #ffbe85; color: #b26a1c; }
+  .fcit.rt { background: transparent; border: 1px dashed var(--line); cursor: pointer; }
+  .fcit.rt .fcn { font-weight: 600; } .fcit.rt .fcn small { color: var(--sub); font-weight: 700; margin-left: 4px; }
+  .fcdot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--c); margin-right: 6px; vertical-align: 1px; }
+  .fcm { display: block; font-size: 12px; color: var(--sub); font-weight: 500; margin-top: 2px; overflow-wrap: anywhere; }
   .fcseq { flex: none; font-size: 11.5px; font-weight: 800; color: #b26a1c; background: #fdebd2; border-radius: 8px; padding: 2px 7px; margin-left: 6px; }
 
   /* 타이머 */
@@ -910,7 +918,7 @@
   function bootKey(code) { return 'bootcache:' + code; }
   function saveBoot(data) {
     if (data && data.member) store(bootKey(data.member.code), JSON.stringify(data));
-    calDirty = true; // 서버 상태가 바뀌었을 수 있음 → 다음 발자국 진입 때 새로 받기
+    calDirty = true; famcalCache = {}; // 서버 상태가 바뀌었을 수 있음 → 다음 발자국·가족 일정 진입 때 새로 받기
   }
   /** 발자국 이달 데이터 미리 받기 (v41) — GAS 콜드 3~4초를 홈에서 흡수. 진입 시 dirty가 아니면 그대로 씀 */
   function prefetchCal_() {
@@ -1166,7 +1174,7 @@
   }
 
   // ── 📅 가족 일정 보기 (v43, GAS @38 api=events) — 가족 캘린더 한 달치를 날짜별 목록으로. 설계 docs/plans/2026-08-18-가족-일정-보기.md ──
-  var famcalYm = '', famcalCache = {};
+  var famcalYm = '', famcalCache = {}, famcalRt = read('famcalRt') !== '0'; // 활동(루틴 블록) 포함 여부 — 기본 포함 (v48)
   /** 횟수권 회차 칩 (GAS @39 seq/total) */
   function seqChip_(it) { return (it && it.seq && it.total) ? '<span class="fcseq">' + it.seq + '/' + it.total + '회</span>' : ''; }
   function openFamCal(ym) {
@@ -1189,14 +1197,19 @@
     var p = ym.split('-'), label = p[0] + '년 ' + (+p[1]) + '월', today = todayStr();
     var h = '<div class="appbar"><div style="display:flex;align-items:center;gap:10px"><button class="iconbtn" id="fcBack" aria-label="일정 등록으로">‹</button><span class="t">📅 가족 일정</span></div><div class="right">' + whoChip('who', 'fcWho', BOOT.member.name) + '</div></div>';
     h += '<div class="clcard">' + calNav_(label, true).replace('id="clPrev"', 'id="fcPrev"').replace('id="clNext"', 'id="fcNext"');
+    h += '<div class="fctog"><button class="' + (!famcalRt ? 'on' : '') + '" data-rt="0">약속만</button><button class="' + (famcalRt ? 'on' : '') + '" data-rt="1">활동 포함</button></div>';
     if (cur.loading) h += calLoading_();
     else if (cur.error) h += '<div class="guide"><p>' + esc(cur.error) + '</p><button class="retry" id="fcRetry">다시 시도</button></div>';
-    else if (!cur.days || !cur.days.length) h += '<div class="empty" style="text-align:center;padding:26px 0">이 달엔 가족 일정이 없어요</div>';
     else {
-      h += '<div class="fclist">' + cur.days.map(function (d) {
+      var dayList = (cur.days || []).map(function (d) { return { date: d.date, items: famcalRt ? d.items : d.items.filter(function (it) { return !it.routine; }) }; }).filter(function (d) { return d.items.length; });
+      if (!dayList.length) h += '<div class="empty" style="text-align:center;padding:26px 0">' + (famcalRt ? '이 달엔 가족 일정·활동이 없어요' : '이 달엔 약속이 없어요') + '</div>';
+      else h += '<div class="fclist">' + dayList.map(function (d) {
         var dt = parseD_(d.date), past = d.date < today, isT = d.date === today;
         return '<div class="fcday' + (past ? ' past' : '') + (isT ? ' today' : '') + '"><div class="fcd"><b>' + dt.getDate() + '</b><small>' + DOW_KO[dt.getDay()] + (isT ? ' · 오늘' : '') + '</small></div><div class="fcitems">' +
-          d.items.map(function (it) { return '<div class="fcit"><span class="fct">' + (it.allDay ? '종일' : esc(it.s) + '–' + esc(it.e)) + '</span><span class="fcn">' + esc(it.title) + '</span>' + seqChip_(it) + (it.who ? '<span class="fcw">' + esc(it.who) + '</span>' : '') + '</div>'; }).join('') + '</div></div>';
+          d.items.map(function (it) {
+            if (it.routine) { var sj = subjByName(it.k); return '<div class="fcit rt" data-fcday="' + esc(d.date) + '" style="--c:' + esc(it.color || (sj && sj.color) || '#9aa4b2') + '"><span class="fct">' + esc(it.s) + '–' + esc(it.e) + '</span><span class="fcn"><i class="fcdot"></i>' + (sj ? subjIcon(sj) : esc(it.emoji || '')) + ' ' + esc(it.title) + ' <small>' + durLabel(it.min || 0) + '</small>' + (it.memo ? '<span class="fcm">' + esc(it.memo) + '</span>' : '') + '</span></div>'; }
+            return '<div class="fcit"><span class="fct">' + (it.allDay ? '종일' : esc(it.s) + '–' + esc(it.e)) + '</span><span class="fcn">' + esc(it.title) + '</span>' + seqChip_(it) + (it.who ? '<span class="fcw">' + esc(it.who) + '</span>' : '') + '</div>';
+          }).join('') + '</div></div>';
       }).join('') + '</div>';
     }
     h += '</div><button class="lnk asmemos" id="fcOpenApp">구글 캘린더 앱에서 열기 ↗</button>';
@@ -1206,6 +1219,8 @@
     $('fcPrev').addEventListener('click', function () { famcalShift_(-1); });
     $('fcNext').addEventListener('click', function () { famcalShift_(1); });
     var rt = $('fcRetry'); if (rt) rt.addEventListener('click', function () { delete famcalCache[ym]; renderFamCal(); });
+    $('app').querySelectorAll('.fctog button').forEach(function (b) { b.addEventListener('click', function () { famcalRt = b.getAttribute('data-rt') === '1'; store('famcalRt', famcalRt ? '1' : '0'); renderFamCal(); }); });
+    $('app').querySelectorAll('.fcit.rt[data-fcday]').forEach(function (b) { b.addEventListener('click', function () { if (BOOT.member.practice || isViewer()) { calCache = {}; if (!statsTarget) statsTarget = isViewer() ? BOOT.viewTarget.code : ''; openCal('day', b.getAttribute('data-fcday'), false); } }); });
     $('fcOpenApp').addEventListener('click', openCalendar);
     // 이번 달이면 오늘(또는 다음 일정)로 스크롤
     if (!cur.loading && ym === today.slice(0, 7)) { var el = $('app').querySelector('.fcday.today') || $('app').querySelector('.fcday:not(.past)'); if (el && el.getBoundingClientRect().top > window.innerHeight * 0.7) el.scrollIntoView({ block: 'center' }); }
@@ -2713,7 +2728,7 @@
     if ((isViewer() && view === 'feed') || Date.now() - lastInitAt > 60000) init();
   });
   // ── 새 버전 자동 반영 (v45): 복귀 때 서버 index.html HEAD ETag가 바뀌었으면 본문 마커(<!-- vNN)를 읽어 APP_VER보다 크면 새로고침. 시트·집중 화면 중엔 미룸(다음 복귀 때) ──
-  var APP_VER = 47, appEtag = null;
+  var APP_VER = 48, appEtag = null;
   function checkUpdate_() {
     fetch('index.html', { method: 'HEAD', cache: 'no-store' }).then(function (r) {
       var et = r.headers.get('ETag') || r.headers.get('Last-Modified') || '';
