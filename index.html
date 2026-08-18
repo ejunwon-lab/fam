@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>가족 일정</title>
 <!-- v40 책 편집 v2: 자동완성·책 허브·⋯ 메뉴·병합·삭제·되돌리기·📚 책 세그먼트 — 2026-08-16 -->
+<!-- v44 횟수권 회차 칩(N/24회) — 가족 일정 목록·다가오는/최근 등록·등록 토스트 (GAS @39 seq/total) — 2026-08-18 -->
 <!-- v43 📅 가족 일정 보기(앱 안, GAS @38 api=events) — 일정 탭 📅 → 월별 날짜 목록·구글 캘린더 앱 링크는 하단 — 2026-08-18 -->
 <!-- v42 GAS @37 연동: 일정 탭 '다가오는 일정' + 이번 주 레슨 서버 계산(BOOT.lessons) — 2026-08-18 -->
 <!-- v41 UI/UX 검토 반영: 할 일 체크→레거시 화면 버그(구 열품타 목록 뷰 제거)·휴식 칩 idle 비활성·집중화면 ☁️/durLabel·부모 'CY의 하루'·'CY의 발자국'·지난 날 기록 추가·이달 프리페치·응원 후 도크 축소·돌아보기 줄바꿈/부제 — 2026-08-18 -->
@@ -148,6 +149,7 @@
   .fct { flex: none; font-size: 12px; color: var(--sub); font-weight: 700; font-variant-numeric: tabular-nums; min-width: 78px; }
   .fcn { flex: 1; min-width: 0; font-weight: 700; overflow-wrap: anywhere; }
   .fcw { flex: none; font-size: 11.5px; font-weight: 800; color: #3d6f9e; background: #e4eefb; border-radius: 8px; padding: 2px 7px; }
+  .fcseq { flex: none; font-size: 11.5px; font-weight: 800; color: #b26a1c; background: #fdebd2; border-radius: 8px; padding: 2px 7px; margin-left: 6px; }
 
   /* 타이머 */
   .timer-wrap { text-align: center; padding-top: 8px; }
@@ -1116,9 +1118,10 @@
       h += '</div></div>';
     }
     var up = BOOT.upcoming || []; // 다가오는 일정 (GAS @37) — 있을 때만
-    if (up.length) { h += '<div class="sec-label">다가오는 일정</div><div class="recent">'; up.forEach(function (r) { h += '<div class="row"><span class="r-t">' + esc(r.t) + '</span><span class="r-d">' + esc(r.d) + '</span></div>'; }); h += '</div>'; }
+    var rowH = function (r) { return '<div class="row"><span class="r-t">' + esc(r.t) + seqChip_(r) + '</span><span class="r-d">' + esc(r.d) + '</span></div>'; };
+    if (up.length) { h += '<div class="sec-label">다가오는 일정</div><div class="recent">'; up.forEach(function (r) { h += rowH(r); }); h += '</div>'; }
     h += '<div class="sec-label">최근 등록</div><div class="recent">';
-    if (BOOT.recent.length) BOOT.recent.forEach(function (r) { h += '<div class="row"><span class="r-t">' + esc(r.t) + '</span><span class="r-d">' + esc(r.d) + '</span></div>'; });
+    if (BOOT.recent.length) BOOT.recent.forEach(function (r) { h += rowH(r); });
     else h += '<div class="empty">아직 기록이 없어요. 첫 일정을 올려보세요!</div>';
     h += '</div>';
     var standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
@@ -1156,6 +1159,8 @@
 
   // ── 📅 가족 일정 보기 (v43, GAS @38 api=events) — 가족 캘린더 한 달치를 날짜별 목록으로. 설계 docs/plans/2026-08-18-가족-일정-보기.md ──
   var famcalYm = '', famcalCache = {};
+  /** 횟수권 회차 칩 (GAS @39 seq/total) */
+  function seqChip_(it) { return (it && it.seq && it.total) ? '<span class="fcseq">' + it.seq + '/' + it.total + '회</span>' : ''; }
   function openFamCal(ym) {
     view = 'famcal'; overlayOpen = false;
     var t = todayStr(); famcalYm = ym || famcalYm || t.slice(0, 7);
@@ -1183,7 +1188,7 @@
       h += '<div class="fclist">' + cur.days.map(function (d) {
         var dt = parseD_(d.date), past = d.date < today, isT = d.date === today;
         return '<div class="fcday' + (past ? ' past' : '') + (isT ? ' today' : '') + '"><div class="fcd"><b>' + dt.getDate() + '</b><small>' + DOW_KO[dt.getDay()] + (isT ? ' · 오늘' : '') + '</small></div><div class="fcitems">' +
-          d.items.map(function (it) { return '<div class="fcit"><span class="fct">' + (it.allDay ? '종일' : esc(it.s) + '–' + esc(it.e)) + '</span><span class="fcn">' + esc(it.title) + '</span>' + (it.who ? '<span class="fcw">' + esc(it.who) + '</span>' : '') + '</div>'; }).join('') + '</div></div>';
+          d.items.map(function (it) { return '<div class="fcit"><span class="fct">' + (it.allDay ? '종일' : esc(it.s) + '–' + esc(it.e)) + '</span><span class="fcn">' + esc(it.title) + '</span>' + seqChip_(it) + (it.who ? '<span class="fcw">' + esc(it.who) + '</span>' : '') + '</div>'; }).join('') + '</div></div>';
       }).join('') + '</div>';
     }
     h += '</div><button class="lnk asmemos" id="fcOpenApp">구글 캘린더 앱에서 열기 ↗</button>';
@@ -2677,7 +2682,7 @@
         sending = false; btn.disabled = false; btn.textContent = '캘린더에 등록';
         if (res && res.error) { showToast(res.error, true); return; }
         BOOT = res; saveBoot(res); famcalCache = {}; render(); closeSheet();
-        showToast('등록 완료 — ' + title + ' (' + subjectName + ') ' + startLabel + ', 가족 캘린더에 올라갔어요');
+        var rg = res.registered; showToast('등록 완료 — ' + title + ' (' + subjectName + ') ' + startLabel + ((rg && rg.seq && rg.total) ? ' · ' + rg.seq + '/' + rg.total + '회' : '') + ', 가족 캘린더에 올라갔어요');
       })
       .catch(function () { sending = false; btn.disabled = false; btn.textContent = '캘린더에 등록'; showToast('등록에 실패했어요. 인터넷 연결을 확인하고 다시 시도해주세요.', true); });
   });
