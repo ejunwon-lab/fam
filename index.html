@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>가족 일정</title>
 <!-- v40 책 편집 v2: 자동완성·책 허브·⋯ 메뉴·병합·삭제·되돌리기·📚 책 세그먼트 — 2026-08-16 -->
+<!-- v47 독서 목표 주 1권(GAS @41/V25): 📚 타일 이번 주 W/1권·올해·이달, 최근 8주 ✓ 스트립+🔥 주 연속, 목표 시트 주 단위, 완독 축하 문구 — 2026-08-18 -->
 <!-- v46 프리페치 dirty 버그(옛 캐시 유지) 수정 · 집중 화면 복귀 시 재렌더 안 함 — 2026-08-18 -->
 <!-- v45 폰 캐시 대책: 복귀 시 모든 화면 60초 재조회 + 새 버전 자동 새로고침(HEAD ETag 변경 → 서버 APP_VER > 내 APP_VER) — 릴리스마다 APP_VER 올릴 것 — 2026-08-18 -->
 <!-- v44 횟수권 회차 칩(N/24회) — 가족 일정 목록·다가오는/최근 등록·등록 토스트 (GAS @39 seq/total) — 2026-08-18 -->
@@ -151,6 +152,10 @@
   .fct { flex: none; font-size: 12px; color: var(--sub); font-weight: 700; font-variant-numeric: tabular-nums; min-width: 78px; }
   .fcn { flex: 1; min-width: 0; font-weight: 700; overflow-wrap: anywhere; }
   .fcw { flex: none; font-size: 11.5px; font-weight: 800; color: #3d6f9e; background: #e4eefb; border-radius: 8px; padding: 2px 7px; }
+  .bkweeks { display: flex; align-items: center; gap: 5px; margin: 0 0 10px; }
+  .bkweeks span { width: 22px; height: 22px; border-radius: 6px; background: #eef3f8; color: #b8c6d4; font-size: 12px; font-weight: 800; display: grid; place-items: center; }
+  .bkweeks span.ok { background: #34a86b; color: #fff; } .bkweeks span.cur { box-shadow: 0 0 0 2px #ffb98a; }
+  .bkweeks small { margin-left: 6px; font-size: 11.5px; color: var(--sub); font-weight: 700; }
   .fcseq { flex: none; font-size: 11.5px; font-weight: 800; color: #b26a1c; background: #fdebd2; border-radius: 8px; padding: 2px 7px; margin-left: 6px; }
 
   /* 타이머 */
@@ -1335,7 +1340,7 @@
   /** 📕 완독 축하 — 하트 애니메이션 골격 재사용 */
   function playBookFx(bd) {
     var em = ['📕', '📗', '📘', '📙', '📖', '✨', '📚'];
-    playFx_(em, ['📕', '📗', '📘', '📙'], '📕 《' + esc(bd.title) + '》 완독!<small>올해 ' + bd.yearCount + '번째 책' + (bd.goal ? ' · 목표 ' + bd.goal + '권' : '') + '</small>', 'book');
+    playFx_(em, ['📕', '📗', '📘', '📙'], '📕 《' + esc(bd.title) + '》 완독!<small>' + (bd.weekGoal ? '이번 주 ' + bd.weekDone + '/' + bd.weekGoal + '권' + (bd.weekDone >= bd.weekGoal ? ' ✓' : '') + ' · ' : '') + '올해 ' + bd.yearCount + '번째 책' + (bd.weekStreak > 1 ? ' · 🔥 ' + bd.weekStreak + '주 연속' : '') + '</small>', 'book');
   }
   function playCheerFx(list) {
     var names = [], ats = [];
@@ -2204,6 +2209,17 @@
 
   // ── 📚 책 관리 — 독서 칩 = 책 목록(api=books), 책 상세(api=book), ★·감상·상태·제목 편집(book_meta), 목표(book_goal). 시안 docs/mockups/2026-08-16-책-관리-시안.html ──
   var bookKey = '', bookQ = '', shelfAll = false;
+  /** 📚 주간 목표 타일(v47): 이번 주 W/G권(✏️ 본인) · 올해 N권 · 이달 독서. x = bookStats(weekGoal·weekDone·yearDone·monthMin) */
+  function bookTilesHtml_(x, own) {
+    var wg = x.weekGoal || 0;
+    return '<div class="cltiles" style="margin-bottom:10px"><span' + (own ? ' class="tap" id="goalEdit"' : '') + '><b>' + (wg ? x.weekDone + ' <small>/ ' + wg + '권' + (own ? ' ✏️' : '') + '</small>' : (x.weekDone || 0) + '권') + '</b>이번 주 완독</span><span><b>' + x.yearDone + '권</b>올해 완독</span><span><b>' + durLabel(x.monthMin || 0) + '</b>이달 독서</span></div>';
+  }
+  /** 최근 8주 스트립 — 주 목표 달성 ✓ (이번 주 강조) + 🔥 연속 */
+  function bookWeeksHtml_(x) {
+    var wg = x.weekGoal || 0, rw = x.recentWeeks || []; if (!wg || !rw.length) return '';
+    return '<div class="bkweeks">' + rw.map(function (w, i) { var last = i === rw.length - 1, ok = w.done >= wg; return '<span class="' + (ok ? 'ok' : '') + (last ? ' cur' : '') + '" title="' + esc(w.mon) + '~">' + (ok ? '✓' : (last ? '·' : '')) + '</span>'; }).join('') +
+      '<small>' + (x.weekStreak > 0 ? '🔥 ' + x.weekStreak + '주 연속' : '최근 8주 · 주 ' + wg + '권 목표') + '</small></div>';
+  }
   function calBooks_() { var k = calKey_('b', 'list'); calFetch_(k, '?api=books'); return calCache[k]; }
   function calBook_() { var k = calKey_('bk', bookKey); calFetch_(k, '?api=book&' + (bookKey.indexOf('t:') === 0 ? 'title=' + encodeURIComponent(bookKey.slice(2)) : 'key=' + encodeURIComponent(bookKey))); return calCache[k]; }
   function bookInvalidate_() { Object.keys(calCache).forEach(function (k) { if (/^(b|bk|x|m|d):/.test(k)) delete calCache[k]; }); }
@@ -2213,11 +2229,11 @@
   function booksHtml_(x) {
     var own = !!(BOOT.member.practice && x.target && x.target.code === BOOT.member.code);
     var goal = x.goal || 0, yy = todayStr().slice(0, 4);
-    var h = '<div class="cltiles" style="margin-bottom:10px"><span' + (own ? ' class="tap" id="goalEdit"' : '') + '><b>' + x.yearDone + (goal ? ' <small>/ ' + goal + '권' + (own ? ' ✏️' : '') + '</small>' : '권') + '</b>올해 완독</span><span><b>' + x.monthDone + '권</b>이달 완독</span><span><b>' + durLabel(x.monthMin || 0) + '</b>이달 독서</span></div>';
+    var h = bookTilesHtml_(x, own);
     var doneAll = x.books.filter(function (b) { return b.done; }), doneYear = doneAll.filter(function (b) { return String(b.doneDate).indexOf(yy) === 0; });
     var shelfBooks = shelfAll ? doneAll : doneYear;
     h += '<div class="clcard"><div class="clt">📚 책장 <small class="tog"><b' + (!shelfAll ? ' class="on"' : '') + ' data-shelf="0">올해</b> · <b' + (shelfAll ? ' class="on"' : '') + ' data-shelf="1">전체</b></small></div>';
-    if (goal) h += '<div class="clbar" style="margin:0 0 8px;background:#eef3f8"><span style="flex:' + Math.min(x.yearDone, goal) + ';background:#34a86b"></span><span style="flex:' + Math.max(0, goal - x.yearDone) + ';background:transparent"></span></div>';
+    h += bookWeeksHtml_(x);
     var cs = ['#34a86b', '#8b6cf2', '#1f9080', '#d9932e', '#ff7a3d', '#3d6f9e', '#c2405a'];
     h += '<div class="shelf">' + (shelfBooks.length ? shelfBooks.slice().reverse().map(function (b, i) { return '<span class="spine" style="background:' + cs[i % cs.length] + '" data-bkey="' + esc(b.key) + '">' + esc(b.title) + (b.seq > 1 ? ' ' + b.seq : '') + '</span>'; }).join('') : '<span class="hint">' + (shelfAll ? '아직 완독한 책이 없어요' : '올해 완독한 책이 아직 없어요') + '</span>') + '</div><div class="shelfbar"></div></div>';
     h += '<input type="search" class="bsearch" id="bookQ" placeholder="🔍 제목·저자 검색" value="' + esc(bookQ) + '">';
@@ -2363,12 +2379,12 @@
   function openGoalSheet() {
     var cur = (BOOT.member && BOOT.member.bookGoal) || 0;
     $('rsheet').style.setProperty('--rt-c', '#34a86b');
-    $('rsheet').innerHTML = '<div class="grip"></div><h2>🎯 올해 몇 권?</h2><p class="sub">스스로 정한 목표가 오래 가요</p><input type="number" id="goalIn" inputmode="numeric" min="0" max="365" value="' + cur + '" style="font-size:22px;font-weight:800;text-align:center"><button class="cta" id="goalSave" style="margin-top:14px">저장</button>';
+    $('rsheet').innerHTML = '<div class="grip"></div><h2>🎯 일주일에 몇 권?</h2><p class="sub">월요일부터 일요일까지 · 스스로 정한 목표가 오래 가요</p><input type="number" id="goalIn" inputmode="numeric" min="0" max="7" value="' + cur + '" style="font-size:22px;font-weight:800;text-align:center"><button class="cta" id="goalSave" style="margin-top:14px">저장</button>';
     document.body.classList.add('rt-open');
     $('goalSave').addEventListener('click', function () {
-      var g = Math.max(0, Math.min(365, +$('goalIn').value || 0)); var btn = $('goalSave'); btn.disabled = true;
+      var g = Math.max(0, Math.min(7, +$('goalIn').value || 0)); var btn = $('goalSave'); btn.disabled = true;
       fetch(API, { method: 'POST', body: JSON.stringify({ action: 'book_goal', u: BOOT.member.code, goal: g }) }).then(function (r) { return r.json(); })
-        .then(function (res) { if (res && res.error) { showToast(res.error, true); btn.disabled = false; return; } BOOT = res; saveBoot(res); bookInvalidate_(); closeRoutineSheet(); renderCal(); showToast('올해 목표 ' + g + '권'); })
+        .then(function (res) { if (res && res.error) { showToast(res.error, true); btn.disabled = false; return; } BOOT = res; saveBoot(res); bookInvalidate_(); closeRoutineSheet(); renderCal(); showToast('주 목표 ' + g + '권'); })
         .catch(function () { showToast('저장 실패 — 인터넷 확인', true); btn.disabled = false; });
     });
   }
@@ -2414,10 +2430,10 @@
     var h = '';
     if (memoKind === '독서' && x.book) {
       var bk = x.book, goal = bk.goal || 0;
-      h += '<div class="cltiles" style="margin-bottom:10px"><span><b>' + bk.yearDone + (goal ? ' <small>/ ' + goal + '</small>' : '') + '권</b>올해 완독</span><span><b>' + bk.monthDone + '권</b>이달 완독</span><span><b>' + durLabel(bk.monthMin || 0) + '</b>이달 독서</span></div>';
+      h += bookTilesHtml_(bk, false);
       var doneBooks = bk.books.filter(function (b) { return b.done; });
-      h += '<div class="clcard"><div class="clt">📚 책장 <small>' + (goal ? '올해 목표 ' + goal + '권' : '') + '</small></div>';
-      if (goal) h += '<div class="clbar" style="margin:0 0 8px;background:#eef3f8"><span style="flex:' + Math.min(bk.yearDone, goal) + ';background:#34a86b"></span><span style="flex:' + Math.max(0, goal - bk.yearDone) + ';background:transparent"></span></div>';
+      h += '<div class="clcard"><div class="clt">📚 책장 <small>' + (bk.weekGoal ? '주 ' + bk.weekGoal + '권 목표' : '') + '</small></div>';
+      h += bookWeeksHtml_(bk);
       h += '<div class="shelf">' + (doneBooks.length ? doneBooks.map(function (b, i) { var cs = ['#34a86b', '#8b6cf2', '#1f9080', '#d9932e', '#ff7a3d', '#3d6f9e', '#c2405a']; return '<span class="spine" style="background:' + cs[i % cs.length] + '" data-book="' + esc(b.title) + '">' + esc(b.title) + '</span>'; }).join('') : '<span class="hint">첫 완독을 기다리는 중 — 다 읽으면 "끝나고 기록"에서 📕 토글!</span>') + '</div><div class="shelfbar"></div></div>';
       var byTitle = {}; (x.items || []).forEach(function (it) { var pb = parseBookF_(it.memo); var t = pb.title || '(책 제목 없음)'; (byTitle[t] = byTitle[t] || []).push(it); });
       bk.books.forEach(function (b) {
@@ -2697,7 +2713,7 @@
     if ((isViewer() && view === 'feed') || Date.now() - lastInitAt > 60000) init();
   });
   // ── 새 버전 자동 반영 (v45): 복귀 때 서버 index.html HEAD ETag가 바뀌었으면 본문 마커(<!-- vNN)를 읽어 APP_VER보다 크면 새로고침. 시트·집중 화면 중엔 미룸(다음 복귀 때) ──
-  var APP_VER = 46, appEtag = null;
+  var APP_VER = 47, appEtag = null;
   function checkUpdate_() {
     fetch('index.html', { method: 'HEAD', cache: 'no-store' }).then(function (r) {
       var et = r.headers.get('ETag') || r.headers.get('Last-Modified') || '';
