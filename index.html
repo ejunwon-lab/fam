@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>가족 일정</title>
 <!-- v40 책 편집 v2: 자동완성·책 허브·⋯ 메뉴·병합·삭제·되돌리기·📚 책 세그먼트 — 2026-08-16 -->
+<!-- v46 프리페치 dirty 버그(옛 캐시 유지) 수정 · 집중 화면 복귀 시 재렌더 안 함 — 2026-08-18 -->
 <!-- v45 폰 캐시 대책: 복귀 시 모든 화면 60초 재조회 + 새 버전 자동 새로고침(HEAD ETag 변경 → 서버 APP_VER > 내 APP_VER) — 릴리스마다 APP_VER 올릴 것 — 2026-08-18 -->
 <!-- v44 횟수권 회차 칩(N/24회) — 가족 일정 목록·다가오는/최근 등록·등록 토스트 (GAS @39 seq/total) — 2026-08-18 -->
 <!-- v43 📅 가족 일정 보기(앱 안, GAS @38 api=events) — 일정 탭 📅 → 월별 날짜 목록·구글 캘린더 앱 링크는 하단 — 2026-08-18 -->
@@ -911,6 +912,7 @@
     if (!BOOT || !BOOT.member) return;
     if (!statsTarget) statsTarget = isViewer() ? BOOT.viewTarget.code : '';
     if (!calDate) calDate = todayStr();
+    if (calDirty) calCache = {}; // 서버 상태가 바뀐 뒤(init 재조회 포함)면 옛 캐시를 버리고 새로 받는다 (v46 — dirty만 끄고 옛 캐시를 쓰던 버그)
     calDirty = false; calCacheAt = Date.now();
     try { calMonth_(); } catch (e) {}
   }
@@ -937,10 +939,10 @@
         flushEvents(); // 밀린 전환 이벤트(오프라인 인증샷 등) 재전송
         if (!cached) view = defaultView(data);
         // 사용자가 시트·요약을 보는 중이면 화면은 두고 데이터만 갱신
-        if (!document.body.classList.contains('open') && !document.body.classList.contains('summary-on') && view !== 'stats') {
+        if (!document.body.classList.contains('open') && !document.body.classList.contains('summary-on') && !document.body.classList.contains('measuring') && view !== 'stats') {
           render();
         } else {
-          renderTabs();
+          renderTabs(); // 시트·집중 화면·발자국은 데이터만 갱신(깜빡임 없음)
         }
         if (view !== 'stats') setTimeout(prefetchCal_, 800);
       })
@@ -2695,7 +2697,7 @@
     if ((isViewer() && view === 'feed') || Date.now() - lastInitAt > 60000) init();
   });
   // ── 새 버전 자동 반영 (v45): 복귀 때 서버 index.html HEAD ETag가 바뀌었으면 본문 마커(<!-- vNN)를 읽어 APP_VER보다 크면 새로고침. 시트·집중 화면 중엔 미룸(다음 복귀 때) ──
-  var APP_VER = 45, appEtag = null;
+  var APP_VER = 46, appEtag = null;
   function checkUpdate_() {
     fetch('index.html', { method: 'HEAD', cache: 'no-store' }).then(function (r) {
       var et = r.headers.get('ETag') || r.headers.get('Last-Modified') || '';
