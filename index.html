@@ -2819,7 +2819,7 @@
     if ((isViewer() && view === 'feed') || Date.now() - lastInitAt > 60000) init();
   });
   // ── 새 버전 자동 반영 (v45): 복귀 때 서버 index.html HEAD ETag가 바뀌었으면 본문 마커(<!-- vNN)를 읽어 APP_VER보다 크면 새로고침. 시트·집중 화면 중엔 미룸(다음 복귀 때) ──
-  var APP_VER = 50, appEtag = null;
+  var APP_VER = 51, appEtag = null;
   function checkUpdate_() {
     fetch('index.html', { method: 'HEAD', cache: 'no-store' }).then(function (r) {
       var et = r.headers.get('ETag') || r.headers.get('Last-Modified') || '';
