@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>가족 일정</title>
 <!-- v40 책 편집 v2: 자동완성·책 허브·⋯ 메뉴·병합·삭제·되돌리기·📚 책 세그먼트 — 2026-08-16 -->
+<!-- v50 🔔 목표 알림: 웹푸시(FCM, push-config.js 값 있을 때만 배너·토큰 등록·테스트) + 포그라운드 목표 도달 비프/토스트 — 2026-08-18 -->
 <!-- v49 📅 일정 탭 A안: 앱바 '📅 일정' + 세그먼트 [➕ 등록 · 📅 가족 일정](마지막 선택 기억), 우상단 📅 아이콘·‹ 제거, '일정 등록' 라벨, 다가오는 일정 '전체 보기 ›' — 2026-08-18 -->
 <!-- v48 📅 가족 일정에 루틴 블록(블록마다 한 줄, GAS @43) + '약속만·활동 포함' 토글 — 2026-08-18 -->
 <!-- v47 독서 목표 주 1권(GAS @41/V25): 📚 타일 이번 주 W/1권·올해·이달, 최근 8주 ✓ 스트립+🔥 주 연속, 목표 시트 주 단위, 완독 축하 문구 — 2026-08-18 -->
@@ -158,6 +159,11 @@
   .bkweeks span { width: 22px; height: 22px; border-radius: 6px; background: #eef3f8; color: #b8c6d4; font-size: 12px; font-weight: 800; display: grid; place-items: center; }
   .bkweeks span.ok { background: #34a86b; color: #fff; } .bkweeks span.cur { box-shadow: 0 0 0 2px #ffb98a; }
   .bkweeks small { margin-left: 6px; font-size: 11.5px; color: var(--sub); font-weight: 700; }
+  .pushb { display: flex; align-items: center; gap: 8px; background: #fff7ec; border: 1px solid #ffd9b0; border-radius: 14px; padding: 9px 12px; margin: 10px 0 0; font-size: 13px; font-weight: 700; color: #7a4a12; }
+  .pushb span { flex: 1; min-width: 0; } .pushb small { display: block; font-size: 11.5px; font-weight: 600; color: #a0703a; margin-top: 2px; }
+  .pushb.on { background: #eef8f1; border-color: #bfe3cb; color: #22633b; } .pushb.on small { color: #4d8a63; }
+  .pushb .lk { font: inherit; font-size: 12.5px; font-weight: 800; border: 1px solid #ffbe85; background: #fff; color: #b26a1c; border-radius: 999px; padding: 5px 11px; cursor: pointer; } .pushb .lk.on { background: #ff8a3d; border-color: #ff8a3d; color: #fff; } .pushb.on .lk { border-color: #9fd3b0; color: #22633b; }
+  .pushb .x { font: inherit; border: none; background: none; color: #b8955f; cursor: pointer; padding: 2px 4px; }
   .fctog { display: flex; justify-content: center; gap: 6px; margin: -4px 0 8px; }
   .fctog button { font: inherit; font-size: 12px; font-weight: 700; border: 1px solid var(--line); background: #fff; color: var(--sub); border-radius: 999px; padding: 4px 11px; cursor: pointer; }
   .fctog button.on { background: #ffe3c2; border-color: #ffbe85; color: #b26a1c; }
@@ -868,6 +874,7 @@
   <div class="cam" id="cam"></div>
   <input type="file" id="camFile" accept="image/*" capture="user" style="display:none">
 
+<script src="push-config.js"></script>
 <script>
   var API = 'https://script.google.com/macros/s/AKfycbxCMHMAE-br_i_MuSG7kQx-Jk6RZW-bqSQVBEorqXo0_EIa0BmujdHZJCNb_n0sSvU4lA/exec';
   var HUES = ['indigo', 'teal', 'amber'];
@@ -959,6 +966,7 @@
           renderTabs(); // 시트·집중 화면·발자국은 데이터만 갱신(깜빡임 없음)
         }
         if (view !== 'stats') setTimeout(prefetchCal_, 800);
+        setTimeout(pushBoot_, 1500);
       })
       .catch(function () {
         if (cached) return; // 캐시로 이미 떠 있으면 조용히 넘어감 — 다음 등록 때 재시도
@@ -1288,6 +1296,7 @@
       if (m.practice) { var rvTot = rg && rg.rings ? rg.rings.reduce(function (a, r) { return a + r.doneMin; }, 0) : 0;
         h += '<button class="night" id="fdNight">' + REVIEW_ICON + ' ' + REVIEW_NAME + '<small>' + (BOOT.note ? '한마디 남김 ✓' : (nd.getHours() >= 21 ? '자기 전에 1분 →' : (rvTot ? '지금까지 ' + durLabel(rvTot) + ' →' : '오늘 어땠는지 →'))) + '</small></button>'; } // 항상 표시 (2026-08-16 주인님 — 21시 제한 해제) · 부제는 시간대별(v41)
       if (BOOT.note && vt) h += '<div class="cheer" style="background:#eef2fb;border-color:#cdd8f2;color:#2c3e6b">🌙 ' + esc(who.name) + '의 한마디 — "' + esc(BOOT.note) + '"</div>';
+      if (m.practice && !vt) h += pushBannerHtml_();
       h += lessonLineHtml();
       if (BOOT.recall && BOOT.recall.memo) { var rc = BOOT.recall, rsj = subjByName(rc.k), rpb = rc.k === '독서' ? parseBookF_(rc.memo) : null;
         h += '<button class="recall" id="fdRecall"><span class="rl">🔁 ' + rc.daysAgo + '일 전 오늘</span><span class="rm">' + subjIcon(rsj) + ' ' + (rpb ? (rpb.title ? '《' + esc(rpb.title) + '》 ' : '') + esc(rpb.line) : esc(rc.memo)) + '</span></button>'; }
@@ -1344,6 +1353,7 @@
     $('fdDate').addEventListener('click', function () { openCal('day', todayStr(), true); });
     if ($('fdRecall')) $('fdRecall').addEventListener('click', function () { var rc = BOOT.recall, pb = rc.k === '독서' ? parseBookF_(rc.memo) : null; if (pb && pb.title) { calCache = {}; if (!statsTarget) statsTarget = isViewer() ? BOOT.viewTarget.code : ''; openBook('t:' + pb.title); } else openCal('day', rc.date, true); });
     bindRings(isToday && !vt);
+    bindPushBanner_();
     if (sess) acquireWake();
     startTick();
     if (m.practice && CHEER_ON) maybeCheerFx();
@@ -1980,6 +1990,7 @@
   function startTick() {
     if (tick) return;
     tick = setInterval(function () {
+      goalCheck_();
       var dk = $('dkTime'); if (dk && sess) dk.textContent = fmt(Date.now() - sess.segStart); // 도크 상태 시간
       var rt = $('restT'); if (rt && sess && sess.state === 'break') rt.textContent = fmt(Date.now() - sess.segStart); else if (rt && !sess && isViewer() && BOOT.live) rt.textContent = fmt(Date.now() - BOOT.live.at);
       var sht = $('shT'); if (sht && sess) sht.textContent = fmt(Date.now() - sess.segStart);
@@ -2050,8 +2061,79 @@
     flushBlocks();
     return sessionId;
   }
+  // ── 🔔 목표 알림 (v50): 웹푸시(FCM, push-config.js 값 있을 때) + 포그라운드 비프. 설계 docs/plans/2026-08-18-목표-알림-웹푸시.md ──
+  var PUSH = (typeof self !== 'undefined' && self.FAM_PUSH && self.FAM_PUSH.config) ? self.FAM_PUSH : null;
+  var pushMsg = null, pushLoading = null, audioCtx = null, goalAlerted = {};
+  function pushSupported_() { return !!(PUSH && 'Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window); }
+  function isStandalone_() { return window.matchMedia('(display-mode: standalone)').matches || !!window.navigator.standalone; }
+  function isIOS_() { return /iPhone|iPad|iPod/i.test(navigator.userAgent); }
+  function pushBannerHtml_() {
+    if (!PUSH) return '';
+    if (read('pushBannerOff') === '1' && !(read('pushOn') === '1')) return '';
+    if (isIOS_() && !isStandalone_() && !('Notification' in window)) return '<div class="pushb"><span>🔔 목표 알림은 <b>홈 화면에 추가한 앱</b>에서 켤 수 있어요</span><button class="x" id="pbX">✕</button></div>';
+    if (!pushSupported_()) return '';
+    var perm = Notification.permission;
+    if (perm === 'granted' && read('pushOn') === '1') return '<div class="pushb on"><span>🔔 목표 알림 켜짐 <small>독서·이론·뉴스 목표 채우면 잠금 화면에 알림</small></span><button class="lk" id="pbTest">테스트</button></div>';
+    if (perm === 'denied') return '<div class="pushb"><span>🔔 알림이 꺼져 있어요 <small>아이폰 설정 › 알림 › 이 앱에서 허용</small></span><button class="x" id="pbX">✕</button></div>';
+    return '<div class="pushb"><span>🔔 목표 알림 켜기 <small>독서 2시간·이론 30분… 채우면 잠금 화면에 알림</small></span><button class="lk on" id="pbOn">켜기</button><button class="x" id="pbX">✕</button></div>';
+  }
+  function bindPushBanner_() {
+    var on = $('pbOn'), x = $('pbX'), t = $('pbTest');
+    if (on) on.addEventListener('click', pushEnable_);
+    if (x) x.addEventListener('click', function () { store('pushBannerOff', '1'); var b = x.parentNode; if (b) b.style.display = 'none'; });
+    if (t) t.addEventListener('click', function () { t.disabled = true; t.textContent = '보내는 중…'; fetch(API, { method: 'POST', body: JSON.stringify({ action: 'push_test', u: BOOT.member.code }) }).then(function (r) { return r.json(); }).then(function (res) { t.disabled = false; t.textContent = '테스트'; if (res && res.ok) showToast('🔔 보냈어요 — 잠금 화면/상단을 확인'); else showToast((res && res.error) || ('실패: ' + ((res && res.detail) || '')), true); }).catch(function () { t.disabled = false; t.textContent = '테스트'; showToast('전송 실패 — 인터넷 확인', true); }); });
+  }
+  function loadScript_(src) { return new Promise(function (res, rej) { var sc = document.createElement('script'); sc.src = src; sc.onload = res; sc.onerror = rej; document.head.appendChild(sc); }); }
+  function pushInit_() {
+    if (pushMsg) return Promise.resolve(pushMsg);
+    if (pushLoading) return pushLoading;
+    pushLoading = loadScript_('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js').then(function () { return loadScript_('https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js'); }).then(function () {
+      if (!firebase.apps.length) firebase.initializeApp(PUSH.config);
+      pushMsg = firebase.messaging();
+      pushMsg.onMessage(function (payload) { var n = (payload && payload.notification) || (payload && payload.data) || {}; showToast((n.title || '🔔 알림') + (n.body ? ' — ' + n.body : '')); beep_(); });
+      return pushMsg;
+    });
+    return pushLoading;
+  }
+  /** 알림 켜기(사용자 탭) → 권한 → 토큰 → 서버 등록 */
+  function pushEnable_() {
+    if (!pushSupported_()) { showToast('이 브라우저는 알림을 지원하지 않아요', true); return; }
+    var btn = $('pbOn'); if (btn) { btn.disabled = true; btn.textContent = '켜는 중…'; }
+    Notification.requestPermission().then(function (perm) {
+      if (perm !== 'granted') { showToast('알림 권한이 허용되지 않았어요', true); render(); return; }
+      return pushRegister_().then(function () { store('pushOn', '1'); render(); showToast('🔔 목표 알림 켜졌어요'); });
+    }).catch(function (e) { showToast('알림 켜기 실패: ' + (e && e.message || e), true); render(); });
+  }
+  /** 토큰 발급·서버 등록 (부팅 시에도 조용히 갱신) */
+  function pushRegister_() {
+    return pushInit_().then(function (m) { return navigator.serviceWorker.ready.then(function (reg) { return m.getToken({ vapidKey: PUSH.vapid, serviceWorkerRegistration: reg }); }); }).then(function (token) {
+      if (!token) throw new Error('토큰 없음');
+      if (read('pushTok') === token) return token;
+      return fetch(API, { method: 'POST', body: JSON.stringify({ action: 'push_token', u: BOOT.member.code, token: token, ua: navigator.userAgent }) }).then(function (r) { return r.json(); }).then(function (res) { if (res && res.error) throw new Error(res.error); store('pushTok', token); return token; });
+    });
+  }
+  function pushBoot_() { if (!pushSupported_() || read('pushOn') !== '1' || Notification.permission !== 'granted' || !BOOT || !BOOT.member || !BOOT.member.practice) return; pushRegister_().catch(function () {}); }
+  /** 포그라운드 비프 — 사용자 제스처(활동 시작) 때 AudioContext 열어둠 */
+  function ensureAudio_() { try { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if (audioCtx.state === 'suspended') audioCtx.resume(); } catch (e) {} }
+  function beep_() {
+    try { ensureAudio_(); if (!audioCtx) return; var t0 = audioCtx.currentTime;
+      [0, 0.25, 0.5].forEach(function (d) { var o = audioCtx.createOscillator(), g = audioCtx.createGain(); o.type = 'sine'; o.frequency.value = 880; g.gain.setValueAtTime(0.0001, t0 + d); g.gain.exponentialRampToValueAtTime(0.4, t0 + d + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t0 + d + 0.18); o.connect(g); g.connect(audioCtx.destination); o.start(t0 + d); o.stop(t0 + d + 0.2); });
+      if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+    } catch (e) {}
+  }
+  /** 진행 중 활동이 목표에 닿는 순간(앱이 떠 있을 때) — 하루 한 번씩 */
+  function goalCheck_() {
+    if (!sess || sess.state !== 'practice' || !BOOT || !BOOT.rings) return;
+    var r = BOOT.rings.rings.find(function (x) { return x.name === sess.kind; }); if (!r || !r.goalMin) return;
+    var pend = pendingBlocks.filter(function (b) { return b.type === 'practice' && b.kind === sess.kind; }).reduce(function (a, b) { return a + Math.round((b.end - b.start) / 60000); }, 0);
+    var done = r.doneMin + pend + (Date.now() - sess.segStart) / 60000;
+    var key = todayStr() + '|' + sess.kind; if (done < r.goalMin || goalAlerted[key]) return;
+    goalAlerted[key] = 1; beep_(); showToast((subjEmoji(subjByName(sess.kind))) + ' ' + sess.kind + ' 목표 ' + durLabel(r.goalMin) + ' 달성! 🎯');
+  }
+
   /** 활동 시작/전환/재개 — 어떤 상태에서든 kind로 */
   function startActivity(kind) {
+    ensureAudio_(); // 목표 비프용 오디오 잠금 해제(사용자 제스처)
     var now = Date.now(), prev = sess ? { kind: sess.kind, state: sess.state, segStart: sess.segStart } : null;
     var savedId = null, savedLabel = '';
     if (sess && sess.state === 'practice') {
@@ -2737,7 +2819,7 @@
     if ((isViewer() && view === 'feed') || Date.now() - lastInitAt > 60000) init();
   });
   // ── 새 버전 자동 반영 (v45): 복귀 때 서버 index.html HEAD ETag가 바뀌었으면 본문 마커(<!-- vNN)를 읽어 APP_VER보다 크면 새로고침. 시트·집중 화면 중엔 미룸(다음 복귀 때) ──
-  var APP_VER = 49, appEtag = null;
+  var APP_VER = 50, appEtag = null;
   function checkUpdate_() {
     fetch('index.html', { method: 'HEAD', cache: 'no-store' }).then(function (r) {
       var et = r.headers.get('ETag') || r.headers.get('Last-Modified') || '';
