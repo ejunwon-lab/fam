@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>가족 일정</title>
 <!-- v40 책 편집 v2: 자동완성·책 허브·⋯ 메뉴·병합·삭제·되돌리기·📚 책 세그먼트 — 2026-08-16 -->
+<!-- v49 📅 일정 탭 A안: 앱바 '📅 일정' + 세그먼트 [➕ 등록 · 📅 가족 일정](마지막 선택 기억), 우상단 📅 아이콘·‹ 제거, '일정 등록' 라벨, 다가오는 일정 '전체 보기 ›' — 2026-08-18 -->
 <!-- v48 📅 가족 일정에 루틴 블록(블록마다 한 줄, GAS @43) + '약속만·활동 포함' 토글 — 2026-08-18 -->
 <!-- v47 독서 목표 주 1권(GAS @41/V25): 📚 타일 이번 주 W/1권·올해·이달, 최근 8주 ✓ 스트립+🔥 주 연속, 목표 시트 주 단위, 완독 축하 문구 — 2026-08-18 -->
 <!-- v46 프리페치 dirty 버그(옛 캐시 유지) 수정 · 집중 화면 복귀 시 재렌더 안 함 — 2026-08-18 -->
@@ -1042,11 +1043,11 @@
     root.querySelectorAll('.mn').forEach(function (b) {
       b.addEventListener('click', function () {
         var k = b.getAttribute('data-k');
-        if (k === view || (k === 'home' && view === 'famcal')) { if (view === 'famcal') { view = 'home'; render(); } return; }
+        if (k === view || (k === 'home' && view === 'famcal')) return;
         overlayOpen = false;
-        view = k;
-        if (k === 'stats') openCal('month', null, true);
-        else render();
+        if (k === 'stats') { view = k; openCal('month', null, true); return; }
+        if (k === 'home' && read('schedSeg') === 'cal') { openFamCal(); return; } // 마지막 세그먼트 기억 (v49)
+        view = k; render();
       });
     });
   }
@@ -1078,16 +1079,25 @@
     })(picks[i]);
   }
 
+  /** 📅 일정 탭 공용 헤더 — 앱바 + 세그먼트 [➕ 등록 · 📅 가족 일정] (v49, 시안 docs/mockups/2026-08-18-일정-탭-개선-시안.html A안) */
+  function schedHeadHtml_(seg, whoId) {
+    return '<div class="appbar"><span class="t">📅 일정</span><div class="right">' + whoChip('who', whoId, BOOT.member.name) + '</div></div>' +
+      '<div class="clseg schedseg"><button class="' + (seg === 'reg' ? 'on' : '') + '" data-sseg="reg">➕ 등록</button><button class="' + (seg === 'cal' ? 'on' : '') + '" data-sseg="cal">📅 가족 일정</button></div>';
+  }
+  function bindSchedSeg_() {
+    $('app').querySelectorAll('[data-sseg]').forEach(function (b) { b.addEventListener('click', function () {
+      var sg = b.getAttribute('data-sseg'); store('schedSeg', sg);
+      if (sg === 'cal') { if (view !== 'famcal') openFamCal(); } else if (view !== 'home') { view = 'home'; render(); window.scrollTo(0, 0); }
+    }); });
+  }
   function renderHome() {
     var isKakao = /KAKAOTALK/i.test(navigator.userAgent);
     var h = '';
     if (isKakao) {
       h += '<div class="kakao"><h2>카카오톡 안에서는 설치가 안 돼요</h2><p>아래 버튼으로 브라우저에서 연 다음, 홈 화면에 추가해주세요.<br>iPhone: 사파리 공유버튼 → <b>홈 화면에 추가</b> · Android: 크롬 메뉴 ⋮ → <b>홈 화면에 추가</b></p><button class="go" id="kakaoGo">브라우저로 열기</button></div>';
     }
-    h += '<div class="appbar"><span class="t">일정 기록</span><div class="right">' +
-      '<button class="iconbtn" id="calBtn" title="가족 일정 보기" aria-label="가족 일정 보기">📅</button>' +
-      whoChip('who', 'whoBtn', BOOT.member.name) + '</div></div>';
-    h += '<div class="sec-label">탭 한 번으로 등록</div><div class="presets">';
+    h += schedHeadHtml_('reg', 'whoBtn');
+    h += '<div class="sec-label">일정 등록</div><div class="presets">';
     // 이름이 'X (변주)' 꼴인 프리셋은 X로 묶어 버튼 1개 → 시트 안에서 변주(칩) 선택
     var items = [], gmap = {};
     BOOT.presets.forEach(function (p) {
@@ -1135,7 +1145,7 @@
     }
     var up = BOOT.upcoming || []; // 다가오는 일정 (GAS @37) — 있을 때만
     var rowH = function (r) { return '<div class="row"><span class="r-t">' + esc(r.t) + seqChip_(r) + '</span><span class="r-d">' + esc(r.d) + '</span></div>'; };
-    if (up.length) { h += '<div class="sec-label">다가오는 일정</div><div class="recent">'; up.forEach(function (r) { h += rowH(r); }); h += '</div>'; }
+    if (up.length) { h += '<div class="sec-label" style="display:flex;justify-content:space-between;align-items:center">다가오는 일정 <button class="lnk" id="upAll" style="font-size:12px;padding:0">전체 보기 ›</button></div><div class="recent">'; up.forEach(function (r) { h += rowH(r); }); h += '</div>'; }
     h += '<div class="sec-label">최근 등록</div><div class="recent">';
     if (BOOT.recent.length) BOOT.recent.forEach(function (r) { h += rowH(r); });
     else h += '<div class="empty">아직 기록이 없어요. 첫 일정을 올려보세요!</div>';
@@ -1148,8 +1158,8 @@
 
     if (isKakao) $('kakaoGo').addEventListener('click', function () { location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(location.origin + location.pathname); });
     if ($('installX')) $('installX').addEventListener('click', function () { store('installHintOff', '1'); $('installHint').style.display = 'none'; });
-    bindWho('whoBtn');
-    $('calBtn').addEventListener('click', function () { openFamCal(); }); // v43: 앱 안 가족 일정 (구글 캘린더 앱은 그 화면 하단 링크)
+    bindWho('whoBtn'); bindSchedSeg_();
+    var ua = $('upAll'); if (ua) ua.addEventListener('click', function () { store('schedSeg', 'cal'); openFamCal(); });
     var btns = $('app').querySelectorAll('.preset');
     for (var i = 0; i < btns.length; i++) (function (b) {
       b.addEventListener('click', function () {
@@ -1178,7 +1188,7 @@
   /** 횟수권 회차 칩 (GAS @39 seq/total) */
   function seqChip_(it) { return (it && it.seq && it.total) ? '<span class="fcseq">' + it.seq + '/' + it.total + '회</span>' : ''; }
   function openFamCal(ym) {
-    view = 'famcal'; overlayOpen = false;
+    view = 'famcal'; overlayOpen = false; store('schedSeg', 'cal');
     var t = todayStr(); famcalYm = ym || famcalYm || t.slice(0, 7);
     renderFamCal(); window.scrollTo(0, 0);
   }
@@ -1195,7 +1205,7 @@
       cur = famcalCache[ym];
     }
     var p = ym.split('-'), label = p[0] + '년 ' + (+p[1]) + '월', today = todayStr();
-    var h = '<div class="appbar"><div style="display:flex;align-items:center;gap:10px"><button class="iconbtn" id="fcBack" aria-label="일정 등록으로">‹</button><span class="t">📅 가족 일정</span></div><div class="right">' + whoChip('who', 'fcWho', BOOT.member.name) + '</div></div>';
+    var h = schedHeadHtml_('cal', 'fcWho');
     h += '<div class="clcard">' + calNav_(label, true).replace('id="clPrev"', 'id="fcPrev"').replace('id="clNext"', 'id="fcNext"');
     h += '<div class="fctog"><button class="' + (!famcalRt ? 'on' : '') + '" data-rt="0">약속만</button><button class="' + (famcalRt ? 'on' : '') + '" data-rt="1">활동 포함</button></div>';
     if (cur.loading) h += calLoading_();
@@ -1214,8 +1224,7 @@
     }
     h += '</div><button class="lnk asmemos" id="fcOpenApp">구글 캘린더 앱에서 열기 ↗</button>';
     $('app').innerHTML = h;
-    bindWho('fcWho');
-    $('fcBack').addEventListener('click', function () { view = 'home'; render(); });
+    bindWho('fcWho'); bindSchedSeg_();
     $('fcPrev').addEventListener('click', function () { famcalShift_(-1); });
     $('fcNext').addEventListener('click', function () { famcalShift_(1); });
     var rt = $('fcRetry'); if (rt) rt.addEventListener('click', function () { delete famcalCache[ym]; renderFamCal(); });
@@ -2728,7 +2737,7 @@
     if ((isViewer() && view === 'feed') || Date.now() - lastInitAt > 60000) init();
   });
   // ── 새 버전 자동 반영 (v45): 복귀 때 서버 index.html HEAD ETag가 바뀌었으면 본문 마커(<!-- vNN)를 읽어 APP_VER보다 크면 새로고침. 시트·집중 화면 중엔 미룸(다음 복귀 때) ──
-  var APP_VER = 48, appEtag = null;
+  var APP_VER = 49, appEtag = null;
   function checkUpdate_() {
     fetch('index.html', { method: 'HEAD', cache: 'no-store' }).then(function (r) {
       var et = r.headers.get('ETag') || r.headers.get('Last-Modified') || '';
