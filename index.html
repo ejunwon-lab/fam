@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>가족 일정</title>
 <!-- v40 책 편집 v2: 자동완성·책 허브·⋯ 메뉴·병합·삭제·되돌리기·📚 책 세그먼트 — 2026-08-16 -->
+<!-- v43 📅 가족 일정 보기(앱 안, GAS @38 api=events) — 일정 탭 📅 → 월별 날짜 목록·구글 캘린더 앱 링크는 하단 — 2026-08-18 -->
 <!-- v42 GAS @37 연동: 일정 탭 '다가오는 일정' + 이번 주 레슨 서버 계산(BOOT.lessons) — 2026-08-18 -->
 <!-- v41 UI/UX 검토 반영: 할 일 체크→레거시 화면 버그(구 열품타 목록 뷰 제거)·휴식 칩 idle 비활성·집중화면 ☁️/durLabel·부모 'CY의 하루'·'CY의 발자국'·지난 날 기록 추가·이달 프리페치·응원 후 도크 축소·돌아보기 줄바꿈/부제 — 2026-08-18 -->
 <meta name="theme-color" content="#e9f3fb">
@@ -135,6 +136,18 @@
   .recent .r-t { font-weight: 600; }
   .recent .r-d { color: var(--sub); font-variant-numeric: tabular-nums; white-space: nowrap; }
   .empty { color: var(--sub); font-size: 13.5px; padding: 6px 2px; }
+  /* 📅 가족 일정 (v43) */
+  .fclist { display: flex; flex-direction: column; }
+  .fcday { display: flex; gap: 12px; padding: 10px 2px; border-top: 1px solid var(--line); }
+  .fcday:first-child { border-top: none; }
+  .fcday.past { opacity: .55; }
+  .fcd { flex: none; width: 40px; text-align: center; } .fcd b { display: block; font-size: 18px; font-weight: 800; line-height: 1.1; } .fcd small { font-size: 10.5px; color: var(--sub); font-weight: 700; }
+  .fcday.today .fcd b { color: #ff7a3d; } .fcday.today .fcd small { color: #ff7a3d; }
+  .fcitems { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+  .fcit { display: flex; align-items: baseline; gap: 8px; background: #f3f8fc; border-radius: 10px; padding: 7px 10px; font-size: 13.5px; }
+  .fct { flex: none; font-size: 12px; color: var(--sub); font-weight: 700; font-variant-numeric: tabular-nums; min-width: 78px; }
+  .fcn { flex: 1; min-width: 0; font-weight: 700; overflow-wrap: anywhere; }
+  .fcw { flex: none; font-size: 11.5px; font-weight: 800; color: #3d6f9e; background: #e4eefb; border-radius: 8px; padding: 2px 7px; }
 
   /* 타이머 */
   .timer-wrap { text-align: center; padding-top: 8px; }
@@ -1004,14 +1017,14 @@
   }
   function menuHtml() {
     return '<div class="menu-row">' + menuTabs().map(function (t) {
-      return '<button class="mn' + (view === t.k ? ' on' : '') + '" data-k="' + t.k + '">' + t.i + ' ' + t.l + '</button>';
+      return '<button class="mn' + (view === t.k || (t.k === 'home' && view === 'famcal') ? ' on' : '') + '" data-k="' + t.k + '">' + t.i + ' ' + t.l + '</button>';
     }).join('') + '</div>';
   }
   function bindMenu(root) {
     root.querySelectorAll('.mn').forEach(function (b) {
       b.addEventListener('click', function () {
         var k = b.getAttribute('data-k');
-        if (k === view) return;
+        if (k === view || (k === 'home' && view === 'famcal')) { if (view === 'famcal') { view = 'home'; render(); } return; }
         overlayOpen = false;
         view = k;
         if (k === 'stats') openCal('month', null, true);
@@ -1032,6 +1045,7 @@
     if (view === 'feed') return renderFeed();
     if (view === 'timer') return renderTimer();
     if (view === 'stats') return renderCal();
+    if (view === 'famcal') return renderFamCal();
     return renderHome();
   }
 
@@ -1053,7 +1067,7 @@
       h += '<div class="kakao"><h2>카카오톡 안에서는 설치가 안 돼요</h2><p>아래 버튼으로 브라우저에서 연 다음, 홈 화면에 추가해주세요.<br>iPhone: 사파리 공유버튼 → <b>홈 화면에 추가</b> · Android: 크롬 메뉴 ⋮ → <b>홈 화면에 추가</b></p><button class="go" id="kakaoGo">브라우저로 열기</button></div>';
     }
     h += '<div class="appbar"><span class="t">일정 기록</span><div class="right">' +
-      '<button class="iconbtn" id="calBtn" title="가족 캘린더 열기" aria-label="가족 캘린더 열기">📅</button>' +
+      '<button class="iconbtn" id="calBtn" title="가족 일정 보기" aria-label="가족 일정 보기">📅</button>' +
       whoChip('who', 'whoBtn', BOOT.member.name) + '</div></div>';
     h += '<div class="sec-label">탭 한 번으로 등록</div><div class="presets">';
     // 이름이 'X (변주)' 꼴인 프리셋은 X로 묶어 버튼 1개 → 시트 안에서 변주(칩) 선택
@@ -1116,7 +1130,7 @@
     if (isKakao) $('kakaoGo').addEventListener('click', function () { location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(location.origin + location.pathname); });
     if ($('installX')) $('installX').addEventListener('click', function () { store('installHintOff', '1'); $('installHint').style.display = 'none'; });
     bindWho('whoBtn');
-    $('calBtn').addEventListener('click', openCalendar);
+    $('calBtn').addEventListener('click', function () { openFamCal(); }); // v43: 앱 안 가족 일정 (구글 캘린더 앱은 그 화면 하단 링크)
     var btns = $('app').querySelectorAll('.preset');
     for (var i = 0; i < btns.length; i++) (function (b) {
       b.addEventListener('click', function () {
@@ -1138,6 +1152,50 @@
     window.addEventListener('pagehide', clear, { once: true });
     document.addEventListener('visibilitychange', function v() { if (document.hidden) { clear(); document.removeEventListener('visibilitychange', v); } });
     location.href = 'googlecalendar://';
+  }
+
+  // ── 📅 가족 일정 보기 (v43, GAS @38 api=events) — 가족 캘린더 한 달치를 날짜별 목록으로. 설계 docs/plans/2026-08-18-가족-일정-보기.md ──
+  var famcalYm = '', famcalCache = {};
+  function openFamCal(ym) {
+    view = 'famcal'; overlayOpen = false;
+    var t = todayStr(); famcalYm = ym || famcalYm || t.slice(0, 7);
+    renderFamCal(); window.scrollTo(0, 0);
+  }
+  function famcalShift_(n) { var p = famcalYm.split('-'); var d = new Date(+p[0], +p[1] - 1 + n, 1); famcalYm = d.getFullYear() + '-' + pad(d.getMonth() + 1); renderFamCal(); }
+  function renderFamCal() {
+    renderTabs();
+    var ym = famcalYm, cur = famcalCache[ym];
+    if (!cur) {
+      famcalCache[ym] = { loading: true };
+      fetch(API + '?api=events&u=' + encodeURIComponent(BOOT.member.code) + '&ym=' + ym)
+        .then(function (r) { return r.json(); })
+        .then(function (d) { famcalCache[ym] = (d && !d.error) ? d : { error: (d && d.error) || '불러오지 못했어요.' }; if (view === 'famcal' && famcalYm === ym) renderFamCal(); })
+        .catch(function () { famcalCache[ym] = { error: '불러오지 못했어요 — 인터넷 확인' }; if (view === 'famcal' && famcalYm === ym) renderFamCal(); });
+      cur = famcalCache[ym];
+    }
+    var p = ym.split('-'), label = p[0] + '년 ' + (+p[1]) + '월', today = todayStr();
+    var h = '<div class="appbar"><div style="display:flex;align-items:center;gap:10px"><button class="iconbtn" id="fcBack" aria-label="일정 등록으로">‹</button><span class="t">📅 가족 일정</span></div><div class="right">' + whoChip('who', 'fcWho', BOOT.member.name) + '</div></div>';
+    h += '<div class="clcard">' + calNav_(label, true).replace('id="clPrev"', 'id="fcPrev"').replace('id="clNext"', 'id="fcNext"');
+    if (cur.loading) h += calLoading_();
+    else if (cur.error) h += '<div class="guide"><p>' + esc(cur.error) + '</p><button class="retry" id="fcRetry">다시 시도</button></div>';
+    else if (!cur.days || !cur.days.length) h += '<div class="empty" style="text-align:center;padding:26px 0">이 달엔 가족 일정이 없어요</div>';
+    else {
+      h += '<div class="fclist">' + cur.days.map(function (d) {
+        var dt = parseD_(d.date), past = d.date < today, isT = d.date === today;
+        return '<div class="fcday' + (past ? ' past' : '') + (isT ? ' today' : '') + '"><div class="fcd"><b>' + dt.getDate() + '</b><small>' + DOW_KO[dt.getDay()] + (isT ? ' · 오늘' : '') + '</small></div><div class="fcitems">' +
+          d.items.map(function (it) { return '<div class="fcit"><span class="fct">' + (it.allDay ? '종일' : esc(it.s) + '–' + esc(it.e)) + '</span><span class="fcn">' + esc(it.title) + '</span>' + (it.who ? '<span class="fcw">' + esc(it.who) + '</span>' : '') + '</div>'; }).join('') + '</div></div>';
+      }).join('') + '</div>';
+    }
+    h += '</div><button class="lnk asmemos" id="fcOpenApp">구글 캘린더 앱에서 열기 ↗</button>';
+    $('app').innerHTML = h;
+    bindWho('fcWho');
+    $('fcBack').addEventListener('click', function () { view = 'home'; render(); });
+    $('fcPrev').addEventListener('click', function () { famcalShift_(-1); });
+    $('fcNext').addEventListener('click', function () { famcalShift_(1); });
+    var rt = $('fcRetry'); if (rt) rt.addEventListener('click', function () { delete famcalCache[ym]; renderFamCal(); });
+    $('fcOpenApp').addEventListener('click', openCalendar);
+    // 이번 달이면 오늘(또는 다음 일정)로 스크롤
+    if (!cur.loading && ym === today.slice(0, 7)) { var el = $('app').querySelector('.fcday.today') || $('app').querySelector('.fcday:not(.past)'); if (el && el.getBoundingClientRect().top > window.innerHeight * 0.7) el.scrollIntoView({ block: 'center' }); }
   }
 
   // ── CY 세션 피드 홈 (밝은 톤) — 서버 today.segs + 진행 중 로컬 세션 ──
@@ -2618,7 +2676,7 @@
       .then(function (res) {
         sending = false; btn.disabled = false; btn.textContent = '캘린더에 등록';
         if (res && res.error) { showToast(res.error, true); return; }
-        BOOT = res; saveBoot(res); render(); closeSheet();
+        BOOT = res; saveBoot(res); famcalCache = {}; render(); closeSheet();
         showToast('등록 완료 — ' + title + ' (' + subjectName + ') ' + startLabel + ', 가족 캘린더에 올라갔어요');
       })
       .catch(function () { sending = false; btn.disabled = false; btn.textContent = '캘린더에 등록'; showToast('등록에 실패했어요. 인터넷 연결을 확인하고 다시 시도해주세요.', true); });
