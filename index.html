@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>가족 일정</title>
 <!-- v40 책 편집 v2: 자동완성·책 허브·⋯ 메뉴·병합·삭제·되돌리기·📚 책 세그먼트 — 2026-08-16 -->
+<!-- v42 GAS @37 연동: 일정 탭 '다가오는 일정' + 이번 주 레슨 서버 계산(BOOT.lessons) — 2026-08-18 -->
 <!-- v41 UI/UX 검토 반영: 할 일 체크→레거시 화면 버그(구 열품타 목록 뷰 제거)·휴식 칩 idle 비활성·집중화면 ☁️/durLabel·부모 'CY의 하루'·'CY의 발자국'·지난 날 기록 추가·이달 프리페치·응원 후 도크 축소·돌아보기 줄바꿈/부제 — 2026-08-18 -->
 <meta name="theme-color" content="#e9f3fb">
 <link rel="preconnect" href="https://script.google.com">
@@ -1100,7 +1101,9 @@
       });
       h += '</div></div>';
     }
-    h += '<div class="sec-label">최근 기록</div><div class="recent">';
+    var up = BOOT.upcoming || []; // 다가오는 일정 (GAS @37) — 있을 때만
+    if (up.length) { h += '<div class="sec-label">다가오는 일정</div><div class="recent">'; up.forEach(function (r) { h += '<div class="row"><span class="r-t">' + esc(r.t) + '</span><span class="r-d">' + esc(r.d) + '</span></div>'; }); h += '</div>'; }
+    h += '<div class="sec-label">최근 등록</div><div class="recent">';
     if (BOOT.recent.length) BOOT.recent.forEach(function (r) { h += '<div class="row"><span class="r-t">' + esc(r.t) + '</span><span class="r-d">' + esc(r.d) + '</span></div>'; });
     else h += '<div class="empty">아직 기록이 없어요. 첫 일정을 올려보세요!</div>';
     h += '</div>';
@@ -1421,7 +1424,8 @@
     });
   }
   function lessonLineHtml() {
-    // 이번 주 레슨: [과목].lesson 프리셋 이름이 이번 주 최근기록에 있으면 ✓ (recent는 5건뿐이라 근사 — 정확값은 통계)
+    // 이번 주 레슨: 서버 계산 BOOT.lessons(GAS @37) 우선 · 없으면(구 캐시) recent 근사
+    if (BOOT.lessons && BOOT.lessons.length) return '<div class="fd-lesson">이번 주 레슨 · ' + BOOT.lessons.map(function (l) { return l.done ? '<b>' + esc(l.name) + ' ✓</b>' : esc(l.name) + ' ○'; }).join(' · ') + '</div>';
     var subs = (BOOT.subjects || []).filter(function (s) { return s.lesson; });
     if (!subs.length) return '';
     var wk = weekKeys_();
