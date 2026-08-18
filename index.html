@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>가족 일정</title>
 <!-- v40 책 편집 v2: 자동완성·책 허브·⋯ 메뉴·병합·삭제·되돌리기·📚 책 세그먼트 — 2026-08-16 -->
+<!-- v45 폰 캐시 대책: 복귀 시 모든 화면 60초 재조회 + 새 버전 자동 새로고침(HEAD ETag 변경 → 서버 APP_VER > 내 APP_VER) — 릴리스마다 APP_VER 올릴 것 — 2026-08-18 -->
 <!-- v44 횟수권 회차 칩(N/24회) — 가족 일정 목록·다가오는/최근 등록·등록 토스트 (GAS @39 seq/total) — 2026-08-18 -->
 <!-- v43 📅 가족 일정 보기(앱 안, GAS @38 api=events) — 일정 탭 📅 → 월별 날짜 목록·구글 캘린더 앱 링크는 하단 — 2026-08-18 -->
 <!-- v42 GAS @37 연동: 일정 탭 '다가오는 일정' + 이번 주 레슨 서버 계산(BOOT.lessons) — 2026-08-18 -->
@@ -2687,11 +2688,31 @@
       .catch(function () { sending = false; btn.disabled = false; btn.textContent = '캘린더에 등록'; showToast('등록에 실패했어요. 인터넷 연결을 확인하고 다시 시도해주세요.', true); });
   });
 
-  // 앱 복귀 시 재조회 (폴링 없음 — GAS 부하 최소): 뷰어=채영 피드·라이브 상태 / CY=응원 하트 등 (마지막 조회 60초 이후만)
+  // 앱 복귀 시 재조회 (폴링 없음 — GAS 부하 최소): 모든 화면에서 마지막 조회 60초 이후면 init (v45 — 과목 설정 등 서버 변경이 폰에 바로 반영). 뷰어 홈은 항상(라이브 상태)
   document.addEventListener('visibilitychange', function () {
-    if (document.hidden || view !== 'feed' || !BOOT || !BOOT.member) return;
-    if (isViewer() || (BOOT.member.practice && Date.now() - lastInitAt > 60000)) init();
+    if (document.hidden || !BOOT || !BOOT.member) return;
+    checkUpdate_(); // 새 버전이면 새로고침 (아래)
+    if ((isViewer() && view === 'feed') || Date.now() - lastInitAt > 60000) init();
   });
+  // ── 새 버전 자동 반영 (v45): 복귀 때 서버 index.html HEAD ETag가 바뀌었으면 본문 마커(<!-- vNN)를 읽어 APP_VER보다 크면 새로고침. 시트·집중 화면 중엔 미룸(다음 복귀 때) ──
+  var APP_VER = 45, appEtag = null;
+  function checkUpdate_() {
+    fetch('index.html', { method: 'HEAD', cache: 'no-store' }).then(function (r) {
+      var et = r.headers.get('ETag') || r.headers.get('Last-Modified') || '';
+      if (!et) return;
+      if (appEtag === null) { appEtag = et; return; }
+      if (et === appEtag) return;
+      return fetch('index.html?nc=' + Date.now(), { cache: 'no-store' }).then(function (r2) { return r2.text(); }).then(function (html) {
+        var m = /var APP_VER = (\d+)/.exec(html); appEtag = et; // 서버 본문의 APP_VER만 비교 — 올릴 곳은 이 상수 하나
+        if (!m || +m[1] <= APP_VER) return;
+        var busy = ['open', 'rt-open', 'todo-open', 'measuring', 'review-on'].some(function (c) { return document.body.classList.contains(c); });
+        if (busy) { appEtag = null; return; } // 다음 복귀 때 다시
+        showToast('새 버전으로 새로고침해요 (v' + m[1] + ')');
+        setTimeout(function () { location.reload(); }, 900);
+      });
+    }).catch(function () {});
+  }
+  setTimeout(checkUpdate_, 3000); // 현재 ETag 기억
 
   if ('serviceWorker' in navigator) { try { navigator.serviceWorker.register('sw.js'); } catch (e) {} }
   init();
