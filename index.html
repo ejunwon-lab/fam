@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>가족 일정</title>
 <!-- v40 책 편집 v2: 자동완성·책 허브·⋯ 메뉴·병합·삭제·되돌리기·📚 책 세그먼트 — 2026-08-16 -->
+<!-- v53 🔴 블록 저장 유실 수정: 부팅·복귀 때 famblkq 재전송(이벤트만 비우던 버그), 저장 큐 남으면 자동 새로고침 미룸, 실패 5초 재시도 — 2026-08-20 -->
 <!-- v50 🔔 목표 알림: 웹푸시(FCM, push-config.js 값 있을 때만 배너·토큰 등록·테스트) + 포그라운드 목표 도달 비프/토스트 — 2026-08-18 -->
 <!-- v49 📅 일정 탭 A안: 앱바 '📅 일정' + 세그먼트 [➕ 등록 · 📅 가족 일정](마지막 선택 기억), 우상단 📅 아이콘·‹ 제거, '일정 등록' 라벨, 다가오는 일정 '전체 보기 ›' — 2026-08-18 -->
 <!-- v48 📅 가족 일정에 루틴 블록(블록마다 한 줄, GAS @43) + '약속만·활동 포함' 토글 — 2026-08-18 -->
@@ -958,6 +959,7 @@
         BOOT = data; lastInitAt = Date.now();
         saveBoot(data);
         flushEvents(); // 밀린 전환 이벤트(오프라인 인증샷 등) 재전송
+        flushBlocks(); // 밀린 블록 저장 재전송 (v53 — 끝내고 바로 잠그면 전송이 끊겨 famblkq에 쌓이던 버그: 부팅 때는 이벤트만 비우고 블록은 안 비웠음)
         if (!cached) view = defaultView(data);
         // 사용자가 시트·요약을 보는 중이면 화면은 두고 데이터만 갱신
         if (!document.body.classList.contains('open') && !document.body.classList.contains('summary-on') && !document.body.classList.contains('measuring') && view !== 'stats') {
@@ -2047,7 +2049,7 @@
         else if (res && res.error) showToast(res.error, true);
         flushBlocks();
       })
-      .catch(function () { blkFlushing = false; showToast('저장 대기 중 — 인터넷이 연결되면 자동으로 보내요', true); });
+      .catch(function () { blkFlushing = false; showToast('저장 대기 중 — 잠시 후 자동으로 다시 보내요', true); setTimeout(flushBlocks, 5000); });
   }
   window.addEventListener('online', flushBlocks);
 
@@ -2816,11 +2818,12 @@
   // 앱 복귀 시 재조회 (폴링 없음 — GAS 부하 최소): 모든 화면에서 마지막 조회 60초 이후면 init (v45 — 과목 설정 등 서버 변경이 폰에 바로 반영). 뷰어 홈은 항상(라이브 상태)
   document.addEventListener('visibilitychange', function () {
     if (document.hidden || !BOOT || !BOOT.member) return;
+    flushBlocks(); flushEvents(); // 밀린 저장부터 (v53)
     checkUpdate_(); // 새 버전이면 새로고침 (아래)
     if ((isViewer() && view === 'feed') || Date.now() - lastInitAt > 60000) init();
   });
   // ── 새 버전 자동 반영 (v45): 복귀 때 서버 index.html HEAD ETag가 바뀌었으면 본문 마커(<!-- vNN)를 읽어 APP_VER보다 크면 새로고침. 시트·집중 화면 중엔 미룸(다음 복귀 때) ──
-  var APP_VER = 52, appEtag = null;
+  var APP_VER = 53, appEtag = null;
   function checkUpdate_() {
     fetch('index.html', { method: 'HEAD', cache: 'no-store' }).then(function (r) {
       var et = r.headers.get('ETag') || r.headers.get('Last-Modified') || '';
@@ -2830,7 +2833,7 @@
       return fetch('index.html?nc=' + Date.now(), { cache: 'no-store' }).then(function (r2) { return r2.text(); }).then(function (html) {
         var m = /var APP_VER = (\d+)/.exec(html); appEtag = et; // 서버 본문의 APP_VER만 비교 — 올릴 곳은 이 상수 하나
         if (!m || +m[1] <= APP_VER) return;
-        var busy = ['open', 'rt-open', 'todo-open', 'measuring', 'review-on'].some(function (c) { return document.body.classList.contains(c); });
+        var busy = ['open', 'rt-open', 'todo-open', 'measuring', 'review-on'].some(function (c) { return document.body.classList.contains(c); }) || bq().length > 0 || qload().length > 0; // 저장 큐 비기 전 reload 금지 (v53)
         if (busy) { appEtag = null; return; } // 다음 복귀 때 다시
         showToast('새 버전으로 새로고침해요 (v' + m[1] + ')');
         setTimeout(function () { location.reload(); }, 900);
