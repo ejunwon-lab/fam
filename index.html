@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>가족 일정</title>
 <!-- v40 책 편집 v2: 자동완성·책 허브·⋯ 메뉴·병합·삭제·되돌리기·📚 책 세그먼트 — 2026-08-16 -->
+<!-- v62 홈도 P2 계산: FS 준비 시 오늘 피드·링·스트릭 폰 계산(실시간), 미러 도착 블록 pendingBlocks 제거 — 탭 전환 사이 홈 낡음 해소 — 2026-08-20 -->
 <!-- v61 CY 전용 앱 아이콘(cy-icon.png, ?u=cy·famcode=cy일 때 apple-touch-icon 교체 — 재설치 시 적용) — 2026-08-20 -->
 <!-- v60 🔥 Firestore P2: 발자국 월·주·일·기록·책을 폰에서 계산(fs-calc.js, records/notes/books 구독·실시간 무효화) — 골든 23+14 diff=0, 롤백 localStorage fsreads='0' — 2026-08-20 -->
 <!-- v59 발자국 stale-first: 마지막 응답 localStorage → 즉시 그리고 뒤에서 갱신, 프리페치에 주 뷰 추가 — 2026-08-20 -->
@@ -1310,6 +1311,15 @@
     var m = BOOT.member;
     var vt = isViewer() ? BOOT.viewTarget : null; // 뷰어(엄마아빠)는 채영 피드를 보기 전용으로
     var who = vt || m;
+    // 🔥 v62: 홈도 P2 계산 — FS 준비되면 오늘 피드·링·스트릭을 폰에서(실시간, 골든 검증된 fs-calc). 미러 도착한 블록은 pendingBlocks에서 제거(이중 집계 방지)
+    if (FS_READS && fsReadyFor_(who.code)) {
+      try {
+        var fc = FSCALC.make(fsCtxFor_(who.code)); var fdd = fc.day(todayStr());
+        BOOT.today = { totalMin: fdd.totalMin, byKind: fdd.byKind, segs: fdd.segs };
+        BOOT.rings = fdd.rings; BOOT.streak = fc.streak();
+        pendingBlocks = pendingBlocks.filter(function (b) { return !fsD[who.code].recs[b.sessionId]; });
+      } catch (eF) {}
+    }
     var isToday = true, dayData = null; // 홈은 오늘만 — 과거는 👣 나의 발자국 일 뷰
     var nd = new Date();
     var dateStr = (nd.getMonth() + 1) + '월 ' + nd.getDate() + '일 ' + ['일', '월', '화', '수', '목', '금', '토'][nd.getDay()];
@@ -2276,6 +2286,7 @@
   function fsInvalidate_(t) {
     Object.keys(calCache).forEach(function (k) { var p = k.split(':'); if (p[1] === t) delete calCache[k]; });
     if (view === 'stats' && calTarget_() === t) renderCal(); // 실시간 발자국
+    if (view === 'feed' && BOOT && BOOT.member && !document.body.classList.contains('rt-open') && !document.body.classList.contains('measuring')) render(); // 실시간 홈 (v62)
   }
   function fsCtxFor_(t) {
     var st = fsD[t]; var mem = (fsCfgMembers || []).find(function (m2) { return m2.code === t; }); if (!st || !mem) return null;
@@ -3033,7 +3044,7 @@
     if ((isViewer() && view === 'feed') || Date.now() - lastInitAt > 60000) init();
   });
   // ── 새 버전 자동 반영 (v45): 복귀 때 서버 index.html HEAD ETag가 바뀌었으면 본문 마커(<!-- vNN)를 읽어 APP_VER보다 크면 새로고침. 시트·집중 화면 중엔 미룸(다음 복귀 때) ──
-  var APP_VER = 61, appEtag = null;
+  var APP_VER = 62, appEtag = null;
   function checkUpdate_() {
     fetch('index.html', { method: 'HEAD', cache: 'no-store' }).then(function (r) {
       var et = r.headers.get('ETag') || r.headers.get('Last-Modified') || '';
