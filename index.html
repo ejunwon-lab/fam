@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>가족 일정</title>
 <!-- v40 책 편집 v2: 자동완성·책 허브·⋯ 메뉴·병합·삭제·되돌리기·📚 책 세그먼트 — 2026-08-16 -->
+<!-- v54 전송 계층 강화: fetch keepalive + 잠금 순간 sendBeacon 위탁 발사(멱등 안전) — 큐는 최후 보루로 강등 — 2026-08-20 -->
 <!-- v53 🔴 블록 저장 유실 수정: 부팅·복귀 때 famblkq 재전송(이벤트만 비우던 버그), 저장 큐 남으면 자동 새로고침 미룸, 실패 5초 재시도 — 2026-08-20 -->
 <!-- v50 🔔 목표 알림: 웹푸시(FCM, push-config.js 값 있을 때만 배너·토큰 등록·테스트) + 포그라운드 목표 도달 비프/토스트 — 2026-08-18 -->
 <!-- v49 📅 일정 탭 A안: 앱바 '📅 일정' + 세그먼트 [➕ 등록 · 📅 가족 일정](마지막 선택 기억), 우상단 📅 아이콘·‹ 제거, '일정 등록' 라벨, 다가오는 일정 '전체 보기 ›' — 2026-08-18 -->
@@ -1793,7 +1794,7 @@
     if (!q.length) return;
     flushing = true;
     var it = q[0];
-    fetch(API, { method: 'POST', body: JSON.stringify({ action: 'practice_event', u: BOOT.member.code, type: it.type, kind: it.kind, segMin: it.segMin, at: it.at, photo: it.photo }) })
+    fetch(API, { method: 'POST', body: JSON.stringify({ action: 'practice_event', u: BOOT.member.code, type: it.type, kind: it.kind, segMin: it.segMin, at: it.at, photo: it.photo }), keepalive: true })
       .then(function (r) { return r.json(); })
       .then(function (res) {
         flushing = false;
@@ -2039,7 +2040,7 @@
     var q = bq(); if (!q.length) return;
     blkFlushing = true;
     var it = q[0];
-    fetch(API, { method: 'POST', body: JSON.stringify(it.payload) })
+    fetch(API, { method: 'POST', body: JSON.stringify(it.payload), keepalive: true })
       .then(function (r) { return r.json(); })
       .then(function (res) {
         blkFlushing = false;
@@ -2052,6 +2053,14 @@
       .catch(function () { blkFlushing = false; showToast('저장 대기 중 — 잠시 후 자동으로 다시 보내요', true); setTimeout(flushBlocks, 5000); });
   }
   window.addEventListener('online', flushBlocks);
+  /** 화면이 꺼지는 순간(잠금·앱 전환) 남은 블록 큐를 OS에 위탁 발사 (v54) — 응답을 안 기다리는 sendBeacon이라 잠겨도 전달.
+   *  큐는 지우지 않는다: 확인 없는 전송이라, 다음 부팅 flush가 확인하고 지움(서버가 세션ID 멱등이라 중복 무해) */
+  function beaconBlocks_() {
+    if (!navigator.sendBeacon) return;
+    try { bq().forEach(function (it) { navigator.sendBeacon(API, new Blob([JSON.stringify(it.payload)], { type: 'text/plain' })); }); } catch (e) {}
+  }
+  window.addEventListener('pagehide', beaconBlocks_);
+  document.addEventListener('visibilitychange', function () { if (document.hidden) beaconBlocks_(); });
 
   /** 블록 1개 저장(큐 경유). 세션ID='S'+start (서버와 동일 규칙 → 멱등·되돌리기 키) */
   function saveBlock(type, kind, start, end, memo) {
@@ -2823,7 +2832,7 @@
     if ((isViewer() && view === 'feed') || Date.now() - lastInitAt > 60000) init();
   });
   // ── 새 버전 자동 반영 (v45): 복귀 때 서버 index.html HEAD ETag가 바뀌었으면 본문 마커(<!-- vNN)를 읽어 APP_VER보다 크면 새로고침. 시트·집중 화면 중엔 미룸(다음 복귀 때) ──
-  var APP_VER = 53, appEtag = null;
+  var APP_VER = 54, appEtag = null;
   function checkUpdate_() {
     fetch('index.html', { method: 'HEAD', cache: 'no-store' }).then(function (r) {
       var et = r.headers.get('ETag') || r.headers.get('Last-Modified') || '';
