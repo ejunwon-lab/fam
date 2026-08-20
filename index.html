@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>가족 일정</title>
 <!-- v40 책 편집 v2: 자동완성·책 허브·⋯ 메뉴·병합·삭제·되돌리기·📚 책 세그먼트 — 2026-08-16 -->
+<!-- v56 🔔 배너 정리: 테스트 성공·✕ 후엔 숨김(pushOkSeen) — 2026-08-20 -->
 <!-- v55 🔥 Firestore P1: 가족 코드 페어링(1회)·records 이중 쓰기(saveBlock/undo/memo)·live 실시간(onSnapshot) — 2026-08-20 -->
 <!-- v54 전송 계층 강화: fetch keepalive + 잠금 순간 sendBeacon 위탁 발사(멱등 안전) — 큐는 최후 보루로 강등 — 2026-08-20 -->
 <!-- v53 🔴 블록 저장 유실 수정: 부팅·복귀 때 famblkq 재전송(이벤트만 비우던 버그), 저장 큐 남으면 자동 새로고침 미룸, 실패 5초 재시도 — 2026-08-20 -->
@@ -2090,15 +2091,19 @@
     if (!pushSupported_()) return '';
     var perm = Notification.permission;
     var pr = !!(BOOT.member && BOOT.member.practice);
-    if (perm === 'granted' && read('pushOn') === '1') return '<div class="pushb on"><span>🔔 알림 켜짐 <small>' + (pr ? '독서·이론·뉴스 목표 채우면 잠금 화면에 알림' : '이 폰으로 알림을 받아요') + '</small></span><button class="lk" id="pbTest">테스트</button></div>';
+    if (perm === 'granted' && read('pushOn') === '1') {
+      if (read('pushOkSeen') === '1') return ''; // 확인 끝난 뒤엔 배너 없음 (v56 — 권한이 꺼지면 아래 denied 배너가 다시 안내)
+      return '<div class="pushb on"><span>🔔 알림 켜짐 <small>' + (pr ? '독서·이론·뉴스 목표 채우면 잠금 화면에 알림' : '이 폰으로 알림을 받아요') + '</small></span><button class="lk" id="pbTest">테스트</button><button class="x" id="pbOk">✕</button></div>';
+    }
     if (perm === 'denied') return '<div class="pushb"><span>🔔 알림이 꺼져 있어요 <small>아이폰 설정 › 알림 › 이 앱에서 허용</small></span><button class="x" id="pbX">✕</button></div>';
     return '<div class="pushb"><span>🔔 ' + (pr ? '목표 알림 켜기' : '알림 켜기') + ' <small>' + (pr ? '독서 2시간·이론 30분… 채우면 잠금 화면에 알림' : '잠금 화면 알림 · 켠 뒤 테스트 가능') + '</small></span><button class="lk on" id="pbOn">켜기</button><button class="x" id="pbX">✕</button></div>';
   }
   function bindPushBanner_() {
-    var on = $('pbOn'), x = $('pbX'), t = $('pbTest');
+    var on = $('pbOn'), x = $('pbX'), t = $('pbTest'), ok = $('pbOk');
+    if (ok) ok.addEventListener('click', function () { store('pushOkSeen', '1'); var b = ok.parentNode; if (b) b.style.display = 'none'; });
     if (on) on.addEventListener('click', pushEnable_);
     if (x) x.addEventListener('click', function () { store('pushBannerOff', '1'); var b = x.parentNode; if (b) b.style.display = 'none'; });
-    if (t) t.addEventListener('click', function () { t.disabled = true; t.textContent = '보내는 중…'; fetch(API, { method: 'POST', body: JSON.stringify({ action: 'push_test', u: BOOT.member.code }) }).then(function (r) { return r.json(); }).then(function (res) { t.disabled = false; t.textContent = '테스트'; if (res && res.ok) showToast('🔔 보냈어요 — 잠금 화면/상단을 확인'); else showToast((res && res.error) || ('실패: ' + ((res && res.detail) || '')), true); }).catch(function () { t.disabled = false; t.textContent = '테스트'; showToast('전송 실패 — 인터넷 확인', true); }); });
+    if (t) t.addEventListener('click', function () { t.disabled = true; t.textContent = '보내는 중…'; fetch(API, { method: 'POST', body: JSON.stringify({ action: 'push_test', u: BOOT.member.code }) }).then(function (r) { return r.json(); }).then(function (res) { t.disabled = false; t.textContent = '테스트'; if (res && res.ok) { showToast('🔔 보냈어요 — 잠금 화면/상단을 확인'); store('pushOkSeen', '1'); setTimeout(function () { if (view === 'feed') render(); }, 2500); } else showToast((res && res.error) || ('실패: ' + ((res && res.detail) || '')), true); }).catch(function () { t.disabled = false; t.textContent = '테스트'; showToast('전송 실패 — 인터넷 확인', true); }); });
   }
   function loadScript_(src) { return new Promise(function (res, rej) { var sc = document.createElement('script'); sc.src = src; sc.onload = res; sc.onerror = rej; document.head.appendChild(sc); }); }
   function pushInit_() {
@@ -2920,7 +2925,7 @@
     if ((isViewer() && view === 'feed') || Date.now() - lastInitAt > 60000) init();
   });
   // ── 새 버전 자동 반영 (v45): 복귀 때 서버 index.html HEAD ETag가 바뀌었으면 본문 마커(<!-- vNN)를 읽어 APP_VER보다 크면 새로고침. 시트·집중 화면 중엔 미룸(다음 복귀 때) ──
-  var APP_VER = 55, appEtag = null;
+  var APP_VER = 56, appEtag = null;
   function checkUpdate_() {
     fetch('index.html', { method: 'HEAD', cache: 'no-store' }).then(function (r) {
       var et = r.headers.get('ETag') || r.headers.get('Last-Modified') || '';
