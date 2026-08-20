@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>가족 일정</title>
 <!-- v40 책 편집 v2: 자동완성·책 허브·⋯ 메뉴·병합·삭제·되돌리기·📚 책 세그먼트 — 2026-08-16 -->
+<!-- v55 🔥 Firestore P1: 가족 코드 페어링(1회)·records 이중 쓰기(saveBlock/undo/memo)·live 실시간(onSnapshot) — 2026-08-20 -->
 <!-- v54 전송 계층 강화: fetch keepalive + 잠금 순간 sendBeacon 위탁 발사(멱등 안전) — 큐는 최후 보루로 강등 — 2026-08-20 -->
 <!-- v53 🔴 블록 저장 유실 수정: 부팅·복귀 때 famblkq 재전송(이벤트만 비우던 버그), 저장 큐 남으면 자동 새로고침 미룸, 실패 5초 재시도 — 2026-08-20 -->
 <!-- v50 🔔 목표 알림: 웹푸시(FCM, push-config.js 값 있을 때만 배너·토큰 등록·테스트) + 포그라운드 목표 도달 비프/토스트 — 2026-08-18 -->
@@ -970,6 +971,7 @@
         }
         if (view !== 'stats') setTimeout(prefetchCal_, 800);
         setTimeout(pushBoot_, 1500);
+        setTimeout(function () { fsEnsurePaired_(true); }, 2200);
       })
       .catch(function () {
         if (cached) return; // 캐시로 이미 떠 있으면 조용히 넘어감 — 다음 등록 때 재시도
@@ -1525,6 +1527,7 @@
       var b = $('meBook') ? canonBookTitle_($('meBook').value) : '', l = $('meLine').value.trim();
       var text = (b ? '《' + b + '》' : '') + (b && l ? ' ｜ ' : '') + l;
       var btn = $('meSave'); btn.disabled = true; btn.textContent = '저장 중…';
+      fsBlockMemo_(sid, text); // 🔥 (v55)
       fetch(API, { method: 'POST', body: JSON.stringify({ action: 'memo_edit', u: BOOT.member.code, sessionId: sid, memo: text, done: isBook && meDone && !!b }) })
         .then(function (r) { return r.json(); })
         .then(function (res) { if (res && res.error) { showToast(res.error, true); btn.disabled = false; btn.textContent = '저장'; return; } BOOT = res; saveBoot(res); closeRoutineSheet(); bookInvalidate_(); render(); if (res.bookDone) { playBookFx(res.bookDone); setTimeout(function () { openBookReviewSheet({ key: res.bookDone.key, title: res.bookDone.title, rating: 0, review: '' }, true); }, 900); } else showToast('✏️ 저장했어요'); })
@@ -1783,6 +1786,7 @@
     }
   }
   function sendEvent(type, segMin, photo) {
+    fsLiveSet_(type); // 🔥 실시간 라이브 (v55)
     var q = qload();
     q.push({ type: type, kind: sess ? sess.kind : '', segMin: segMin || 0, photo: photo || '', at: Date.now() });
     qsave(q);
@@ -2069,6 +2073,7 @@
     var payload = { action: 'session', u: BOOT.member.code, kind: kind, segments: [{ type: type, kind: type === 'practice' ? kind : '', start: start, end: end }], memo: memo || '' };
     var q = bq(); q.push({ sessionId: sessionId, payload: payload }); bqSave(q);
     pendingBlocks.push({ sessionId: sessionId, type: type, kind: kind, start: start, end: end });
+    fsBlock_(sessionId, type, kind, start, end, memo); // 🔥 이중 쓰기 (v55)
     flushBlocks();
     return sessionId;
   }
@@ -2143,6 +2148,88 @@
     goalAlerted[key] = 1; beep_(); showToast((subjEmoji(subjByName(sess.kind))) + ' ' + sess.kind + ' 목표 ' + durLabel(r.goalMin) + ' 달성! 🎯');
   }
 
+  // ── 🔥 Firestore P1 (v55): 페어링 + records 이중 쓰기 + live 실시간. 설계 docs/plans/2026-08-20-firestore-P1-이중쓰기.md ──
+  var fsDb = null, fsLoading = null, fsLiveUnsub = null;
+  function fsReady_() { return !!(PUSH && read('fspaired') === '1'); }
+  function fsInitClient_() {
+    if (fsDb) return Promise.resolve(fsDb);
+    if (!PUSH) return Promise.reject(new Error('no config'));
+    if (fsLoading) return fsLoading;
+    fsLoading = loadScript_('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js')
+      .then(function () { return loadScript_('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js'); })
+      .then(function () { return loadScript_('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js'); })
+      .then(function () {
+        if (!firebase.apps.length) firebase.initializeApp(PUSH.config);
+        return firebase.auth().signInAnonymously();
+      }).then(function () {
+        fsDb = firebase.firestore();
+        try { fsDb.enablePersistence({ synchronizeTabs: false }); } catch (e) {}
+        return fsDb;
+      });
+    return fsLoading;
+  }
+  /** 페어링 확인 — 미페어링이면 시트 1회. done(paired) 콜백 */
+  function fsEnsurePaired_(interactive) {
+    if (!PUSH || !BOOT || !BOOT.member) return;
+    if (read('fspaired') === '1') { fsAfterPair_(); return; }
+    fsInitClient_().then(function (db) {
+      var uid = firebase.auth().currentUser.uid;
+      return db.collection('devices').doc(uid).get({ source: 'server' }).then(function (snap) { // 서버 소스 — 낙관 캐시 오판 방지 (v55)
+        if (snap.exists) { store('fspaired', '1'); fsAfterPair_(); return; }
+        if (interactive && read('fsPairOff') !== '1') openPairSheet_();
+      });
+    }).catch(function () {});
+  }
+  function openPairSheet_() {
+    $('rsheet').style.setProperty('--rt-c', '#3d6f9e');
+    $('rsheet').innerHTML = '<div class="grip"></div><h2>🔐 가족 코드</h2><p class="sub">이 폰을 우리 가족으로 등록해요 — 최초 1번만 물어봐요</p>' +
+      '<input type="text" id="pairIn" placeholder="가족 코드" autocomplete="off" style="font-size:18px;font-weight:800;text-align:center">' +
+      '<button class="cta" id="pairGo" style="margin-top:14px">등록</button><button class="alt" id="pairSkip">나중에</button>';
+    document.body.classList.add('rt-open');
+    setTimeout(function () { if ($('pairIn')) $('pairIn').focus(); }, 200);
+    $('pairSkip').addEventListener('click', function () { store('fsPairOff', '1'); closeRoutineSheet(); });
+    $('pairGo').addEventListener('click', function () {
+      var code = ($('pairIn').value || '').trim(); if (!code) return;
+      var b = $('pairGo'); b.disabled = true; b.textContent = '등록 중…';
+      fsInitClient_().then(function (db) {
+        var uid = firebase.auth().currentUser.uid;
+        return db.collection('devices').doc(uid).set({ code: code, member: BOOT.member.code, ua: navigator.userAgent.slice(0, 120), at: firebase.firestore.FieldValue.serverTimestamp() });
+      }).then(function () { store('fspaired', '1'); store('fsPairOff', ''); closeRoutineSheet(); showToast('🔐 이 폰이 가족으로 등록됐어요'); fsAfterPair_(); })
+        .catch(function (e) { store('fspaired', ''); b.disabled = false; b.textContent = '등록'; showToast(/permission/i.test(String(e)) ? '가족 코드가 달라요' : '등록 실패 — 인터넷 확인', true); });
+    });
+  }
+  function fsAfterPair_() { fsWatchLive_(); }
+  /** records 이중 쓰기 — fire & forget (GAS 큐가 원본 경로, FS는 P2 읽기 대비 미러) */
+  function fsBlock_(sessionId, type, kind, start, end, memo) {
+    if (!fsReady_()) return;
+    fsInitClient_().then(function (db) {
+      return db.collection('records').doc(sessionId).set({ code: BOOT.member.code, type: type, kind: kind, start: firebase.firestore.Timestamp.fromMillis(start), end: firebase.firestore.Timestamp.fromMillis(end), memo: memo || '', src: 'app' }, { merge: true });
+    }).catch(function () {});
+  }
+  function fsBlockDelete_(sessionId) { if (!fsReady_()) return; fsInitClient_().then(function (db) { return db.collection('records').doc(sessionId).delete(); }).catch(function () {}); }
+  function fsBlockMemo_(sessionId, memo) { if (!fsReady_()) return; fsInitClient_().then(function (db) { return db.collection('records').doc(sessionId).set({ memo: memo }, { merge: true }); }).catch(function () {}); }
+  /** live 실시간 — 본인 쓰기 + 뷰어 구독 */
+  function fsLiveSet_(type) {
+    if (!fsReady_() || !BOOT.member.practice) return;
+    fsInitClient_().then(function (db) {
+      var doc = db.collection('live').doc(BOOT.member.code);
+      if (type === 'end') return doc.set({ state: 'idle', at: firebase.firestore.FieldValue.serverTimestamp() });
+      return doc.set({ state: type === 'break' ? 'break' : 'practice', kind: sess ? sess.kind : '', at: firebase.firestore.Timestamp.fromMillis(sess ? sess.segStart : Date.now()) });
+    }).catch(function () {});
+  }
+  function fsWatchLive_() {
+    if (!fsReady_() || !isViewer() || fsLiveUnsub) return;
+    fsInitClient_().then(function (db) {
+      fsLiveUnsub = db.collection('live').doc(BOOT.viewTarget.code).onSnapshot(function (snap) {
+        var d = snap.data();
+        var nv = (d && d.state && d.state !== 'idle') ? { state: d.state, kind: d.kind || '', at: d.at && d.at.toMillis ? d.at.toMillis() : Date.now() } : null;
+        var was = JSON.stringify(BOOT.live || null);
+        BOOT.live = nv;
+        if (JSON.stringify(nv) !== was && view === 'feed') render(); // 실시간 라이브 카드 (v55)
+      });
+    }).catch(function () {});
+  }
+
   /** 활동 시작/전환/재개 — 어떤 상태에서든 kind로 */
   function startActivity(kind) {
     ensureAudio_(); // 목표 비프용 오디오 잠금 해제(사용자 제스처)
@@ -2200,6 +2287,7 @@
     var q = bq(); var inQ = q.some(function (x) { return x.sessionId === lb.sessionId; });
     if (inQ) { bqSave(q.filter(function (x) { return x.sessionId !== lb.sessionId; })); pendingBlocks = pendingBlocks.filter(function (b) { return b.sessionId !== lb.sessionId; }); }
     else fetch(API, { method: 'POST', body: JSON.stringify({ action: 'undo_block', u: BOOT.member.code, sessionId: lb.sessionId }) }).then(function (r) { return r.json(); }).then(function (res) { if (res && !res.error) { BOOT = res; saveBoot(res); render(); } }).catch(function () {});
+    fsBlockDelete_(lb.sessionId); // 🔥 (v55)
     if (lb.prevSess) { sess = { kind: lb.prevSess.kind, state: lb.prevSess.state, segStart: lb.prevSess.segStart, segments: [] }; saveSess(); sendEvent(lb.prevSess.state === 'break' ? 'break' : 'resume', 0, null); }
     render(); showToast('↩︎ 되돌렸어요');
   }
@@ -2832,7 +2920,7 @@
     if ((isViewer() && view === 'feed') || Date.now() - lastInitAt > 60000) init();
   });
   // ── 새 버전 자동 반영 (v45): 복귀 때 서버 index.html HEAD ETag가 바뀌었으면 본문 마커(<!-- vNN)를 읽어 APP_VER보다 크면 새로고침. 시트·집중 화면 중엔 미룸(다음 복귀 때) ──
-  var APP_VER = 54, appEtag = null;
+  var APP_VER = 55, appEtag = null;
   function checkUpdate_() {
     fetch('index.html', { method: 'HEAD', cache: 'no-store' }).then(function (r) {
       var et = r.headers.get('ETag') || r.headers.get('Last-Modified') || '';
