@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>가족 일정</title>
 <!-- v40 책 편집 v2: 자동완성·책 허브·⋯ 메뉴·병합·삭제·되돌리기·📚 책 세그먼트 — 2026-08-16 -->
+<!-- v59 발자국 stale-first: 마지막 응답 localStorage → 즉시 그리고 뒤에서 갱신, 프리페치에 주 뷰 추가 — 2026-08-20 -->
 <!-- v58 ⚙️ 설정 아이콘 분리(모든 헤더), 이름 칩=표시 전용 — 2026-08-20 -->
 <!-- v57 ⚙️ 설정 시트(이름 칩 탭): 알림 상태·테스트·켜기 / 가족 등록 / (아빠) 이름 다시 고르기 / 앱 버전·업데이트 확인 — 2026-08-20 -->
 <!-- v56 🔔 배너 정리: 테스트 성공·✕ 후엔 숨김(pushOkSeen) — 2026-08-20 -->
@@ -948,7 +949,7 @@
     if (!calDate) calDate = todayStr();
     if (calDirty) calCache = {}; // 서버 상태가 바뀐 뒤(init 재조회 포함)면 옛 캐시를 버리고 새로 받는다 (v46 — dirty만 끄고 옛 캐시를 쓰던 버그)
     calDirty = false; calCacheAt = Date.now();
-    try { calMonth_(); } catch (e) {}
+    try { calMonth_(); calWeek_(); } catch (e) {}
   }
 
   function init() {
@@ -2368,13 +2369,24 @@
     if (calDate > todayStr()) calDate = todayStr();
     renderCal();
   }
+  /** 발자국 로컬 캐시(v59, stale-first) — 마지막 응답을 localStorage에 두고, 스피너 대신 즉시 그린 뒤 뒤에서 갱신 */
+  var CAL_LS = 'famcalc';
+  function calLS_() { try { return JSON.parse(read(CAL_LS) || '{}'); } catch (e) { return {}; } }
+  function calLSSave_(key, d) {
+    try { var m = calLS_(); m[key] = { t: Date.now(), d: d };
+      var ks = Object.keys(m).sort(function (a, b) { return m[b].t - m[a].t; }).slice(0, 10); // 최근 10키만
+      var out = {}; ks.forEach(function (k) { out[k] = m[k]; }); store(CAL_LS, JSON.stringify(out));
+    } catch (e) {}
+  }
   function calFetch_(key, url) {
-    if (calCache[key]) return;
-    calCache[key] = { loading: true };
+    if (calCache[key] && !calCache[key].__stale) return;
+    if (calCache[key] && calCache[key].__fetching) return;
+    if (!calCache[key]) { var st = calLS_()[key]; calCache[key] = st ? Object.assign({}, st.d, { __stale: true }) : { loading: true }; }
+    calCache[key].__fetching = true;
     fetch(API + url + '&u=' + encodeURIComponent(BOOT.member.code) + '&t=' + encodeURIComponent(statsTarget))
       .then(function (r) { return r.json(); })
-      .then(function (d) { calCache[key] = (d && !d.error) ? d : { error: (d && d.error) || '불러오지 못했어요.' }; if (view === 'stats') renderCal(); })
-      .catch(function () { calCache[key] = { error: '불러오지 못했어요 — 인터넷 확인' }; if (view === 'stats') renderCal(); });
+      .then(function (d) { calCache[key] = (d && !d.error) ? d : { error: (d && d.error) || '불러오지 못했어요.' }; if (d && !d.error) calLSSave_(key, d); if (view === 'stats') renderCal(); })
+      .catch(function () { if (calCache[key] && calCache[key].__stale) { delete calCache[key].__fetching; } else calCache[key] = { error: '불러오지 못했어요 — 인터넷 확인' }; if (view === 'stats') renderCal(); });
   }
   function calMonth_() { var off = monthOff_(calDate), k = calKey_('m', off); calFetch_(k, '?api=stats&off=' + off); return calCache[k]; }
   function calWeek_() { var mon = mondayOf_(calDate), k = calKey_('w', mon); calFetch_(k, '?api=week&d=' + mon); return calCache[k]; }
@@ -2959,7 +2971,7 @@
     if ((isViewer() && view === 'feed') || Date.now() - lastInitAt > 60000) init();
   });
   // ── 새 버전 자동 반영 (v45): 복귀 때 서버 index.html HEAD ETag가 바뀌었으면 본문 마커(<!-- vNN)를 읽어 APP_VER보다 크면 새로고침. 시트·집중 화면 중엔 미룸(다음 복귀 때) ──
-  var APP_VER = 58, appEtag = null;
+  var APP_VER = 59, appEtag = null;
   function checkUpdate_() {
     fetch('index.html', { method: 'HEAD', cache: 'no-store' }).then(function (r) {
       var et = r.headers.get('ETag') || r.headers.get('Last-Modified') || '';
