@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>가족 일정</title>
 <!-- v40 책 편집 v2: 자동완성·책 허브·⋯ 메뉴·병합·삭제·되돌리기·📚 책 세그먼트 — 2026-08-16 -->
+<!-- v58 ⚙️ 설정 아이콘 분리(모든 헤더), 이름 칩=표시 전용 — 2026-08-20 -->
 <!-- v57 ⚙️ 설정 시트(이름 칩 탭): 알림 상태·테스트·켜기 / 가족 등록 / (아빠) 이름 다시 고르기 / 앱 버전·업데이트 확인 — 2026-08-20 -->
 <!-- v56 🔔 배너 정리: 테스트 성공·✕ 후엔 숨김(pushOkSeen) — 2026-08-20 -->
 <!-- v55 🔥 Firestore P1: 가족 코드 페어링(1회)·records 이중 쓰기(saveBlock/undo/memo)·live 실시간(onSnapshot) — 2026-08-20 -->
@@ -164,6 +165,8 @@
   .bkweeks span { width: 22px; height: 22px; border-radius: 6px; background: #eef3f8; color: #b8c6d4; font-size: 12px; font-weight: 800; display: grid; place-items: center; }
   .bkweeks span.ok { background: #34a86b; color: #fff; } .bkweeks span.cur { box-shadow: 0 0 0 2px #ffb98a; }
   .bkweeks small { margin-left: 6px; font-size: 11.5px; color: var(--sub); font-weight: 700; }
+  .iconbtn.gear { font-size: 17px; }
+  .fd-top .r { display: flex; align-items: center; gap: 8px; }
   .setrow { display: flex; align-items: center; gap: 10px; padding: 13px 2px; border-bottom: 1px solid var(--line); font-size: 14.5px; font-weight: 700; }
   .setrow:last-child { border-bottom: none; }
   .setrow > span { flex: 1; min-width: 0; } .setrow small { display: block; font-size: 12px; font-weight: 600; color: var(--sub); margin-top: 2px; }
@@ -1004,9 +1007,11 @@
     startTick();
   }
   function canRename() { return !!(BOOT && BOOT.member && BOOT.member.code === ADMIN_CODE); }
-  /** 이름 칩 — 탭하면 ⚙️ 설정 시트 (v57) */
-  function whoChip(cls, id, name) { return '<button class="' + cls + '" id="' + id + '" title="설정">' + esc(name) + '</button>'; }
-  function bindWho(id) { var b = $(id); if (b) b.addEventListener('click', openSettings_); }
+  /** 이름 칩(표시 전용) + ⚙️ 설정 아이콘 (v58 — 설정 진입은 아이콘으로) */
+  function whoChip(cls, id, name) { return '<span class="' + cls + '">' + esc(name) + '</span>'; }
+  function gearBtn_(id) { return '<button class="iconbtn gear" id="' + id + '" title="설정" aria-label="설정">⚙️</button>'; }
+  function bindWho(id) { } // (v58) 설정은 ⚙️로 — 호출부 호환용
+  function bindGear_(id) { var b = $(id); if (b) b.addEventListener('click', openSettings_); }
   /** ⚙️ 설정 — 알림·가족 등록·앱 정보 + (아빠만) 이름 다시 고르기 */
   function openSettings_() {
     var m = BOOT.member;
@@ -1123,7 +1128,7 @@
 
   /** 📅 일정 탭 공용 헤더 — 앱바 + 세그먼트 [➕ 등록 · 📅 가족 일정] (v49, 시안 docs/mockups/2026-08-18-일정-탭-개선-시안.html A안) */
   function schedHeadHtml_(seg, whoId) {
-    return '<div class="appbar"><span class="t">📅 일정</span><div class="right">' + whoChip('who', whoId, BOOT.member.name) + '</div></div>' +
+    return '<div class="appbar"><span class="t">📅 일정</span><div class="right">' + gearBtn_('sgGear') + whoChip('who', whoId, BOOT.member.name) + '</div></div>' +
       '<div class="clseg schedseg"><button class="' + (seg === 'reg' ? 'on' : '') + '" data-sseg="reg">➕ 등록</button><button class="' + (seg === 'cal' ? 'on' : '') + '" data-sseg="cal">📅 가족 일정</button></div>';
   }
   function bindSchedSeg_() {
@@ -1200,7 +1205,7 @@
 
     if (isKakao) $('kakaoGo').addEventListener('click', function () { location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(location.origin + location.pathname); });
     if ($('installX')) $('installX').addEventListener('click', function () { store('installHintOff', '1'); $('installHint').style.display = 'none'; });
-    bindWho('whoBtn'); bindSchedSeg_();
+    bindGear_('sgGear'); bindSchedSeg_();
     var ua = $('upAll'); if (ua) ua.addEventListener('click', function () { store('schedSeg', 'cal'); openFamCal(); });
     var btns = $('app').querySelectorAll('.preset');
     for (var i = 0; i < btns.length; i++) (function (b) {
@@ -1266,7 +1271,7 @@
     }
     h += '</div><button class="lnk asmemos" id="fcOpenApp">구글 캘린더 앱에서 열기 ↗</button>';
     $('app').innerHTML = h;
-    bindWho('fcWho'); bindSchedSeg_();
+    bindGear_('sgGear'); bindSchedSeg_();
     $('fcPrev').addEventListener('click', function () { famcalShift_(-1); });
     $('fcNext').addEventListener('click', function () { famcalShift_(1); });
     var rt = $('fcRetry'); if (rt) rt.addEventListener('click', function () { delete famcalCache[ym]; renderFamCal(); });
@@ -1318,7 +1323,7 @@
     }
 
     // 헤더 한 줄(2026-08-16 정돈): 날짜 제목(탭→발자국 일 뷰) + D-day(있을 때) / 우측 이름 칩. 🌙 버튼·오늘 합계는 제거(21시 배너·발자국 일 뷰로)
-    var h = '<div class="fd-top"><button class="hdt" id="fdDate" title="발자국에서 오늘 보기"><span class="d">' + (nd.getMonth() + 1) + '월 ' + nd.getDate() + '일 ' + DOW_KO[nd.getDay()] + '요일 <small>›</small></span>' + ((vt || who.dday) ? '<span class="sub2">' + (vt ? '<span class="dd vw">👀 ' + esc(who.name) + '의 하루</span>' : '') + ddayFd(who) + '</span>' : '') + '</button><div class="r">' + whoChip('fd-who', 'fdWho', m.name) + '</div></div>';
+    var h = '<div class="fd-top"><button class="hdt" id="fdDate" title="발자국에서 오늘 보기"><span class="d">' + (nd.getMonth() + 1) + '월 ' + nd.getDate() + '일 ' + DOW_KO[nd.getDay()] + '요일 <small>›</small></span>' + ((vt || who.dday) ? '<span class="sub2">' + (vt ? '<span class="dd vw">👀 ' + esc(who.name) + '의 하루</span>' : '') + ddayFd(who) + '</span>' : '') + '</button><div class="r">' + gearBtn_('fdGear') + whoChip('fd-who', 'fdWho', m.name) + '</div></div>';
 
     // 루틴 링 카드 (오늘=BOOT.rings 실시간 / 과거=dayData.rings)
     var rg = isToday ? BOOT.rings : (dayData && dayData.rings);
@@ -1379,7 +1384,7 @@
 
     // 도크(큰 버튼+메뉴)는 공통 #tabbar가 담당 — 피드는 콘텐츠만
     $('app').innerHTML = h;
-    bindWho('fdWho');
+    bindGear_('fdGear');
     if ($('fdMoon')) $('fdMoon').addEventListener('click', openReview);
     document.querySelectorAll('.memo-edit[data-sid]').forEach(function (b) { b.addEventListener('click', function () { openMemoEdit(b.getAttribute('data-sid'), b.getAttribute('data-k'), b.getAttribute('data-memo') || ''); }); });
     if ($('fdNight')) $('fdNight').addEventListener('click', openReview);
@@ -2380,7 +2385,7 @@
     renderTabs();
     var md = calMonth_(); // 대상 칩·연습 여부는 월 데이터에서
     var tgtName = (statsTarget && statsTarget !== BOOT.member.code) ? ((md && md.target && md.target.name) || (BOOT.viewTarget && BOOT.viewTarget.code === statsTarget ? BOOT.viewTarget.name : '')) : '';
-    var h = '<div class="appbar"><span class="t">👣 ' + (tgtName ? esc(tgtName) + '의' : '나의') + ' 발자국</span><div class="right"><span class="who">' + esc(BOOT.member.name) + '</span></div></div>';
+    var h = '<div class="appbar"><span class="t">👣 ' + (tgtName ? esc(tgtName) + '의' : '나의') + ' 발자국</span><div class="right">' + gearBtn_('calGear') + '<span class="who">' + esc(BOOT.member.name) + '</span></div></div>';
     if (md && md.targets && md.targets.length) {
       h += '<div class="chips" style="justify-content:center;margin-bottom:10px">' +
         md.targets.map(function (m) { return '<button class="chip st-t' + (m.code === md.target.code ? ' on' : '') + '" data-c="' + esc(m.code) + '">' + esc(m.name) + '</button>'; }).join('') + '</div>';
@@ -2704,6 +2709,7 @@
     var n = $('clNext'); if (n) n.addEventListener('click', function () { if (!n.disabled) calShift_(1); });
     var r = $('calRetry'); if (r) r.addEventListener('click', calRetry_);
     var da = $('dayAdd'); if (da) da.addEventListener('click', function () { openPastLogPicker(da.getAttribute('data-d')); });
+    bindGear_('calGear');
     $('app').querySelectorAll('[data-day]').forEach(function (b) { b.addEventListener('click', function (ev) { if (ev.target.closest && ev.target.closest('[data-med]')) return; var ds = b.getAttribute('data-day'); if (ds > todayStr()) return; calDate = ds; calMode = 'day'; renderCal(); }); });
     $('app').querySelectorAll('[data-mk]').forEach(function (b) { b.addEventListener('click', function () { memoKind = b.getAttribute('data-mk'); renderCal(); }); });
     var mm = $('memoMore'); if (mm) mm.addEventListener('click', memoMore_);
@@ -2953,7 +2959,7 @@
     if ((isViewer() && view === 'feed') || Date.now() - lastInitAt > 60000) init();
   });
   // ── 새 버전 자동 반영 (v45): 복귀 때 서버 index.html HEAD ETag가 바뀌었으면 본문 마커(<!-- vNN)를 읽어 APP_VER보다 크면 새로고침. 시트·집중 화면 중엔 미룸(다음 복귀 때) ──
-  var APP_VER = 57, appEtag = null;
+  var APP_VER = 58, appEtag = null;
   function checkUpdate_() {
     fetch('index.html', { method: 'HEAD', cache: 'no-store' }).then(function (r) {
       var et = r.headers.get('ETag') || r.headers.get('Last-Modified') || '';
