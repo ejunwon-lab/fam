@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>가족 일정</title>
 <!-- v40 책 편집 v2: 자동완성·책 허브·⋯ 메뉴·병합·삭제·되돌리기·📚 책 세그먼트 — 2026-08-16 -->
+<!-- v63 ⏰ 끝내기 안 누른 세션 안전장치: 자정 넘긴 세션은 부팅·복귀 때 보정 시트(언제까지 했어?), 같은 날 4h+는 홈 배너, FS 라이브 12h 필터 — 2026-08-20 -->
 <!-- v62 홈도 P2 계산: FS 준비 시 오늘 피드·링·스트릭 폰 계산(실시간), 미러 도착 블록 pendingBlocks 제거 — 탭 전환 사이 홈 낡음 해소 — 2026-08-20 -->
 <!-- v61 CY 전용 앱 아이콘(cy-icon.png, ?u=cy·famcode=cy일 때 apple-touch-icon 교체 — 재설치 시 적용) — 2026-08-20 -->
 <!-- v60 🔥 Firestore P2: 발자국 월·주·일·기록·책을 폰에서 계산(fs-calc.js, records/notes/books 구독·실시간 무효화) — 골든 23+14 diff=0, 롤백 localStorage fsreads='0' — 2026-08-20 -->
@@ -961,6 +962,7 @@
   function init() {
     var code = myCode();
     sess = loadSess();
+    setTimeout(maybeStalePrompt_, 500); // ⏰ 자정 넘긴 세션 보정 (v63)
     // 진행 중 세션이 있어도 피드 홈으로 복귀 — 라이브 카드 탭으로 측정 화면 진입
     // 캐시 우선: 지난 데이터로 즉시 그리고, 최신은 뒤에서 받아 갱신 (앱 시작 체감 0초)
     var cached = null;
@@ -1350,6 +1352,8 @@
       if (CHEER_BANNER && ch.length) h += '<div class="cheer">❤️ ' + esc(ch.map(function (c) { return c.name; }).join(' · ')) + '가 응원해요<small>' + esc(ch[ch.length - 1].at) + '</small></div>';
       if (m.practice) { var rvTot = rg && rg.rings ? rg.rings.reduce(function (a, r) { return a + r.doneMin; }, 0) : 0;
         h += '<button class="night" id="fdNight">' + REVIEW_ICON + ' ' + REVIEW_NAME + '<small>' + (BOOT.note ? '한마디 남김 ✓' : (nd.getHours() >= 21 ? '자기 전에 1분 →' : (rvTot ? '지금까지 ' + durLabel(rvTot) + ' →' : '오늘 어땠는지 →'))) + '</small></button>'; } // 항상 표시 (2026-08-16 주인님 — 21시 제한 해제) · 부제는 시간대별(v41)
+      var siB = !vt && staleSessInfo_(); // ⏰ 4시간+ 계속 켜져 있으면 배너 → 보정 시트 (v63)
+      if (siB) h += '<button class="night" id="fdStale" style="background:#fff4ea;border:1px solid #f0cfae">⏰ ' + (sess.state === 'break' ? '☁️ 휴식' : esc(sess.kind)) + ' ' + Math.floor(siB.el / 3600000) + '시간째 계속<small>끝내는 걸 잊었다면 여기를 탭 →</small></button>';
       if (BOOT.note && vt) h += '<div class="cheer" style="background:#eef2fb;border-color:#cdd8f2;color:#2c3e6b">🌙 ' + esc(who.name) + '의 한마디 — "' + esc(BOOT.note) + '"</div>';
       h += pushBannerHtml_(); // 연습자=목표 알림 · 부모=테스트/앞으로 소식 (v52)
       h += lessonLineHtml();
@@ -1404,6 +1408,7 @@
     if ($('fdMoon')) $('fdMoon').addEventListener('click', openReview);
     document.querySelectorAll('.memo-edit[data-sid]').forEach(function (b) { b.addEventListener('click', function () { openMemoEdit(b.getAttribute('data-sid'), b.getAttribute('data-k'), b.getAttribute('data-memo') || ''); }); });
     if ($('fdNight')) $('fdNight').addEventListener('click', openReview);
+    if ($('fdStale')) $('fdStale').addEventListener('click', function () { staleEndHM = nowHM_(); openStaleSheet(); }); // ⏰ (v63) 같은 날 배너 — 기본값은 지금
     if ($('fdLive')) $('fdLive').addEventListener('click', function () { openActivitySheet(sess.kind); });
     $('fdDate').addEventListener('click', function () { openCal('day', todayStr(), true); });
     if ($('fdRecall')) $('fdRecall').addEventListener('click', function () { var rc = BOOT.recall, pb = rc.k === '독서' ? parseBookF_(rc.memo) : null; if (pb && pb.title) { calCache = {}; if (!statsTarget) statsTarget = isViewer() ? BOOT.viewTarget.code : ''; openBook('t:' + pb.title); } else openCal('day', rc.date, true); });
@@ -2332,6 +2337,7 @@
     fsInitClient_().then(function (db) {
       fsLiveUnsub = db.collection('live').doc(BOOT.viewTarget.code).onSnapshot(function (snap) {
         var d = snap.data();
+        if (d && d.at && d.at.toMillis && Date.now() - d.at.toMillis() > 12 * 3600000) d = null; // 12시간 넘은 유령 라이브 무시 (v63 — GAS init 경로와 동일 규칙)
         var nv = (d && d.state && d.state !== 'idle') ? { state: d.state, kind: d.kind || '', at: d.at && d.at.toMillis ? d.at.toMillis() : Date.now() } : null;
         var was = JSON.stringify(BOOT.live || null);
         BOOT.live = nv;
@@ -2409,6 +2415,62 @@
     if (undoTimer) clearTimeout(undoTimer);
     undoTimer = setTimeout(function () { toast.className = 'toast'; toast.style.pointerEvents = 'none'; lastBlock = null; }, 5000);
   }
+  // ── ⏰ 끝내기 안 누른 세션 안전장치 (v63) — 자정 넘긴 세션은 부팅·복귀 때 보정 시트, 같은 날 4시간+는 홈 배너. 설계 docs/plans/2026-08-20-firestore-P3P4-세션-안전장치.md ──
+  var staleEndHM = '';
+  function staleSessInfo_() {
+    if (!sess) return null;
+    var el = Date.now() - sess.segStart;
+    var d0 = new Date(); d0.setHours(0, 0, 0, 0);
+    if (sess.segStart < d0.getTime() && el >= 2 * 3600000) return { why: 'midnight', el: el }; // 자정 넘김(23:50 시작 새벽 복귀 같은 진짜 밤샘은 2시간 미만이라 안 걸림)
+    if (el >= 4 * 3600000) return { why: 'long', el: el };
+    return null;
+  }
+  function maybeStalePrompt_() {
+    var si = staleSessInfo_();
+    if (!si || si.why !== 'midnight' || !BOOT || !BOOT.member || isViewer()) return;
+    if (read('staleskip') === String(sess.segStart)) return; // "계속하고 있어" 선택한 세션은 다시 안 물음
+    if (document.body.classList.contains('rt-open') || document.body.classList.contains('measuring')) return;
+    openStaleSheet();
+  }
+  function openStaleSheet() {
+    if (!sess) return;
+    var s = subjByName(sess.kind);
+    var isBrk = sess.state === 'break';
+    var st = new Date(sess.segStart);
+    var stLbl = (st.getMonth() + 1) + '월 ' + st.getDate() + '일 ' + pad(st.getHours()) + ':' + pad(st.getMinutes());
+    if (!staleEndHM) { var de = new Date(Math.min(sess.segStart + 3600000, Date.now())); staleEndHM = pad(de.getHours()) + ':' + pad(de.getMinutes()); }
+    $('rsheet').style.setProperty('--rt-c', (s && s.color) || '#3d6f9e');
+    $('rsheet').innerHTML = '<div class="grip"></div><h2>⏰ 끝내기를 안 눌렀나 봐요</h2>' +
+      '<p class="sub">' + (isBrk ? '☁️ 휴식' : actLabel(sess.kind)) + '이 <b>' + stLbl + '</b>부터 계속 켜져 있었어요.<br>실제로 언제까지 했는지 알려주면 그 시간까지만 기록해요.</p>' +
+      '<div class="f-label">언제까지 했어?</div><div class="chips" id="stChips">' +
+      [30, 60, 120].map(function (m2) { var t2 = new Date(sess.segStart + m2 * 60000); var hm2 = pad(t2.getHours()) + ':' + pad(t2.getMinutes()); return '<button class="chip" data-hm="' + hm2 + '">' + durLabel(m2) + ' 뒤 (' + hm2 + ')</button>'; }).join('') + '</div>' +
+      '<div class="endrow"><span>끝난 시간 <b id="stEndLbl">' + esc(staleEndHM) + '</b> <small>시작한 날 기준 · 시작보다 이르면 다음 날 새벽</small></span><input type="time" id="stEndIn" value="' + esc(staleEndHM) + '"></div>' +
+      '<button class="cta" id="stSave">이 시간까지 한 걸로 저장</button>' +
+      '<button class="alt" id="stKeep">아니야, 계속하고 있어 — 그대로 두기</button>';
+    document.body.classList.add('rt-open');
+    $('rsheet').querySelectorAll('#stChips .chip').forEach(function (c) {
+      c.addEventListener('click', function () { staleEndHM = c.getAttribute('data-hm'); $('stEndIn').value = staleEndHM; $('stEndLbl').textContent = staleEndHM; });
+    });
+    $('stEndIn').addEventListener('change', function () { staleEndHM = this.value || staleEndHM; $('stEndLbl').textContent = staleEndHM; });
+    $('stKeep').addEventListener('click', function () { store('staleskip', String(sess.segStart)); staleEndHM = ''; closeRoutineSheet(); render(); });
+    $('stSave').addEventListener('click', function () {
+      var hm = (staleEndHM || '').split(':'); if (hm.length < 2 || !sess) return;
+      var d2 = new Date(sess.segStart); d2.setHours(+hm[0], +hm[1], 0, 0);
+      if (d2.getTime() <= sess.segStart) d2.setDate(d2.getDate() + 1); // 시작보다 이르면 다음 날(자정 넘김)
+      var endMs = Math.min(d2.getTime(), Date.now());
+      var prev = { kind: sess.kind, state: sess.state, segStart: sess.segStart };
+      var id = saveBlock(prev.state === 'break' ? 'break' : 'practice', prev.state === 'break' ? '휴식' : prev.kind, prev.segStart, endMs, '');
+      var lbl = (prev.state === 'break' ? '휴식' : actLabel(prev.kind)) + ' ' + human(endMs - prev.segStart);
+      sess = null; store(SKEY, null); store('staleskip', null);
+      sendEvent('end', 0, null); // 라이브 클리어 + 목표 알람 취소
+      lastBlock = id ? { sessionId: id, prevSess: prev } : null;
+      staleEndHM = ''; closeRoutineSheet(); closeMeasure(); overlayOpen = false;
+      if (view === 'timer') view = 'feed';
+      render();
+      if (id) showUndoToast(lbl + ' 저장됨'); else showToast('너무 짧아서 저장하지 않았어요');
+    });
+  }
+
   // 하위 호환 별칭 (연습 탭·집중 화면)
   function doBreak() { goBreak(); }
   function tFinish() { endActivity(); }
@@ -3041,10 +3103,11 @@
     if (document.hidden || !BOOT || !BOOT.member) return;
     flushBlocks(); flushEvents(); // 밀린 저장부터 (v53)
     checkUpdate_(); // 새 버전이면 새로고침 (아래)
+    maybeStalePrompt_(); // ⏰ 자정 넘긴 세션 보정 (v63)
     if ((isViewer() && view === 'feed') || Date.now() - lastInitAt > 60000) init();
   });
   // ── 새 버전 자동 반영 (v45): 복귀 때 서버 index.html HEAD ETag가 바뀌었으면 본문 마커(<!-- vNN)를 읽어 APP_VER보다 크면 새로고침. 시트·집중 화면 중엔 미룸(다음 복귀 때) ──
-  var APP_VER = 62, appEtag = null;
+  var APP_VER = 63, appEtag = null;
   function checkUpdate_() {
     fetch('index.html', { method: 'HEAD', cache: 'no-store' }).then(function (r) {
       var et = r.headers.get('ETag') || r.headers.get('Last-Modified') || '';
