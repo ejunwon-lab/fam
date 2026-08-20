@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>가족 일정</title>
 <!-- v40 책 편집 v2: 자동완성·책 허브·⋯ 메뉴·병합·삭제·되돌리기·📚 책 세그먼트 — 2026-08-16 -->
+<!-- v57 ⚙️ 설정 시트(이름 칩 탭): 알림 상태·테스트·켜기 / 가족 등록 / (아빠) 이름 다시 고르기 / 앱 버전·업데이트 확인 — 2026-08-20 -->
 <!-- v56 🔔 배너 정리: 테스트 성공·✕ 후엔 숨김(pushOkSeen) — 2026-08-20 -->
 <!-- v55 🔥 Firestore P1: 가족 코드 페어링(1회)·records 이중 쓰기(saveBlock/undo/memo)·live 실시간(onSnapshot) — 2026-08-20 -->
 <!-- v54 전송 계층 강화: fetch keepalive + 잠금 순간 sendBeacon 위탁 발사(멱등 안전) — 큐는 최후 보루로 강등 — 2026-08-20 -->
@@ -163,6 +164,11 @@
   .bkweeks span { width: 22px; height: 22px; border-radius: 6px; background: #eef3f8; color: #b8c6d4; font-size: 12px; font-weight: 800; display: grid; place-items: center; }
   .bkweeks span.ok { background: #34a86b; color: #fff; } .bkweeks span.cur { box-shadow: 0 0 0 2px #ffb98a; }
   .bkweeks small { margin-left: 6px; font-size: 11.5px; color: var(--sub); font-weight: 700; }
+  .setrow { display: flex; align-items: center; gap: 10px; padding: 13px 2px; border-bottom: 1px solid var(--line); font-size: 14.5px; font-weight: 700; }
+  .setrow:last-child { border-bottom: none; }
+  .setrow > span { flex: 1; min-width: 0; } .setrow small { display: block; font-size: 12px; font-weight: 600; color: var(--sub); margin-top: 2px; }
+  .setrow .lk { font: inherit; font-size: 12.5px; font-weight: 800; border: 1px solid var(--line); background: #fff; color: #3d6f9e; border-radius: 999px; padding: 6px 13px; cursor: pointer; }
+  .setrow .lk.on { background: #ff8a3d; border-color: #ff8a3d; color: #fff; }
   .pushb { display: flex; align-items: center; gap: 8px; background: #fff7ec; border: 1px solid #ffd9b0; border-radius: 14px; padding: 9px 12px; margin: 10px 0 0; font-size: 13px; font-weight: 700; color: #7a4a12; }
   .pushb span { flex: 1; min-width: 0; } .pushb small { display: block; font-size: 11.5px; font-weight: 600; color: #a0703a; margin-top: 2px; }
   .pushb.on { background: #eef8f1; border-color: #bfe3cb; color: #22633b; } .pushb.on small { color: #4d8a63; }
@@ -998,9 +1004,31 @@
     startTick();
   }
   function canRename() { return !!(BOOT && BOOT.member && BOOT.member.code === ADMIN_CODE); }
-  /** 이름 칩 — 아빠만 탭하면 이름 다시 고르기, 나머지는 표시만 */
-  function whoChip(cls, id, name) { return canRename() ? '<button class="' + cls + '" id="' + id + '" title="이름 바꾸기">' + esc(name) + '</button>' : '<span class="' + cls + '">' + esc(name) + '</span>'; }
-  function bindWho(id) { var b = $(id); if (b && b.tagName === 'BUTTON') b.addEventListener('click', function () { if (confirm('이름을 다시 고를까요?')) { store('famcode', null); init(); } }); }
+  /** 이름 칩 — 탭하면 ⚙️ 설정 시트 (v57) */
+  function whoChip(cls, id, name) { return '<button class="' + cls + '" id="' + id + '" title="설정">' + esc(name) + '</button>'; }
+  function bindWho(id) { var b = $(id); if (b) b.addEventListener('click', openSettings_); }
+  /** ⚙️ 설정 — 알림·가족 등록·앱 정보 + (아빠만) 이름 다시 고르기 */
+  function openSettings_() {
+    var m = BOOT.member;
+    var perm = ('Notification' in window) ? Notification.permission : 'unsupported';
+    var pushSt = !PUSH ? '준비 안 됨' : (perm === 'granted' && read('pushOn') === '1' ? '켜짐 ✓' : (perm === 'denied' ? '꺼짐 — 아이폰 설정 › 알림에서 허용' : '꺼짐'));
+    var canPush = pushSupported_();
+    var paired = read('fspaired') === '1';
+    $('rsheet').style.setProperty('--rt-c', '#3d6f9e');
+    var h = '<div class="grip"></div><h2>⚙️ 설정 <span class="pill">' + esc(m.name) + '</span></h2>' +
+      '<div class="setrow"><span>🔔 알림<small>' + esc(pushSt) + '</small></span>' +
+        (canPush ? (perm === 'granted' && read('pushOn') === '1' ? '<button class="lk" id="stTest">테스트</button>' : (perm !== 'denied' ? '<button class="lk on" id="stPushOn">켜기</button>' : '')) : '') + '</div>' +
+      '<div class="setrow"><span>🔐 가족 등록<small>' + (paired ? '이 폰은 등록돼 있어요 ✓' : '아직 등록 안 됨') + '</small></span>' + (!paired && PUSH ? '<button class="lk on" id="stPair">등록</button>' : '') + '</div>' +
+      (canRename() ? '<div class="setrow"><span>👤 이 폰의 이름<small>' + esc(m.name) + ' — 다시 고르면 처음 화면으로</small></span><button class="lk" id="stWho">다시 고르기</button></div>' : '') +
+      '<div class="setrow"><span>📱 앱 버전<small>v' + APP_VER + '</small></span><button class="lk" id="stUpd">업데이트 확인</button></div>';
+    $('rsheet').innerHTML = h;
+    document.body.classList.add('rt-open');
+    if ($('stTest')) $('stTest').addEventListener('click', function () { var t = $('stTest'); t.disabled = true; t.textContent = '보내는 중…'; fetch(API, { method: 'POST', body: JSON.stringify({ action: 'push_test', u: BOOT.member.code }) }).then(function (r) { return r.json(); }).then(function (res) { t.disabled = false; t.textContent = '테스트'; if (res && res.ok) { showToast('🔔 보냈어요 — 잠금 화면/상단을 확인'); store('pushOkSeen', '1'); } else showToast((res && res.error) || '실패', true); }).catch(function () { t.disabled = false; t.textContent = '테스트'; showToast('전송 실패 — 인터넷 확인', true); }); });
+    if ($('stPushOn')) $('stPushOn').addEventListener('click', function () { closeRoutineSheet(); pushEnable_(); });
+    if ($('stPair')) $('stPair').addEventListener('click', function () { store('fsPairOff', ''); openPairSheet_(); });
+    if ($('stWho')) $('stWho').addEventListener('click', function () { if (confirm('이름을 다시 고를까요?')) { closeRoutineSheet(); store('famcode', null); store('fspaired', ''); store('pushOn', ''); store('pushOkSeen', ''); init(); } });
+    if ($('stUpd')) $('stUpd').addEventListener('click', function () { showToast('확인 중…'); appEtag = 'force'; checkUpdate_(); setTimeout(function () { showToast('최신이면 그대로, 새 버전이면 곧 새로고침돼요'); }, 1500); });
+  }
   /** 과목 아이콘 — 시트 이모지 기본, 오버라이드(뉴스=네이버 N 배지, 2026-08-16) */
   var ICON_OVERRIDE = { '뉴스': '<span class="ico-n">N</span>', '운동': '🏃‍♀️' }; // 운동 🏃‍♀️ (2026-08-16 주인님 선택 — 시트 G열은 🏋️ 그대로여도 프론트가 우선)
   var EMOJI_OVERRIDE = { '운동': '🏃‍♀️' }; // 텍스트(토스트·상태바) 용
@@ -2925,7 +2953,7 @@
     if ((isViewer() && view === 'feed') || Date.now() - lastInitAt > 60000) init();
   });
   // ── 새 버전 자동 반영 (v45): 복귀 때 서버 index.html HEAD ETag가 바뀌었으면 본문 마커(<!-- vNN)를 읽어 APP_VER보다 크면 새로고침. 시트·집중 화면 중엔 미룸(다음 복귀 때) ──
-  var APP_VER = 56, appEtag = null;
+  var APP_VER = 57, appEtag = null;
   function checkUpdate_() {
     fetch('index.html', { method: 'HEAD', cache: 'no-store' }).then(function (r) {
       var et = r.headers.get('ETag') || r.headers.get('Last-Modified') || '';
