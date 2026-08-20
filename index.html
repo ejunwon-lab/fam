@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>가족 일정</title>
 <!-- v40 책 편집 v2: 자동완성·책 허브·⋯ 메뉴·병합·삭제·되돌리기·📚 책 세그먼트 — 2026-08-16 -->
+<!-- v60 🔥 Firestore P2: 발자국 월·주·일·기록·책을 폰에서 계산(fs-calc.js, records/notes/books 구독·실시간 무효화) — 골든 23+14 diff=0, 롤백 localStorage fsreads='0' — 2026-08-20 -->
 <!-- v59 발자국 stale-first: 마지막 응답 localStorage → 즉시 그리고 뒤에서 갱신, 프리페치에 주 뷰 추가 — 2026-08-20 -->
 <!-- v58 ⚙️ 설정 아이콘 분리(모든 헤더), 이름 칩=표시 전용 — 2026-08-20 -->
 <!-- v57 ⚙️ 설정 시트(이름 칩 탭): 알림 상태·테스트·켜기 / 가족 등록 / (아빠) 이름 다시 고르기 / 앱 버전·업데이트 확인 — 2026-08-20 -->
@@ -889,6 +890,7 @@
   <input type="file" id="camFile" accept="image/*" capture="user" style="display:none">
 
 <script src="push-config.js"></script>
+<script src="fs-calc.js"></script>
 <script>
   var API = 'https://script.google.com/macros/s/AKfycbxCMHMAE-br_i_MuSG7kQx-Jk6RZW-bqSQVBEorqXo0_EIa0BmujdHZJCNb_n0sSvU4lA/exec';
   var HUES = ['indigo', 'teal', 'amber'];
@@ -2237,12 +2239,67 @@
         .catch(function (e) { store('fspaired', ''); b.disabled = false; b.textContent = '등록'; showToast(/permission/i.test(String(e)) ? '가족 코드가 달라요' : '등록 실패 — 인터넷 확인', true); });
     });
   }
-  function fsAfterPair_() { fsWatchLive_(); }
+  function fsAfterPair_() { fsWatchLive_(); if (BOOT && BOOT.member) fsWatchData_(isViewer() && BOOT.viewTarget ? BOOT.viewTarget.code : BOOT.member.code); }
+  // ── 🔥 발자국 읽기 이전 (P2, v60): records/notes/books 구독 → FSCALC 계산 → calCache 단락. 롤백: localStorage fsreads='0' ──
+  var FS_READS = read('fsreads') !== '0';
+  var fsD = {}, fsCfgMembers = null, fsCfgPresets = null, fsCfgSubjects = null, fsCfgUnsubbed = false;
+  function fsWatchCfg_(db) {
+    if (fsCfgUnsubbed) return; fsCfgUnsubbed = true;
+    db.collection('config').doc('members').onSnapshot(function (sn) { var d = sn.data(); if (d && d.list) { fsCfgMembers = d.list; } });
+    db.collection('config').doc('presets').onSnapshot(function (sn) { var d = sn.data(); if (d && d.list) { fsCfgPresets = d.list; } });
+    db.collection('config').doc('subjects').onSnapshot(function (sn) { var d = sn.data(); if (d && d.list) { fsCfgSubjects = d.list; } });
+  }
+  function fsWatchData_(t) {
+    if (!t || fsD[t] || !fsReady_()) return;
+    var st = fsD[t] = { recs: {}, notes: {}, books: {}, rdy: {}, unsubs: [] };
+    fsInitClient_().then(function (db) {
+      fsWatchCfg_(db);
+      var ms = function (v) { return v && v.toMillis ? v.toMillis() : +v; };
+      st.unsubs.push(db.collection('records').where('code', '==', t).onSnapshot(function (qs) {
+        qs.docChanges().forEach(function (ch) { var d = ch.doc; if (ch.type === 'removed') delete st.recs[d.id]; else { var x = d.data(); st.recs[d.id] = { id: d.id, sid: x.sid, code: x.code, type: x.type, kind: x.kind, title: x.title, start: ms(x.start), end: ms(x.end), memo: x.memo || '' }; } });
+        st.rdy.r = 1; fsInvalidate_(t);
+      }, function () { st.rdy.r = 0; }));
+      st.unsubs.push(db.collection('notes').where('code', '==', t).onSnapshot(function (qs) {
+        qs.docChanges().forEach(function (ch) { var d = ch.doc; var x = d.data(); if (ch.type === 'removed') { Object.keys(st.notes).forEach(function (k) { if (st.notes[k].__id === d.id) delete st.notes[k]; }); } else if (x && x.date) { st.notes[x.date] = x.text || ''; } });
+        st.rdy.n = 1; fsInvalidate_(t);
+      }, function () { st.rdy.n = 0; }));
+      st.unsubs.push(db.collection('books').where('code', '==', t).onSnapshot(function (qs) {
+        qs.docChanges().forEach(function (ch) { var d = ch.doc; if (ch.type === 'removed') delete st.books[d.id]; else { var x = d.data(); st.books[d.id] = { key: x.key, title: x.title, seq: x.seq || 1, author: x.author || '', status: x.status || '', start: x.start || '', doneDate: x.doneDate || '', rating: x.rating || 0, review: x.review || '' }; } });
+        st.rdy.b = 1; fsInvalidate_(t);
+      }, function () { st.rdy.b = 0; }));
+    }).catch(function () {});
+  }
+  function fsReadyFor_(t) { var st = fsD[t]; return !!(FS_READS && typeof FSCALC !== 'undefined' && st && st.rdy.r && st.rdy.n && st.rdy.b && fsCfgMembers && fsCfgPresets && BOOT && BOOT.subjects && (fsCfgMembers || []).some(function (m2) { return m2.code === t; })); }
+  function fsInvalidate_(t) {
+    Object.keys(calCache).forEach(function (k) { var p = k.split(':'); if (p[1] === t) delete calCache[k]; });
+    if (view === 'stats' && calTarget_() === t) renderCal(); // 실시간 발자국
+  }
+  function fsCtxFor_(t) {
+    var st = fsD[t]; var mem = (fsCfgMembers || []).find(function (m2) { return m2.code === t; }); if (!st || !mem) return null;
+    var recs = Object.keys(st.recs).map(function (k) { return st.recs[k]; });
+    var books = Object.keys(st.books).map(function (k) { return st.books[k]; });
+    return { recs: recs, notes: st.notes, books: books, member: mem, subjects: fsCfgSubjects || BOOT.subjects, presets: fsCfgPresets, now: new Date() }; // 과목은 FS config 우선(항상 전체본)
+  }
+  function fsCompute_(key) {
+    var i1 = key.indexOf(':'), i2 = key.indexOf(':', i1 + 1);
+    var kind = key.slice(0, i1), t = key.slice(i1 + 1, i2), par = key.slice(i2 + 1);
+    if (!fsReadyFor_(t)) return null;
+    try {
+      var c = FSCALC.make(fsCtxFor_(t)); var out = null;
+      if (kind === 'm') { out = c.stats(+par || 0); if (BOOT.member.statsAll) out.targets = fsCfgMembers.map(function (m2) { return { code: m2.code, name: m2.name }; }); }
+      else if (kind === 'w') out = c.week(par);
+      else if (kind === 'd') out = c.day(par);
+      else if (kind === 'x') out = c.memos(par, '', 30);
+      else if (kind === 'b') out = c.books();
+      else if (kind === 'bk') out = par.indexOf('t:') === 0 ? c.book('', par.slice(2)) : c.book(par, '');
+      return out;
+    } catch (e) { return null; }
+  }
   /** records 이중 쓰기 — fire & forget (GAS 큐가 원본 경로, FS는 P2 읽기 대비 미러) */
   function fsBlock_(sessionId, type, kind, start, end, memo) {
     if (!fsReady_()) return;
     fsInitClient_().then(function (db) {
-      return db.collection('records').doc(sessionId).set({ code: BOOT.member.code, type: type, kind: kind, start: firebase.firestore.Timestamp.fromMillis(start), end: firebase.firestore.Timestamp.fromMillis(end), memo: memo || '', src: 'app' }, { merge: true });
+      return db.collection('records').doc(sessionId).set({ code: BOOT.member.code, sid: sessionId, type: type, kind: kind, title: kind, start: firebase.firestore.Timestamp.fromMillis(start), end: firebase.firestore.Timestamp.fromMillis(end), memo: memo || '', src: 'app' }, { merge: true });
     }).catch(function () {});
   }
   function fsBlockDelete_(sessionId) { if (!fsReady_()) return; fsInitClient_().then(function (db) { return db.collection('records').doc(sessionId).delete(); }).catch(function () {}); }
@@ -2379,6 +2436,7 @@
     } catch (e) {}
   }
   function calFetch_(key, url) {
+    if (FS_READS) { fsWatchData_(calTarget_()); var fsOut = fsCompute_(key); if (fsOut && !fsOut.error) { calCache[key] = fsOut; return; } } // 🔥 P2: 폰에서 즉시 계산(구독 준비 전엔 GAS 폴백)
     if (calCache[key] && !calCache[key].__stale) return;
     if (calCache[key] && calCache[key].__fetching) return;
     if (!calCache[key]) { var st = calLS_()[key]; calCache[key] = st ? Object.assign({}, st.d, { __stale: true }) : { loading: true }; }
@@ -2436,6 +2494,7 @@
   function calMemos_() { var k = memoKey_(); calFetch_(k, '?api=memos&k=' + encodeURIComponent(memoKind) + '&n=30'); return calCache[k]; }
   function memoMore_() {
     var k = memoKey_(), cur = calCache[k]; if (!cur || cur.loading || !cur.more || cur.loadingMore) return;
+    if (FS_READS && fsReadyFor_(calTarget_())) { try { var c2 = FSCALC.make(fsCtxFor_(calTarget_())); var d2 = c2.memos(memoKind, cur.next, 30); cur.items = cur.items.concat(d2.items || []); cur.more = d2.more; cur.next = d2.next; renderCal(); return; } catch (e2) {} } // 🔥 P2
     cur.loadingMore = true; renderCal();
     fetch(API + '?api=memos&k=' + encodeURIComponent(memoKind) + '&n=30&before=' + cur.next + '&u=' + encodeURIComponent(BOOT.member.code) + '&t=' + encodeURIComponent(statsTarget))
       .then(function (r) { return r.json(); })
@@ -2971,7 +3030,7 @@
     if ((isViewer() && view === 'feed') || Date.now() - lastInitAt > 60000) init();
   });
   // ── 새 버전 자동 반영 (v45): 복귀 때 서버 index.html HEAD ETag가 바뀌었으면 본문 마커(<!-- vNN)를 읽어 APP_VER보다 크면 새로고침. 시트·집중 화면 중엔 미룸(다음 복귀 때) ──
-  var APP_VER = 59, appEtag = null;
+  var APP_VER = 60, appEtag = null;
   function checkUpdate_() {
     fetch('index.html', { method: 'HEAD', cache: 'no-store' }).then(function (r) {
       var et = r.headers.get('ETag') || r.headers.get('Last-Modified') || '';
