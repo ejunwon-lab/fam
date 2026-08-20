@@ -1,6 +1,6 @@
 /* 가족 일정 — 앱 셸 캐시: index.html=네트워크 우선(항상 최신, 오프라인 폴백), 나머지=stale-while-revalidate */
-var CACHE = 'fam-shell-v16';
-var SHELL = ['./', './index.html', './push-config.js', './fs-calc.js', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png', './bass.jpg', './tl/bass.jpg', './tl/book.jpg', './tl/news.jpg', './tl/theory.jpg', './tl/gym.jpg'];
+var CACHE = 'fam-shell-v17';
+var SHELL = ['./', './index.html', './push-config.js', './fs-calc.js', './cy-icon.png', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png', './bass.jpg', './tl/bass.jpg', './tl/book.jpg', './tl/news.jpg', './tl/theory.jpg', './tl/gym.jpg'];
 
 self.addEventListener('install', function (e) {
   self.skipWaiting();

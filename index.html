@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>가족 일정</title>
 <!-- v40 책 편집 v2: 자동완성·책 허브·⋯ 메뉴·병합·삭제·되돌리기·📚 책 세그먼트 — 2026-08-16 -->
+<!-- v61 CY 전용 앱 아이콘(cy-icon.png, ?u=cy·famcode=cy일 때 apple-touch-icon 교체 — 재설치 시 적용) — 2026-08-20 -->
 <!-- v60 🔥 Firestore P2: 발자국 월·주·일·기록·책을 폰에서 계산(fs-calc.js, records/notes/books 구독·실시간 무효화) — 골든 23+14 diff=0, 롤백 localStorage fsreads='0' — 2026-08-20 -->
 <!-- v59 발자국 stale-first: 마지막 응답 localStorage → 즉시 그리고 뒤에서 갱신, 프리페치에 주 뷰 추가 — 2026-08-20 -->
 <!-- v58 ⚙️ 설정 아이콘 분리(모든 헤더), 이름 칩=표시 전용 — 2026-08-20 -->
@@ -28,6 +29,8 @@
 <link rel="preconnect" href="https://script.googleusercontent.com">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script>/* CY 폰 전용 홈 화면 아이콘 (v61, CY 요청) — 추가(설치) 시점에 링크를 바꿔치기. 다른 가족은 기본 아이콘 */
+(function(){try{var u=new URLSearchParams(location.search).get('u')||localStorage.getItem('famcode');if(u==='cy'){var l=document.querySelector('link[rel="apple-touch-icon"]');if(l)l.href='cy-icon.png';}}catch(e){}})();</script>
 <link rel="icon" type="image/png" href="icon-192.png">
 <style>
   /* 밝은 크림/오렌지 톤 — CY 피드 홈과 동일한 분위기로 앱 전체 통일 (2026-07-18)
@@ -3030,7 +3033,7 @@
     if ((isViewer() && view === 'feed') || Date.now() - lastInitAt > 60000) init();
   });
   // ── 새 버전 자동 반영 (v45): 복귀 때 서버 index.html HEAD ETag가 바뀌었으면 본문 마커(<!-- vNN)를 읽어 APP_VER보다 크면 새로고침. 시트·집중 화면 중엔 미룸(다음 복귀 때) ──
-  var APP_VER = 60, appEtag = null;
+  var APP_VER = 61, appEtag = null;
   function checkUpdate_() {
     fetch('index.html', { method: 'HEAD', cache: 'no-store' }).then(function (r) {
       var et = r.headers.get('ETag') || r.headers.get('Last-Modified') || '';
